@@ -10,5 +10,15 @@
   "localAppUrl": "http://localhost:3000",
   "logoPath": "Default",
   "connectionReferences": {},
-  "databaseReferences": {}
+  "databaseReferences": {
+    "default.cds": {
+      "dataSources": {
+        "jde_co_assignments": {
+          "entitySetName": "cr113_jde_co_assignments",
+          "logicalName": "cr113_jde_co_assignment"
+        }
+      },
+      "environmentVariableName": ""
+    }
+  }
 }
