@@ -16,6 +16,54 @@
         "jde_co_assignments": {
           "entitySetName": "cr113_jde_co_assignments",
           "logicalName": "cr113_jde_co_assignment"
+        },
+        "jde_co_segments": {
+          "entitySetName": "cr113_jde_co_segments",
+          "logicalName": "cr113_jde_co_segment"
+        },
+        "jde_companies": {
+          "entitySetName": "cr113_jde_companies",
+          "logicalName": "cr113_jde_company"
+        },
+        "jde_divs": {
+          "entitySetName": "cr113_jde_divs",
+          "logicalName": "cr113_jde_div"
+        },
+        "jde_groups": {
+          "entitySetName": "cr113_jde_groups",
+          "logicalName": "cr113_jde_group"
+        },
+        "jde_ledger_types": {
+          "entitySetName": "cr113_jde_ledger_types",
+          "logicalName": "cr113_jde_ledger_type"
+        },
+        "jde_loc_assignments": {
+          "entitySetName": "cr113_jde_loc_assignments",
+          "logicalName": "cr113_jde_loc_assignment"
+        },
+        "jde_locations": {
+          "entitySetName": "cr113_jde_locations",
+          "logicalName": "cr113_jde_location"
+        },
+        "jde_location_segments": {
+          "entitySetName": "cr113_jde_location_segments",
+          "logicalName": "cr113_jde_location_segment"
+        },
+        "jde_managers": {
+          "entitySetName": "cr113_jde_managers",
+          "logicalName": "cr113_jde_manager"
+        },
+        "jde_otcs": {
+          "entitySetName": "cr113_jde_otcs",
+          "logicalName": "cr113_jde_otc"
+        },
+        "jde_roles": {
+          "entitySetName": "cr113_jde_roleses",
+          "logicalName": "cr113_jde_roles"
+        },
+        "jde_types": {
+          "entitySetName": "cr113_jde_types",
+          "logicalName": "cr113_jde_type"
         }
       },
       "environmentVariableName": ""
