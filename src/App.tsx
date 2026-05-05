@@ -1,34 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import { HomePage } from './pages/HomePage'
+import { RolesPage } from './pages/RolesPage'
+import { CoSegmentsPage } from './pages/CoSegmentsPage'
+import { LocationSegmentsPage } from './pages/LocationSegmentsPage'
+import { DivsPage } from './pages/DivsPage'
+import { GroupsPage } from './pages/GroupsPage'
+import { LedgerTypesPage } from './pages/LedgerTypesPage'
+import { TypesPage } from './pages/TypesPage'
+import { OtcsPage } from './pages/OtcsPage'
+
+const NAV = [
+  { id: 'home',          label: '🏠 Home',           component: <HomePage /> },
+  { id: 'roles',         label: 'Roles',             component: <RolesPage /> },
+  { id: 'divisions',     label: 'Divisions',         component: <DivsPage /> },
+  { id: 'groups',        label: 'Groups',            component: <GroupsPage /> },
+  { id: 'co-segments',   label: 'Co. Segments',      component: <CoSegmentsPage /> },
+  { id: 'loc-segments',  label: 'Loc. Segments',     component: <LocationSegmentsPage /> },
+  { id: 'ledger-types',  label: 'Ledger Types',      component: <LedgerTypesPage /> },
+  { id: 'company-types', label: 'Company Types',     component: <TypesPage /> },
+  { id: 'otcs',          label: 'OTCs',              component: <OtcsPage /> },
+] as const
+
+type NavId = typeof NAV[number]['id']
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activePage, setActivePage] = useState<NavId>('home')
+  const [dark, setDark] = useState<boolean>(() => {
+    return localStorage.getItem('theme') === 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    localStorage.setItem('theme', dark ? 'dark' : 'light')
+  }, [dark])
+
+  const active = NAV.find(n => n.id === activePage) ?? NAV[0]
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app-root">
+      <aside className="app-sidebar">
+        <div className="app-brand">
+          <span className="app-brand-icon">🏗</span>
+          <div>
+            <div className="app-brand-title">JDE Hierarchy</div>
+            <div className="app-brand-sub">Manager</div>
+          </div>
+        </div>
+
+        <nav className="side-nav" role="navigation">
+          {NAV.map(item => (
+            <button
+              key={item.id}
+              className={`side-nav-btn${activePage === item.id ? ' active' : ''}`}
+              onClick={() => setActivePage(item.id as NavId)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <button
+            className="theme-toggle"
+            onClick={() => setDark(d => !d)}
+            title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            <span className="theme-toggle-icon">{dark ? '☀️' : '🌙'}</span>
+            <span>{dark ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
+        </div>
+      </aside>
+
+      <div className="app-body">
+        <main className="app-content" key={activePage}>
+          {active.component}
+        </main>
       </div>
-      <h1>Hello World!</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
