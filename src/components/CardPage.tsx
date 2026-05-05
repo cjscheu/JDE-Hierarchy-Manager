@@ -6,6 +6,10 @@ export interface FieldDef {
   key: string
   /** human-readable label */
   label: string
+  /** input control type in add/edit form */
+  inputType?: 'text' | 'select'
+  /** options for select inputs */
+  options?: Array<{ label: string; value: string }>
   /** shown on the card face (first field is the card title) */
   showOnCard?: boolean
   /** included in the add/edit form */
@@ -23,6 +27,10 @@ export interface CardPageConfig {
   /** attribute that uniquely identifies a record (GUID) */
   idField: string
   fields: FieldDef[]
+  /** default sort column key */
+  defaultSortKey?: string
+  /** default sort direction (default: 'asc') */
+  defaultSortDir?: 'asc' | 'desc'
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   service: {
     getAll: () => Promise<{ data?: any[]; success?: boolean }>
@@ -39,7 +47,10 @@ type Row = Record<string, any>
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function CardPage({ config }: { config: CardPageConfig }) {
-  const { title, description, idField, fields, service } = config
+  const { title, description, idField, fields, service, defaultSortKey, defaultSortDir: defaultSortDirProp } = config
+  const singularTitle = title.endsWith('ies')
+    ? `${title.slice(0, -3)}y`
+    : title.replace(/s$/, '')
 
   const [rows, setRows] = useState<Row[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,10 +71,11 @@ export function CardPage({ config }: { config: CardPageConfig }) {
   const [search, setSearch] = useState('')
 
   const firstInputRef = useRef<HTMLInputElement>(null)
+  const firstSelectRef = useRef<HTMLSelectElement>(null)
 
   // sort
-  const [sortKey, setSortKey] = useState<string | null>(null)
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [sortKey, setSortKey] = useState<string | null>(defaultSortKey ?? null)
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>(defaultSortDirProp ?? 'asc')
 
   const handleSort = (key: string) => {
     if (sortKey === key) {
@@ -120,7 +132,10 @@ export function CardPage({ config }: { config: CardPageConfig }) {
     setFormValues({})
     setFormError(null)
     setModalOpen(true)
-    setTimeout(() => firstInputRef.current?.focus(), 50)
+    setTimeout(() => {
+      firstInputRef.current?.focus()
+      firstSelectRef.current?.focus()
+    }, 50)
   }
 
   // ── open edit modal ──
@@ -131,7 +146,10 @@ export function CardPage({ config }: { config: CardPageConfig }) {
     setFormValues(vals)
     setFormError(null)
     setModalOpen(true)
-    setTimeout(() => firstInputRef.current?.focus(), 50)
+    setTimeout(() => {
+      firstInputRef.current?.focus()
+      firstSelectRef.current?.focus()
+    }, 50)
   }
 
   // ── close modal ──
@@ -206,7 +224,7 @@ export function CardPage({ config }: { config: CardPageConfig }) {
             onChange={e => setSearch(e.target.value)}
           />
           <button className="cp-btn cp-btn-primary" onClick={openAdd}>
-            + Add {title.replace(/s$/, '')}
+            + Add {singularTitle}
           </button>
         </div>
       </div>
@@ -282,7 +300,7 @@ export function CardPage({ config }: { config: CardPageConfig }) {
         <div className="cp-overlay" onMouseDown={closeModal}>
           <div className="cp-modal" onMouseDown={e => e.stopPropagation()}>
             <div className="cp-modal-header">
-              <h3>{editTarget ? `Edit ${title.replace(/s$/, '')}` : `Add ${title.replace(/s$/, '')}`}</h3>
+              <h3>{editTarget ? `Edit ${singularTitle}` : `Add ${singularTitle}`}</h3>
               <button className="cp-modal-close" onClick={closeModal}>×</button>
             </div>
             <div className="cp-modal-body">
@@ -291,15 +309,30 @@ export function CardPage({ config }: { config: CardPageConfig }) {
                   <span className="cp-field-label">
                     {f.label}{f.required && <span className="cp-required">*</span>}
                   </span>
-                  <input
-                    ref={i === 0 ? firstInputRef : undefined}
-                    type="text"
-                    className="cp-input"
-                    placeholder={f.placeholder ?? ''}
-                    value={formValues[f.key] ?? ''}
-                    onChange={e => setFormValues(v => ({ ...v, [f.key]: e.target.value }))}
-                    onKeyDown={e => { if (e.key === 'Enter') void handleSave() }}
-                  />
+                  {f.inputType === 'select' ? (
+                    <select
+                      ref={i === 0 ? firstSelectRef : undefined}
+                      className="cp-input"
+                      value={formValues[f.key] ?? ''}
+                      onChange={e => setFormValues(v => ({ ...v, [f.key]: e.target.value }))}
+                      onKeyDown={e => { if (e.key === 'Enter') void handleSave() }}
+                    >
+                      <option value="">{f.placeholder ?? `Select ${f.label}`}</option>
+                      {(f.options ?? []).map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      ref={i === 0 ? firstInputRef : undefined}
+                      type="text"
+                      className="cp-input"
+                      placeholder={f.placeholder ?? ''}
+                      value={formValues[f.key] ?? ''}
+                      onChange={e => setFormValues(v => ({ ...v, [f.key]: e.target.value }))}
+                      onKeyDown={e => { if (e.key === 'Enter') void handleSave() }}
+                    />
+                  )}
                 </label>
               ))}
               {formError && <div className="cp-form-error">{formError}</div>}

@@ -14,4 +14,8 @@
 -can you add a build version below the toggle theme button.  It should say v1.0.0 - Build X then below the date/time of refresh.  Everytime the app is updated and deployed, I would like the version to be updated
 -add sort ability on columns for every page card.  Do not add sort ability for any column called Actions
 -add a ToDo.md file to the app
+-on the left hand pane and within the JDE Updates dropdown, add a page called JDE Companies.  This page card should be table formatted.  Each row should be editable and deletable.  Users should need the ability to add new companies.  Columns in the card should be Company Code, Company Name, Company Segment, Company Type and Company Ledger.  The table should be sorted on Company Code Ascending order.
+-Company Segment should use cr113_segment_name, Company Type should use cr113_segment_type, Company Ledger should use cr113_ledger_type
+-change button + Add JDE Companies to + Add JDE Company
+-when adding a new jde company, include fields for company segment, company type, and company ledger
 

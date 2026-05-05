@@ -11,6 +11,7 @@ import { GroupsPage } from './pages/GroupsPage'
 import { LedgerTypesPage } from './pages/LedgerTypesPage'
 import { TypesPage } from './pages/TypesPage'
 import { OtcsPage } from './pages/OtcsPage'
+import { CompaniesPage } from './pages/CompaniesPage'
 
 const HOME_NAV = [
   { id: 'home', label: '🏠 Home', component: <HomePage /> },
@@ -27,7 +28,11 @@ const REF_NAV = [
   { id: 'otcs',          label: 'OTCs',              component: <OtcsPage /> },
 ] as const
 
-const NAV = [...HOME_NAV, ...REF_NAV] as const
+const UPDATES_NAV = [
+  { id: 'companies', label: 'JDE Companies', component: <CompaniesPage /> },
+] as const
+
+const NAV = [...HOME_NAV, ...REF_NAV, ...UPDATES_NAV] as const
 
 type NavId = typeof NAV[number]['id']
 
@@ -97,7 +102,15 @@ function App() {
 
           {updatesOpen && (
             <div className="side-nav-group">
-              <div className="side-nav-empty">No updates posted yet.</div>
+              {UPDATES_NAV.map(item => (
+                <button
+                  key={item.id}
+                  className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
+                  onClick={() => setActivePage(item.id as NavId)}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
           )}
         </nav>
