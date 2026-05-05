@@ -61,6 +61,19 @@ export function CardPage({ config }: { config: CardPageConfig }) {
 
   const firstInputRef = useRef<HTMLInputElement>(null)
 
+  // sort
+  const [sortKey, setSortKey] = useState<string | null>(null)
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortKey(key)
+      setSortDir('asc')
+    }
+  }
+
   const load = async () => {
     setLoading(true)
     setError(null)
@@ -77,8 +90,14 @@ export function CardPage({ config }: { config: CardPageConfig }) {
   useEffect(() => { void load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // filter rows by search across all visible fields
-  const tableFields = fields.filter(f => f.showOnCard)
-  const editableFields = fields.filter(f => f.editable)
+  const filteredFields = fields.filter(f => {
+    const key = f.key.toLowerCase()
+    const label = f.label.toLowerCase()
+    return !(key.endsWith('_ak') || label === 'alternate key')
+  })
+
+  const tableFields = filteredFields.filter(f => f.showOnCard)
+  const editableFields = filteredFields.filter(f => f.editable)
 
   const filtered = search.trim()
     ? rows.filter(r =>
@@ -87,7 +106,14 @@ export function CardPage({ config }: { config: CardPageConfig }) {
         )
       )
     : rows
-
+  const sortedFiltered = sortKey
+    ? [...filtered].sort((a, b) => {
+        const av = String(a[sortKey] ?? '').toLowerCase()
+        const bv = String(b[sortKey] ?? '').toLowerCase()
+        const cmp = av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' })
+        return sortDir === 'asc' ? cmp : -cmp
+      })
+    : filtered
   // ── open add modal ──
   const openAdd = () => {
     setEditTarget(null)
@@ -189,49 +215,66 @@ export function CardPage({ config }: { config: CardPageConfig }) {
 
       {/* Table */}
       <div className="cp-table-wrap">
-        <table className="cp-table">
-          <thead>
-            <tr>
-              {tableFields.map(f => <th key={f.key}>{f.label}</th>)}
-              <th className="cp-col-actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && rows.length === 0 && (
-              <tr><td colSpan={tableFields.length + 1} className="cp-td-empty">Loading…</td></tr>
-            )}
-            {!loading && filtered.length === 0 && (
+        <div className="cp-table-scroll">
+          <table className="cp-table">
+            <thead>
               <tr>
-                <td colSpan={tableFields.length + 1} className="cp-td-empty">
-                  {search ? 'No records match your search.' : `No ${title.toLowerCase()} found. Add one above.`}
-                </td>
-              </tr>
-            )}
-            {filtered.map(row => (
-              <tr key={String(row[idField])}>
                 {tableFields.map(f => (
-                  <td key={f.key}>{row[f.key] ?? '—'}</td>
+                  <th
+                    key={f.key}
+                    className="cp-th-sortable"
+                    onClick={() => handleSort(f.key)}
+                    aria-sort={sortKey === f.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                  >
+                    <span className="cp-th-inner">
+                      {f.label}
+                      <span className="cp-sort-indicator">
+                        {sortKey === f.key ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}
+                      </span>
+                    </span>
+                  </th>
                 ))}
-                <td className="cp-col-actions">
-                  <button
-                    className="cp-btn cp-btn-ghost"
-                    onClick={() => openEdit(row)}
-                    title="Edit"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    className="cp-btn cp-btn-danger-ghost"
-                    onClick={() => setDeleteTarget(row)}
-                    title="Delete"
-                  >
-                    🗑 Delete
-                  </button>
-                </td>
+                <th className="cp-col-actions">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {loading && rows.length === 0 && (
+                <tr><td colSpan={tableFields.length + 1} className="cp-td-empty">Loading…</td></tr>
+              )}
+              {!loading && filtered.length === 0 && (
+                <tr>
+                  <td colSpan={tableFields.length + 1} className="cp-td-empty">
+                    {search ? 'No records match your search.' : `No ${title.toLowerCase()} found. Add one above.`}
+                  </td>
+                </tr>
+              )}
+              {sortedFiltered.map(row => (
+                <tr key={String(row[idField])}>
+                  {tableFields.map(f => (
+                    <td key={f.key}>{row[f.key] ?? '—'}</td>
+                  ))}
+                  <td className="cp-col-actions">
+                    <button
+                      className="cp-btn cp-btn-ghost"
+                      onClick={() => openEdit(row)}
+                      title="Edit"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      className="cp-btn cp-btn-danger-ghost"
+                      onClick={() => setDeleteTarget(row)}
+                      title="Delete"
+                    >
+                      🗑 Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="cp-table-footer" aria-hidden="true" />
       </div>
 
       {/* Add / Edit modal */}

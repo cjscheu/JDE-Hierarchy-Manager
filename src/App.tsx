@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './App.css'
+import { useTheme } from './components/theme/use-theme'
+import { BUILD_META } from './build-meta'
 import { HomePage } from './pages/HomePage'
 import { RolesPage } from './pages/RolesPage'
 import { CoSegmentsPage } from './pages/CoSegmentsPage'
@@ -10,8 +12,11 @@ import { LedgerTypesPage } from './pages/LedgerTypesPage'
 import { TypesPage } from './pages/TypesPage'
 import { OtcsPage } from './pages/OtcsPage'
 
-const NAV = [
-  { id: 'home',          label: '🏠 Home',           component: <HomePage /> },
+const HOME_NAV = [
+  { id: 'home', label: '🏠 Home', component: <HomePage /> },
+] as const
+
+const REF_NAV = [
   { id: 'roles',         label: 'Roles',             component: <RolesPage /> },
   { id: 'divisions',     label: 'Divisions',         component: <DivsPage /> },
   { id: 'groups',        label: 'Groups',            component: <GroupsPage /> },
@@ -22,18 +27,17 @@ const NAV = [
   { id: 'otcs',          label: 'OTCs',              component: <OtcsPage /> },
 ] as const
 
+const NAV = [...HOME_NAV, ...REF_NAV] as const
+
 type NavId = typeof NAV[number]['id']
 
 function App() {
   const [activePage, setActivePage] = useState<NavId>('home')
-  const [dark, setDark] = useState<boolean>(() => {
-    return localStorage.getItem('theme') === 'dark'
-  })
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
-    localStorage.setItem('theme', dark ? 'dark' : 'light')
-  }, [dark])
+  const [refsOpen, setRefsOpen] = useState(false)
+  const [updatesOpen, setUpdatesOpen] = useState(false)
+  const [refreshTime] = useState(() => new Date())
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === 'dark'
 
   const active = NAV.find(n => n.id === activePage) ?? NAV[0]
 
@@ -49,7 +53,7 @@ function App() {
         </div>
 
         <nav className="side-nav" role="navigation">
-          {NAV.map(item => (
+          {HOME_NAV.map(item => (
             <button
               key={item.id}
               className={`side-nav-btn${activePage === item.id ? ' active' : ''}`}
@@ -58,17 +62,60 @@ function App() {
               {item.label}
             </button>
           ))}
+
+          <button
+            className="side-nav-group-btn"
+            onClick={() => setRefsOpen(o => !o)}
+            aria-expanded={refsOpen}
+          >
+            <span>📋 JDE References</span>
+            <span className={`side-nav-chevron${refsOpen ? ' open' : ''}`}>▸</span>
+          </button>
+
+          {refsOpen && (
+            <div className="side-nav-group">
+              {REF_NAV.map(item => (
+                <button
+                  key={item.id}
+                  className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
+                  onClick={() => setActivePage(item.id as NavId)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <button
+            className="side-nav-group-btn"
+            onClick={() => setUpdatesOpen(o => !o)}
+            aria-expanded={updatesOpen}
+          >
+            <span>🔔 JDE Updates</span>
+            <span className={`side-nav-chevron${updatesOpen ? ' open' : ''}`}>▸</span>
+          </button>
+
+          {updatesOpen && (
+            <div className="side-nav-group">
+              <div className="side-nav-empty">No updates posted yet.</div>
+            </div>
+          )}
         </nav>
 
         <div className="sidebar-footer">
           <button
             className="theme-toggle"
-            onClick={() => setDark(d => !d)}
-            title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            <span className="theme-toggle-icon">{dark ? '☀️' : '🌙'}</span>
-            <span>{dark ? 'Light Mode' : 'Dark Mode'}</span>
+            <span className="theme-toggle-icon">{isDark ? '☀️' : '🌙'}</span>
+            <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
           </button>
+
+          <div className="build-meta" aria-label="Build information">
+            <div>v{BUILD_META.version} - Build {BUILD_META.build}</div>
+            <div>{refreshTime.toLocaleString()}</div>
+          </div>
         </div>
       </aside>
 

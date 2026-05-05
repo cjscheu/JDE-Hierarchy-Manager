@@ -21,7 +21,7 @@ export function DivsPage() {
           {
             key: 'cr113_div_id',
             label: 'Division ID',
-            showOnCard: true,
+            showOnCard: false,
             editable: true,
             placeholder: 'e.g. NA01',
           },
