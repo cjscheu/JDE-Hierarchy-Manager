@@ -535,7 +535,6 @@ export function CompaniesPage() {
       <section className="companies-details">
         <div className="companies-details-shell">
           <div className="companies-details-header">
-            <h2 className="companies-details-title">Company Details</h2>
             <p className="companies-details-subtitle">
               {selectedCompanyId
                 ? `Related records for ${selectedCompanyName || 'selected company'}.`

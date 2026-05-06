@@ -19,4 +19,6 @@
 -change button + Add JDE Companies to + Add JDE Company
 -when adding a new jde company, include fields for company segment, company type, and company ledger
 -on the JDE Companies page, add a details card with table rows to the right of the main card and move the main card to the right so both cards fit horizontally on the screen.  The details card should have two tabs: one for JDE Locations and the other for JDE Co Assignments.  When a row in the main card is selected, the details card populates the lookup (Related) values in those two tables on each tab.  Also add the ability to create, edit and delete records on both tabs in the details card
-
+-move the company details card from the right of the main card to below the main card.  center both cards horizontally on the screen
+-remove the company details title to save from vertical space
+-reduce the vertical size of the jde companies details card so it fits on the screen vertically

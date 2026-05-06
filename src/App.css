@@ -452,14 +452,15 @@
 
 /* ─── Companies master/details layout ──────────────────────────────────────── */
 .companies-layout {
-  display: grid;
-  grid-template-columns: minmax(540px, 1.1fr) minmax(540px, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 18px;
-  align-items: start;
+  align-items: center;
 }
 
 .companies-main,
 .companies-details {
+  width: min(100%, 1180px);
   min-width: 0;
 }
 
@@ -479,15 +480,19 @@
   max-height: calc(44px * 8);
 }
 
+.companies-details .cp-table-scroll {
+  max-height: min(250px, calc(100vh - 470px));
+}
+
 .companies-details-shell {
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--bg-surface);
   box-shadow: var(--shadow-sm);
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .companies-details-title {
@@ -498,7 +503,7 @@
 }
 
 .companies-details-subtitle {
-  margin: 6px 0 0;
+  margin: 0;
   font-size: 13px;
   color: var(--text-muted);
 }
@@ -507,7 +512,7 @@
   display: flex;
   gap: 8px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 10px;
+  padding-bottom: 8px;
 }
 
 .companies-tab-btn {
@@ -542,8 +547,9 @@
   font-size: 14px;
 }
 
-@media (max-width: 1420px) {
-  .companies-layout {
-    grid-template-columns: 1fr;
+@media (max-width: 1220px) {
+  .companies-main,
+  .companies-details {
+    width: 100%;
   }
 }
