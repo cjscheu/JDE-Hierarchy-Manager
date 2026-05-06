@@ -490,20 +490,20 @@ export function ManagersHubPage() {
                 Select a manager in the main table to view and manage company and location assignments.
               </div>
             ) : activeDetailsTab === 'company' ? (
-              <CardPage
-                ref={companyAssignmentsCardRef}
-                key={`manager-company-assignments-${selectedManagerId}`}
-                config={{
-                  title: 'JDE Company Assignments',
-                  description: 'Create, edit, and delete company assignments related to the selected manager.',
-                  hideHeaderCopy: true,
-                  hideHeaderActions: true,
-                  hideRowDeleteAction: true,
-                  idField: 'cr113_jde_co_assignmentid',
-                  service: companyAssignmentsService,
-                  defaultSortKey: 'cr113_companycodename',
-                  defaultSortDir: 'asc',
-                  fields: [
+                  <CardPage
+                    ref={companyAssignmentsCardRef}
+                    key={`manager-company-assignments-${selectedManagerId}`}
+                    config={{
+                      title: 'JDE Company Assignments',
+                      description: 'Create, edit, and delete company assignments related to the selected manager.',
+                      hideHeaderCopy: true,
+                      hideHeaderActions: true,
+                      hideRowDeleteAction: true,
+                      idField: 'cr113_jde_co_assignmentid',
+                      service: companyAssignmentsService,
+                      defaultSortKey: 'cr113_companycodecode',
+                      defaultSortDir: 'asc',
+                      fields: [
                     {
                       key: 'cr113_assign_id',
                       label: 'Assignment ID',
@@ -563,7 +563,7 @@ export function ManagersHubPage() {
                   hideRowDeleteAction: true,
                   idField: 'cr113_jde_loc_assignmentid',
                   service: locationAssignmentsService,
-                  defaultSortKey: 'cr113_locationcodename',
+                  defaultSortKey: 'cr113_locationcodecode',
                   defaultSortDir: 'asc',
                   fields: [
                     {

@@ -542,7 +542,7 @@ export function LocationsPage() {
                   hideRowDeleteAction: true,
                   idField: 'cr113_jde_loc_assignmentid',
                   service: locationAssignmentsService,
-                  defaultSortKey: 'cr113_assign_id',
+                  defaultSortKey: 'cr113_rolenamename',
                   defaultSortDir: 'asc',
                   fields: [
                     {
@@ -551,22 +551,7 @@ export function LocationsPage() {
                       showOnCard: false,
                       editable: false,
                     },
-                    {
-                      key: 'cr113_empl_idname',
-                      label: 'Manager',
-                      showOnCard: true,
-                      editable: false,
-                    },
-                    {
-                      key: 'cr113_empl_id',
-                      label: 'Manager',
-                      inputType: 'select',
-                      editable: true,
-                      required: true,
-                      options: managerOptions,
-                      showOnCard: false,
-                      placeholder: 'Select manager',
-                    },
+                    // Show Role first
                     {
                       key: 'cr113_rolenamename',
                       label: 'Role',
@@ -582,6 +567,23 @@ export function LocationsPage() {
                       options: roleOptions,
                       showOnCard: false,
                       placeholder: 'Select role',
+                    },
+                    // Then Manager Name
+                    {
+                      key: 'cr113_empl_idname',
+                      label: 'Manager',
+                      showOnCard: true,
+                      editable: false,
+                    },
+                    {
+                      key: 'cr113_empl_id',
+                      label: 'Manager',
+                      inputType: 'select',
+                      editable: true,
+                      required: true,
+                      options: managerOptions,
+                      showOnCard: false,
+                      placeholder: 'Select manager',
                     },
                     {
                       key: 'cr113_assign_ak',

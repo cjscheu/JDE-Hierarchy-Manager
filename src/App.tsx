@@ -9,15 +9,17 @@ import { ManagersHubPage } from './pages/ManagersHubPage'
 import { DataManagementPage } from './pages/DataManagementPage'
 import { PageModeProvider } from './components/page-mode'
 
+
 const PRIMARY_NAV = [
-  { id: 'home', label: 'Home', component: <HomePage /> },
-  { id: 'companies', label: 'JDE Companies', component: <CompaniesPage /> },
-  { id: 'locations', label: 'JDE Locations', component: <LocationsPage /> },
-  { id: 'managers', label: 'JDE Managers', component: <ManagersHubPage /> },
+  { id: 'home', label: 'Home', icon: '🏠', component: <HomePage /> },
+  { id: 'companies', label: 'JDE Companies', icon: '🏢', component: <CompaniesPage /> },
+  { id: 'locations', label: 'JDE Locations', icon: '📍', component: <LocationsPage /> },
+  { id: 'managers', label: 'JDE Managers', icon: '🧑‍💼', component: <ManagersHubPage /> },
 ] as const
 
+
 const ADMIN_NAV = [
-  { id: 'data-management', label: 'Data Management', component: <DataManagementPage /> },
+  { id: 'data-management', label: 'Data Management', icon: '🗄️', component: <DataManagementPage /> },
 ] as const
 
 const NAV = [...PRIMARY_NAV, ...ADMIN_NAV] as const
@@ -36,11 +38,10 @@ function App() {
   return (
     <div className="app-root">
       <aside className={`app-sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
+
         <div className="app-brand">
-          <span className="app-brand-mark" aria-hidden="true">
-            <span className="app-brand-mark-inner" />
-          </span>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span aria-hidden="true" style={{ fontSize: '1.25em', marginRight: 2 }}>🏛️</span>
             <div className="app-brand-sub">Manage JDE Company/Location Ownership</div>
           </div>
         </div>
@@ -52,6 +53,7 @@ function App() {
               className={`side-nav-btn${activePage === item.id ? ' active' : ''}`}
               onClick={() => setActivePage(item.id as NavId)}
             >
+              <span style={{ marginRight: 10 }} aria-hidden="true">{item.icon}</span>
               {item.label}
             </button>
           ))}
@@ -66,6 +68,7 @@ function App() {
                 className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
                 onClick={() => setActivePage(item.id as NavId)}
               >
+                <span style={{ marginRight: 10 }} aria-hidden="true">{item.icon}</span>
                 {item.label}
               </button>
             ))}

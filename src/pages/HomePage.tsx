@@ -10,22 +10,22 @@ export function HomePage() {
         <div className="home-info-card">
           <div className="home-info-icon" aria-hidden="true">01</div>
           <div className="home-info-text">
-            <strong>Reference Data</strong>
-            <span>Manage Roles, Divisions, Groups, Segments, Ledger Types, Company Types, and OTCs from the navigation pane.</span>
+            <strong>Division Listing</strong>
+            <span>COMING SOON! Review up-to-date company and location ownership information.</span>
           </div>
         </div>
         <div className="home-info-card">
           <div className="home-info-icon" aria-hidden="true">02</div>
           <div className="home-info-text">
-            <strong>Full CRUD</strong>
-            <span>Add, edit, and delete records on every page using the built-in table and modal forms.</span>
+            <strong>Hierarchy Management</strong>
+            <span>TBD...</span>
           </div>
         </div>
         <div className="home-info-card">
           <div className="home-info-icon" aria-hidden="true">03</div>
           <div className="home-info-text">
-            <strong>Instant Search</strong>
-            <span>Filter any table in real-time using the search box at the top of each page.</span>
+            <strong>AI Copilot</strong>
+            <span>COMING SOON! Ask questions, get instant answers and guided assistance from a Copilot studio agent — directly in this app.</span>
           </div>
         </div>
       </div>

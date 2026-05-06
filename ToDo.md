@@ -47,3 +47,10 @@
 -in the location dropdown in the add JDE Location Assignment card, the location field should be sort as numeric not alpha
 -remove employee id field from the Add JDE Manager card
 -on the Add JDE Manager card, the Manager Name is auto-generated.  remove this field and replace it with the First and Last Name as separate fields
+
+-add icons to the left of the page links on the left hand pane
+-add a hierarchy icon next to the menu pane title called Manager JDE Company/Location Ownership
+-on the JDE Co Assignement tab on the JDE Companies page, columns should be left to right as Role, Manager Name, Actions
+-on the JDE Location Assignement tab on the JDE Locations page, columns should be left to right as Role, Manager Name, Actions
+-sort table by role column ascending order in the JDE Co Assignments tab, sort table by role column ascending order in the JDE Locations Assignments details card, sort table by Location Code column ascending order in the JDE Location Assigment tab on the JDE Managers page, sort table by Company Code column ascending order in the JDE Company Assigment tab on the JDE Managers page
+-increase the font size of the table columns and rows for all page cards.  Do not overlap columns or increase the size of the cards to accomodate the larger font.  Table column and row font are too small right now.  please increase the size of the font so that it easily read but not overly large

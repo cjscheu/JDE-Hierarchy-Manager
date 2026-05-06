@@ -770,7 +770,7 @@ export function CompaniesPage() {
                 hideRowDeleteAction: true,
                 idField: 'cr113_jde_co_assignmentid',
                 service: assignmentsService,
-                defaultSortKey: 'cr113_assign_id',
+                defaultSortKey: 'cr113_rolenamename',
                 defaultSortDir: 'asc',
                 fields: [
                   {
@@ -779,21 +779,7 @@ export function CompaniesPage() {
                     showOnCard: false,
                     editable: false,
                   },
-                  {
-                    key: 'cr113_managernamename',
-                    label: 'Manager',
-                    showOnCard: true,
-                    editable: false,
-                  },
-                  {
-                    key: 'cr113_managername',
-                    label: 'Manager',
-                    inputType: 'select',
-                    editable: true,
-                    options: managerOptions,
-                    showOnCard: false,
-                    placeholder: 'Select manager',
-                  },
+                  // Show Role first
                   {
                     key: 'cr113_rolenamename',
                     label: 'Role',
@@ -808,6 +794,22 @@ export function CompaniesPage() {
                     options: roleOptions,
                     showOnCard: false,
                     placeholder: 'Select role',
+                  },
+                  // Then Manager Name
+                  {
+                    key: 'cr113_managernamename',
+                    label: 'Manager',
+                    showOnCard: true,
+                    editable: false,
+                  },
+                  {
+                    key: 'cr113_managername',
+                    label: 'Manager',
+                    inputType: 'select',
+                    editable: true,
+                    options: managerOptions,
+                    showOnCard: false,
+                    placeholder: 'Select manager',
                   },
                 ],
               }}
