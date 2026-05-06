@@ -54,3 +54,9 @@
 -on the JDE Location Assignement tab on the JDE Locations page, columns should be left to right as Role, Manager Name, Actions
 -sort table by role column ascending order in the JDE Co Assignments tab, sort table by role column ascending order in the JDE Locations Assignments details card, sort table by Location Code column ascending order in the JDE Location Assigment tab on the JDE Managers page, sort table by Company Code column ascending order in the JDE Company Assigment tab on the JDE Managers page
 -increase the font size of the table columns and rows for all page cards.  Do not overlap columns or increase the size of the cards to accomodate the larger font.  Table column and row font are too small right now.  please increase the size of the font so that it easily read but not overly large
+
+-update toggle theme to be same as CIP App
+-capture DFA network user (Full Name) and place right above theme toggle.  add divider above network user, then add icon to left of DFA network user
+-on the JDE Companies page, move the search field and command button on teh JDE Companies card from the right to the left side
+-on the JDE Locations page, move the search field and command button on teh JDE Location card from the right to the left side
+-on the JDE Managers page, move the search field and command button on teh JDE Manager card from the right to the left side

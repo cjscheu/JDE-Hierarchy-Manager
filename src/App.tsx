@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getContext } from '@microsoft/power-apps/app'
+import { UserRound } from 'lucide-react'
 import './App.css'
-import { useTheme } from './components/theme/use-theme'
+import { ModeToggle } from './components/theme/ModeToggle'
 import { BUILD_META } from './build-meta'
 import { HomePage } from './pages/HomePage'
 import { CompaniesPage } from './pages/CompaniesPage'
@@ -30,10 +32,37 @@ function App() {
   const [activePage, setActivePage] = useState<NavId>('home')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [refreshTime] = useState(() => new Date())
-  const { theme, setTheme } = useTheme()
-  const isDark = theme === 'dark'
+  const [networkUserName, setNetworkUserName] = useState('DFA network user')
 
   const active = NAV.find(n => n.id === activePage) ?? NAV[0]
+
+  useEffect(() => {
+    let isActive = true
+
+    const loadCurrentUser = async () => {
+      try {
+        const context = await getContext()
+        const fullName = context.user.fullName?.trim()
+        const userPrincipalName = context.user.userPrincipalName?.trim()
+
+        if (!isActive) {
+          return
+        }
+
+        setNetworkUserName(fullName || userPrincipalName || 'DFA network user')
+      } catch {
+        if (isActive) {
+          setNetworkUserName('DFA network user')
+        }
+      }
+    }
+
+    loadCurrentUser()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   return (
     <div className="app-root">
@@ -42,7 +71,7 @@ function App() {
         <div className="app-brand">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span aria-hidden="true" style={{ fontSize: '1.25em', marginRight: 2 }}>🏛️</span>
-            <div className="app-brand-sub">Manage JDE Company/Location Ownership</div>
+            <div className="app-brand-sub">Manage JDE Hierarchy Ownership</div>
           </div>
         </div>
 
@@ -76,14 +105,14 @@ function App() {
         </nav>
 
         <div className="sidebar-footer">
-          <button
-            className="theme-toggle"
-            onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            <span className="theme-toggle-icon">{isDark ? '☀️' : '🌙'}</span>
-            <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
+          <div className="sidebar-footer-divider" role="presentation" />
+
+          <div className="network-user" aria-label="DFA network user">
+            <UserRound className="network-user-icon" size={18} aria-hidden="true" />
+            <span className="network-user-text">{networkUserName}</span>
+          </div>
+
+          <ModeToggle />
 
           <div className="build-meta" aria-label="Build information">
             <div>v{BUILD_META.version} - Build {BUILD_META.build}</div>

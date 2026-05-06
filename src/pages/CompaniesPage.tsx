@@ -446,7 +446,7 @@ export function CompaniesPage() {
         <section className="companies-main">
           <div className="companies-main-shell">
             <div className="companies-main-topbar">
-              <div className="companies-main-toolbar">
+              <div className="companies-main-toolbar companies-details-toolbar">
                 <input
                   className="cp-search"
                   type="search"
