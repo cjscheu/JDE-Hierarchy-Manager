@@ -9,8 +9,8 @@ import { CompaniesPage } from './pages/CompaniesPage'
 import { LocationsPage } from './pages/LocationsPage'
 import { ManagersHubPage } from './pages/ManagersHubPage'
 import { DataManagementPage } from './pages/DataManagementPage'
+import { UserManagementPage } from './pages/UserManagementPage'
 import { PageModeProvider } from './components/page-mode'
-
 
 const PRIMARY_NAV = [
   { id: 'home', label: 'Home', icon: '🏠', component: <HomePage /> },
@@ -22,6 +22,7 @@ const PRIMARY_NAV = [
 
 const ADMIN_NAV = [
   { id: 'data-management', label: 'Data Management', icon: '🗄️', component: <DataManagementPage /> },
+  { id: 'user-management', label: 'User Management', icon: '👤', component: <UserManagementPage /> },
 ] as const
 
 const NAV = [...PRIMARY_NAV, ...ADMIN_NAV] as const

@@ -60,3 +60,6 @@
 -on the JDE Companies page, move the search field and command button on teh JDE Companies card from the right to the left side
 -on the JDE Locations page, move the search field and command button on teh JDE Location card from the right to the left side
 -on the JDE Managers page, move the search field and command button on teh JDE Manager card from the right to the left side
+
+-add page below Data Management called User Management.  This page should have two card side by side.  Left card should be an admin table with Email, Display Name as columns.  Have the ability to add, edit and delete.  The right side card should be a power user table with Email, Display Name as columns.  Have the ability to add, edit and delete
+-Instead of separate cards for Admin and power users, make the user management page one card with a tab for Admin Users and a tab for Power Users
