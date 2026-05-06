@@ -40,6 +40,11 @@ export interface CardPageConfig {
     update: (id: string, changes: any) => Promise<{ data?: any; success?: boolean }>
     delete: (id: string) => Promise<void>
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRowSelect?: (row: any) => void
+  selectedRowId?: string | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRowsLoaded?: (rows: any[]) => void
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,7 +52,18 @@ type Row = Record<string, any>
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function CardPage({ config }: { config: CardPageConfig }) {
-  const { title, description, idField, fields, service, defaultSortKey, defaultSortDir: defaultSortDirProp } = config
+  const {
+    title,
+    description,
+    idField,
+    fields,
+    service,
+    defaultSortKey,
+    defaultSortDir: defaultSortDirProp,
+    onRowSelect,
+    selectedRowId,
+    onRowsLoaded,
+  } = config
   const singularTitle = title.endsWith('ies')
     ? `${title.slice(0, -3)}y`
     : title.replace(/s$/, '')
@@ -91,7 +107,9 @@ export function CardPage({ config }: { config: CardPageConfig }) {
     setError(null)
     try {
       const res = await service.getAll()
-      setRows(res?.data ?? [])
+      const nextRows = res?.data ?? []
+      setRows(nextRows)
+      onRowsLoaded?.(nextRows)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
@@ -266,29 +284,44 @@ export function CardPage({ config }: { config: CardPageConfig }) {
                   </td>
                 </tr>
               )}
-              {sortedFiltered.map(row => (
-                <tr key={String(row[idField])}>
+              {sortedFiltered.map(row => {
+                const rowId = String(row[idField])
+                const isSelected = selectedRowId != null && rowId === selectedRowId
+                return (
+                <tr
+                  key={rowId}
+                  className={onRowSelect ? `cp-row-selectable${isSelected ? ' cp-row-selected' : ''}` : undefined}
+                  onClick={onRowSelect ? () => onRowSelect(row) : undefined}
+                  aria-selected={isSelected}
+                >
                   {tableFields.map(f => (
                     <td key={f.key}>{row[f.key] ?? '—'}</td>
                   ))}
                   <td className="cp-col-actions">
                     <button
                       className="cp-btn cp-btn-ghost"
-                      onClick={() => openEdit(row)}
+                      onClick={e => {
+                        e.stopPropagation()
+                        openEdit(row)
+                      }}
                       title="Edit"
                     >
                       ✏️ Edit
                     </button>
                     <button
                       className="cp-btn cp-btn-danger-ghost"
-                      onClick={() => setDeleteTarget(row)}
+                      onClick={e => {
+                        e.stopPropagation()
+                        setDeleteTarget(row)
+                      }}
                       title="Delete"
                     >
                       🗑 Delete
                     </button>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>
