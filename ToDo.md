@@ -22,3 +22,28 @@
 -move the company details card from the right of the main card to below the main card.  center both cards horizontally on the screen
 -remove the company details title to save from vertical space
 -reduce the vertical size of the jde companies details card so it fits on the screen vertically
+5/6/2026
+-change the JDE References dropdown to be it own page with all of the pages underneath it shown as tabs on the new page
+-on the jde Co Assignments page card, remove the section with this text: JDE Co Assignments, Create, edit, and delete assignments related to the selected company and move the field and button above the divider. This should be the same update as you did for the JDE Locations card
+-change the JDE updates dropdown to be a divider with JDE Updates as text below the divider
+-add a divider below JDE Companies and call it Admin
+-add a page under admin called Data Management; The page should have a table card (similar to the JDE References page), with tabs for each page. Include JDE Manager, JDE Company Assignments and JDE Location Assignment as a tab as well
+-remove edit and delete buttons from the JDE References; remove delete buttons from the JDE Companies page cards
+-on the JDE Companies page, remove columns from the main card: Company Segment, Company Type, Company Ledger.  Remove columns from the JDE Location details card: City, State, Location Segment, Division, Group, OTC.  Instead of the details card below the main card, move it to the right and ensure both cards fit and are centered horizonally on the page
+-add a page under JDE Companies called JDE Locations.  The page should be similar to JDE Companies but the main card should be JDE Locations and the detail card should be JDE location assignments
+-move the pages JDE Companies and JDE Locations underneath JDE References and remove the section JDE Updates and the divider.  Then remove the JDE References page
+-remove the Assignment ID column from the JDE Companies details card
+-remove the JDE Location Assignment tab from the JDE Locations detail card, we don't need it since the card is only one table.  Also, apply the same logic to the JDE Location assignements as the JDE Company Assignments; users shoud not be able to add a new location assignment unless they are selecting a row in the JDE Locations table card; Also remove the Assignment ID field from the JDE Locations Assignement card.  this column is auto generated
+-Add a page underneatch JDE Locations called JDE Managers similar to the JDE Locations page.  The main card should be JDE Managers and the detail card should be a table with two tabs;  JDE Company Assignments and  JDE Locations Assignements.  Same logic should apply as the JDE Location pages.  Users should not be able to create a company or location assignement unless a row in the JDE manager page card is selected
+-remove the employee ID and chat handle columns from the JDE Manager cards
+-on the JDE Managers page cards; the tables only show 5 rows, increase this number to 15
+-on the JDE Companies and Locations page cards; the tables only show 5 rows, increase this number to 15
+-the page cards with tabs, the tabs look very similar to command buttons, can you change them to look more like tabs on the table?
+-the page cards with tabs, the tabs look very similar to command buttons, can you change them to look more like tabs on the table?
+-do the same thing you just did for the search field and command button on the JDE Managers details card in the JDE Companies details card
+-add location code column to the left of Location in the Add JDE Location Assignement page card
+-add Company code column to the left of Company in the Add JDE Company Assignement page card; The company field on the add JDE Company assignment page should only show the Company code.  the dropdown should be sorted in Ascending order
+-in the company dropdown in the add JDE Company Assignment card, the company field should be sort as numeric not alpha
+-in the location dropdown in the add JDE Location Assignment card, the location field should be sort as numeric not alpha
+-remove employee id field from the Add JDE Manager card
+-on the Add JDE Manager card, the Manager Name is auto-generated.  remove this field and replace it with the First and Last Name as separate fields

@@ -3,43 +3,30 @@ import './App.css'
 import { useTheme } from './components/theme/use-theme'
 import { BUILD_META } from './build-meta'
 import { HomePage } from './pages/HomePage'
-import { RolesPage } from './pages/RolesPage'
-import { CoSegmentsPage } from './pages/CoSegmentsPage'
-import { LocationSegmentsPage } from './pages/LocationSegmentsPage'
-import { DivsPage } from './pages/DivsPage'
-import { GroupsPage } from './pages/GroupsPage'
-import { LedgerTypesPage } from './pages/LedgerTypesPage'
-import { TypesPage } from './pages/TypesPage'
-import { OtcsPage } from './pages/OtcsPage'
 import { CompaniesPage } from './pages/CompaniesPage'
+import { LocationsPage } from './pages/LocationsPage'
+import { ManagersHubPage } from './pages/ManagersHubPage'
+import { DataManagementPage } from './pages/DataManagementPage'
+import { PageModeProvider } from './components/page-mode'
 
-const HOME_NAV = [
-  { id: 'home', label: '🏠 Home', component: <HomePage /> },
-] as const
-
-const REF_NAV = [
-  { id: 'roles',         label: 'Roles',             component: <RolesPage /> },
-  { id: 'divisions',     label: 'Divisions',         component: <DivsPage /> },
-  { id: 'groups',        label: 'Groups',            component: <GroupsPage /> },
-  { id: 'co-segments',   label: 'Co. Segments',      component: <CoSegmentsPage /> },
-  { id: 'loc-segments',  label: 'Loc. Segments',     component: <LocationSegmentsPage /> },
-  { id: 'ledger-types',  label: 'Ledger Types',      component: <LedgerTypesPage /> },
-  { id: 'company-types', label: 'Company Types',     component: <TypesPage /> },
-  { id: 'otcs',          label: 'OTCs',              component: <OtcsPage /> },
-] as const
-
-const UPDATES_NAV = [
+const PRIMARY_NAV = [
+  { id: 'home', label: 'Home', component: <HomePage /> },
   { id: 'companies', label: 'JDE Companies', component: <CompaniesPage /> },
+  { id: 'locations', label: 'JDE Locations', component: <LocationsPage /> },
+  { id: 'managers', label: 'JDE Managers', component: <ManagersHubPage /> },
 ] as const
 
-const NAV = [...HOME_NAV, ...REF_NAV, ...UPDATES_NAV] as const
+const ADMIN_NAV = [
+  { id: 'data-management', label: 'Data Management', component: <DataManagementPage /> },
+] as const
+
+const NAV = [...PRIMARY_NAV, ...ADMIN_NAV] as const
 
 type NavId = typeof NAV[number]['id']
 
 function App() {
   const [activePage, setActivePage] = useState<NavId>('home')
-  const [refsOpen, setRefsOpen] = useState(false)
-  const [updatesOpen, setUpdatesOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [refreshTime] = useState(() => new Date())
   const { theme, setTheme } = useTheme()
   const isDark = theme === 'dark'
@@ -48,17 +35,18 @@ function App() {
 
   return (
     <div className="app-root">
-      <aside className="app-sidebar">
+      <aside className={`app-sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
         <div className="app-brand">
-          <span className="app-brand-icon">🏗</span>
+          <span className="app-brand-mark" aria-hidden="true">
+            <span className="app-brand-mark-inner" />
+          </span>
           <div>
-            <div className="app-brand-title">JDE Hierarchy</div>
-            <div className="app-brand-sub">Manager</div>
+            <div className="app-brand-sub">Manage JDE Company/Location Ownership</div>
           </div>
         </div>
 
         <nav className="side-nav" role="navigation">
-          {HOME_NAV.map(item => (
+          {PRIMARY_NAV.map(item => (
             <button
               key={item.id}
               className={`side-nav-btn${activePage === item.id ? ' active' : ''}`}
@@ -68,51 +56,20 @@ function App() {
             </button>
           ))}
 
-          <button
-            className="side-nav-group-btn"
-            onClick={() => setRefsOpen(o => !o)}
-            aria-expanded={refsOpen}
-          >
-            <span>📋 JDE References</span>
-            <span className={`side-nav-chevron${refsOpen ? ' open' : ''}`}>▸</span>
-          </button>
+          <div className="side-nav-divider" role="presentation" />
+          <div className="side-nav-section-label">Admin</div>
 
-          {refsOpen && (
-            <div className="side-nav-group">
-              {REF_NAV.map(item => (
-                <button
-                  key={item.id}
-                  className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
-                  onClick={() => setActivePage(item.id as NavId)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <button
-            className="side-nav-group-btn"
-            onClick={() => setUpdatesOpen(o => !o)}
-            aria-expanded={updatesOpen}
-          >
-            <span>🔔 JDE Updates</span>
-            <span className={`side-nav-chevron${updatesOpen ? ' open' : ''}`}>▸</span>
-          </button>
-
-          {updatesOpen && (
-            <div className="side-nav-group">
-              {UPDATES_NAV.map(item => (
-                <button
-                  key={item.id}
-                  className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
-                  onClick={() => setActivePage(item.id as NavId)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="side-nav-group">
+            {ADMIN_NAV.map(item => (
+              <button
+                key={item.id}
+                className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
+                onClick={() => setActivePage(item.id as NavId)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </nav>
 
         <div className="sidebar-footer">
@@ -133,8 +90,24 @@ function App() {
       </aside>
 
       <div className="app-body">
+        <header className="app-header">
+          <button
+            className="app-sidebar-toggle"
+            onClick={() => setSidebarCollapsed(value => !value)}
+            aria-label={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+            title={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+          >
+            {sidebarCollapsed ? '›' : '‹'}
+          </button>
+          <div className="app-header-copy">
+            <h1 className="app-header-title">{active.label}</h1>
+          </div>
+        </header>
+
         <main className="app-content" key={activePage}>
-          {active.component}
+          <PageModeProvider mode="default">
+            {active.component}
+          </PageModeProvider>
         </main>
       </div>
     </div>

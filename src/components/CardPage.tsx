@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useState, useEffect, useRef } from 'react'
+import { usePageMode } from './page-mode'
 
 // ── Field descriptor ──────────────────────────────────────────────────────────
 export interface FieldDef {
@@ -24,6 +25,14 @@ export interface FieldDef {
 export interface CardPageConfig {
   title: string
   description?: string
+  /** hides title/description while keeping search and add actions visible */
+  hideHeaderCopy?: boolean
+  /** hides search and add actions while keeping title/description visible */
+  hideHeaderActions?: boolean
+  /** hides edit action from row actions */
+  hideRowEditAction?: boolean
+  /** hides delete action from row actions */
+  hideRowDeleteAction?: boolean
   /** attribute that uniquely identifies a record (GUID) */
   idField: string
   fields: FieldDef[]
@@ -47,14 +56,23 @@ export interface CardPageConfig {
   onRowsLoaded?: (rows: any[]) => void
 }
 
+export interface CardPageHandle {
+  setSearchValue: (value: string) => void
+  openAddForm: () => void
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Row = Record<string, any>
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function CardPage({ config }: { config: CardPageConfig }) {
+export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(function CardPage({ config }, ref) {
   const {
     title,
     description,
+    hideHeaderCopy,
+    hideHeaderActions,
+    hideRowEditAction,
+    hideRowDeleteAction,
     idField,
     fields,
     service,
@@ -64,6 +82,7 @@ export function CardPage({ config }: { config: CardPageConfig }) {
     selectedRowId,
     onRowsLoaded,
   } = config
+  const pageMode = usePageMode()
   const singularTitle = title.endsWith('ies')
     ? `${title.slice(0, -3)}y`
     : title.replace(/s$/, '')
@@ -156,6 +175,11 @@ export function CardPage({ config }: { config: CardPageConfig }) {
     }, 50)
   }
 
+  useImperativeHandle(ref, () => ({
+    setSearchValue: (value: string) => setSearch(value),
+    openAddForm: () => openAdd(),
+  }))
+
   // ── open edit modal ──
   const openEdit = (row: Row) => {
     setEditTarget(row)
@@ -224,109 +248,129 @@ export function CardPage({ config }: { config: CardPageConfig }) {
 
   // ── primary display field (first visible field) ──
   const primaryField = tableFields[0]
+  const showHeaderCopy = !hideHeaderCopy
+  const showHeaderActions = !hideHeaderActions
+  const showHeader = showHeaderCopy || showHeaderActions
+  const showRowEditAction = !(hideRowEditAction || pageMode === 'references')
+  const showRowDeleteAction = !(hideRowDeleteAction || pageMode === 'references')
+  const showRowActionsColumn = showRowEditAction || showRowDeleteAction
+
+  const tableSection = (
+    <div className={`cp-table-wrap${showHeader ? '' : ' cp-table-wrap-standalone'}`}>
+      <div className="cp-table-scroll">
+        <table className="cp-table">
+          <thead>
+            <tr>
+              {tableFields.map(f => (
+                <th
+                  key={f.key}
+                  className="cp-th-sortable"
+                  onClick={() => handleSort(f.key)}
+                  aria-sort={sortKey === f.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                >
+                  <span className="cp-th-inner">
+                    {f.label}
+                    <span className="cp-sort-indicator">
+                      {sortKey === f.key ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}
+                    </span>
+                  </span>
+                </th>
+              ))}
+              {showRowActionsColumn && <th className="cp-col-actions">Actions</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {loading && rows.length === 0 && (
+              <tr><td colSpan={tableFields.length + (showRowActionsColumn ? 1 : 0)} className="cp-td-empty">Loading…</td></tr>
+            )}
+            {!loading && filtered.length === 0 && (
+              <tr>
+                <td colSpan={tableFields.length + (showRowActionsColumn ? 1 : 0)} className="cp-td-empty">
+                  {search ? 'No records match your search.' : `No ${title.toLowerCase()} found. Add one above.`}
+                </td>
+              </tr>
+            )}
+            {sortedFiltered.map(row => {
+              const rowId = String(row[idField])
+              const isSelected = selectedRowId != null && rowId === selectedRowId
+              return (
+              <tr
+                key={rowId}
+                className={onRowSelect ? `cp-row-selectable${isSelected ? ' cp-row-selected' : ''}` : undefined}
+                onClick={onRowSelect ? () => onRowSelect(row) : undefined}
+                aria-selected={isSelected}
+              >
+                {tableFields.map(f => (
+                  <td key={f.key}>{row[f.key] ?? '—'}</td>
+                ))}
+                {showRowActionsColumn && (
+                  <td className="cp-col-actions">
+                    {showRowEditAction && (
+                      <button
+                        className="cp-btn cp-btn-ghost"
+                        onClick={e => {
+                          e.stopPropagation()
+                          openEdit(row)
+                        }}
+                        title="Edit"
+                      >
+                        ✏️ Edit
+                      </button>
+                    )}
+                    {showRowDeleteAction && (
+                      <button
+                        className="cp-btn cp-btn-danger-ghost"
+                        onClick={e => {
+                          e.stopPropagation()
+                          setDeleteTarget(row)
+                        }}
+                        title="Delete"
+                      >
+                        🗑 Delete
+                      </button>
+                    )}
+                  </td>
+                )}
+              </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="cp-table-footer" aria-hidden="true" />
+    </div>
+  )
 
   return (
     <div className="cp-page">
-      {/* Page header */}
-      <div className="cp-header">
-        <div>
-          <h2 className="cp-title">{title}</h2>
-          {description && <p className="cp-desc">{description}</p>}
-        </div>
-        <div className="cp-header-actions">
-          <input
-            className="cp-search"
-            type="search"
-            placeholder={`Search ${title.toLowerCase()}…`}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <button className="cp-btn cp-btn-primary" onClick={openAdd}>
-            + Add {singularTitle}
-          </button>
-        </div>
-      </div>
-
       {error && <div className="cp-error">{error}</div>}
 
-      {/* Table */}
-      <div className="cp-table-wrap">
-        <div className="cp-table-scroll">
-          <table className="cp-table">
-            <thead>
-              <tr>
-                {tableFields.map(f => (
-                  <th
-                    key={f.key}
-                    className="cp-th-sortable"
-                    onClick={() => handleSort(f.key)}
-                    aria-sort={sortKey === f.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
-                  >
-                    <span className="cp-th-inner">
-                      {f.label}
-                      <span className="cp-sort-indicator">
-                        {sortKey === f.key ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}
-                      </span>
-                    </span>
-                  </th>
-                ))}
-                <th className="cp-col-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && rows.length === 0 && (
-                <tr><td colSpan={tableFields.length + 1} className="cp-td-empty">Loading…</td></tr>
-              )}
-              {!loading && filtered.length === 0 && (
-                <tr>
-                  <td colSpan={tableFields.length + 1} className="cp-td-empty">
-                    {search ? 'No records match your search.' : `No ${title.toLowerCase()} found. Add one above.`}
-                  </td>
-                </tr>
-              )}
-              {sortedFiltered.map(row => {
-                const rowId = String(row[idField])
-                const isSelected = selectedRowId != null && rowId === selectedRowId
-                return (
-                <tr
-                  key={rowId}
-                  className={onRowSelect ? `cp-row-selectable${isSelected ? ' cp-row-selected' : ''}` : undefined}
-                  onClick={onRowSelect ? () => onRowSelect(row) : undefined}
-                  aria-selected={isSelected}
-                >
-                  {tableFields.map(f => (
-                    <td key={f.key}>{row[f.key] ?? '—'}</td>
-                  ))}
-                  <td className="cp-col-actions">
-                    <button
-                      className="cp-btn cp-btn-ghost"
-                      onClick={e => {
-                        e.stopPropagation()
-                        openEdit(row)
-                      }}
-                      title="Edit"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button
-                      className="cp-btn cp-btn-danger-ghost"
-                      onClick={e => {
-                        e.stopPropagation()
-                        setDeleteTarget(row)
-                      }}
-                      title="Delete"
-                    >
-                      🗑 Delete
-                    </button>
-                  </td>
-                </tr>
-                )
-              })}
-            </tbody>
-          </table>
+      {showHeader ? (
+        <div className="cp-card-shell">
+          <div className={`cp-header${!showHeaderCopy && showHeaderActions ? ' cp-header-actions-only' : ''}`}>
+            {showHeaderCopy && (
+              <div>
+                <h2 className="cp-title">{title}</h2>
+                {description && <p className="cp-desc">{description}</p>}
+              </div>
+            )}
+            {showHeaderActions && <div className="cp-header-actions">
+              <input
+                className="cp-search"
+                type="search"
+                placeholder={`Search ${title.toLowerCase()}…`}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+              <button className="cp-btn cp-btn-primary" onClick={openAdd}>
+                + Add {singularTitle}
+              </button>
+            </div>}
+          </div>
+
+          {tableSection}
         </div>
-        <div className="cp-table-footer" aria-hidden="true" />
-      </div>
+      ) : tableSection}
 
       {/* Add / Edit modal */}
       {modalOpen && (
@@ -383,7 +427,7 @@ export function CardPage({ config }: { config: CardPageConfig }) {
       )}
 
       {/* Delete confirm modal */}
-      {deleteTarget && (
+      {showRowDeleteAction && deleteTarget && (
         <div className="cp-overlay" onMouseDown={() => !deleting && setDeleteTarget(null)}>
           <div className="cp-modal cp-modal-sm" onMouseDown={e => e.stopPropagation()}>
             <div className="cp-modal-header">
@@ -410,4 +454,4 @@ export function CardPage({ config }: { config: CardPageConfig }) {
       )}
     </div>
   )
-}
+})

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { CardPage } from '../components/CardPage'
+import { useEffect, useRef, useState } from 'react'
+import { CardPage, type CardPageHandle } from '../components/CardPage'
 import { Cr113_jde_companiesService } from '../generated/services/Cr113_jde_companiesService'
 import { Cr113_jde_co_segmentsService } from '../generated/services/Cr113_jde_co_segmentsService'
 import { Cr113_jde_typesService } from '../generated/services/Cr113_jde_typesService'
@@ -148,6 +148,9 @@ const companiesService = {
 }
 
 export function CompaniesPage() {
+  const companiesCardRef = useRef<CardPageHandle | null>(null)
+  const locationsCardRef = useRef<CardPageHandle | null>(null)
+  const assignmentsCardRef = useRef<CardPageHandle | null>(null)
   const [segmentOptions, setSegmentOptions] = useState<LookupOption[]>([])
   const [typeOptions, setTypeOptions] = useState<LookupOption[]>([])
   const [ledgerOptions, setLedgerOptions] = useState<LookupOption[]>([])
@@ -160,6 +163,9 @@ export function CompaniesPage() {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
   const [selectedCompanyName, setSelectedCompanyName] = useState('')
   const [activeDetailsTab, setActiveDetailsTab] = useState<'locations' | 'assignments'>('locations')
+  const [companiesSearch, setCompaniesSearch] = useState('')
+  const [locationsSearch, setLocationsSearch] = useState('')
+  const [assignmentsSearch, setAssignmentsSearch] = useState('')
 
   useEffect(() => {
     const loadOptions = async () => {
@@ -430,39 +436,71 @@ export function CompaniesPage() {
   }
 
   return (
-    <div className="companies-layout">
-      <section className="companies-main">
-        <CardPage
-          config={{
-            title: 'JDE Companies',
-            description: 'Manage JDE company records. Select a row to load related details.',
-            idField: 'cr113_jde_companyid',
-            service: companiesService,
-            defaultSortKey: 'cr113_co_id',
-            defaultSortDir: 'asc',
-            selectedRowId: selectedCompanyId,
-            onRowSelect: row => {
-              setSelectedCompanyId(String(row.cr113_jde_companyid))
-              setSelectedCompanyName(String(row.cr113_co_desc ?? row.cr113_co_id ?? ''))
-            },
-            onRowsLoaded: rows => {
-              if (rows.length === 0) {
-                setSelectedCompanyId(null)
-                setSelectedCompanyName('')
-                return
-              }
+    <div className="companies-page">
+      <section className="companies-page-title-card">
+        <h2 className="companies-page-title">JDE Companies</h2>
+        <p className="companies-page-subtitle">Manage JDE company records and related locations and assignments.</p>
+      </section>
 
-              const selectedStillExists = selectedCompanyId
-                ? rows.some(row => String(row.cr113_jde_companyid) === selectedCompanyId)
-                : false
+      <div className="companies-layout">
+        <section className="companies-main">
+          <div className="companies-main-shell">
+            <div className="companies-main-topbar">
+              <div className="companies-main-toolbar">
+                <input
+                  className="cp-search"
+                  type="search"
+                  placeholder="Search jde companies..."
+                  value={companiesSearch}
+                  onChange={e => {
+                    const next = e.target.value
+                    setCompaniesSearch(next)
+                    companiesCardRef.current?.setSearchValue(next)
+                  }}
+                />
+                <button
+                  className="cp-btn cp-btn-primary"
+                  onClick={() => companiesCardRef.current?.openAddForm()}
+                >
+                  + Add JDE Company
+                </button>
+              </div>
+            </div>
 
-              if (!selectedStillExists) {
-                const first = rows[0]
-                setSelectedCompanyId(String(first.cr113_jde_companyid))
-                setSelectedCompanyName(String(first.cr113_co_desc ?? first.cr113_co_id ?? ''))
-              }
-            },
-            fields: [
+            <CardPage
+              ref={companiesCardRef}
+              config={{
+                title: 'JDE Companies',
+                description: 'Manage JDE company records. Select a row to load related details.',
+                hideHeaderCopy: true,
+                hideHeaderActions: true,
+                hideRowDeleteAction: true,
+                idField: 'cr113_jde_companyid',
+                service: companiesService,
+                defaultSortKey: 'cr113_co_id',
+                defaultSortDir: 'asc',
+                selectedRowId: selectedCompanyId,
+                onRowSelect: row => {
+                  setSelectedCompanyId(String(row.cr113_jde_companyid))
+                  setSelectedCompanyName(String(row.cr113_co_desc ?? row.cr113_co_id ?? ''))
+                },
+                onRowsLoaded: rows => {
+                  if (rows.length === 0) {
+                    setSelectedCompanyId(null)
+                    setSelectedCompanyName('')
+                    return
+                  }
+
+                  const selectedStillExists = selectedCompanyId
+                    ? rows.some(row => String(row.cr113_jde_companyid) === selectedCompanyId)
+                    : false
+
+                  if (!selectedStillExists) {
+                    setSelectedCompanyId(null)
+                    setSelectedCompanyName('')
+                  }
+                },
+                fields: [
               {
                 key: 'cr113_co_id',
                 label: 'Company Code',
@@ -482,7 +520,7 @@ export function CompaniesPage() {
               {
                 key: 'cr113_segment_namename',
                 label: 'Company Segment',
-                showOnCard: true,
+                showOnCard: false,
                 editable: false,
               },
               {
@@ -498,7 +536,7 @@ export function CompaniesPage() {
               {
                 key: 'cr113_segment_typename',
                 label: 'Company Type',
-                showOnCard: true,
+                showOnCard: false,
                 editable: false,
               },
               {
@@ -514,7 +552,7 @@ export function CompaniesPage() {
               {
                 key: 'cr113_ledger_typename',
                 label: 'Company Ledger',
-                showOnCard: true,
+                showOnCard: false,
                 editable: false,
               },
               {
@@ -527,12 +565,13 @@ export function CompaniesPage() {
                 options: ledgerOptions,
                 showOnCard: false,
               },
-            ],
-          }}
-        />
-      </section>
+                ],
+              }}
+            />
+          </div>
+        </section>
 
-      <section className="companies-details">
+        <section className="companies-details">
         <div className="companies-details-shell">
           <div className="companies-details-header">
             <p className="companies-details-subtitle">
@@ -542,7 +581,53 @@ export function CompaniesPage() {
             </p>
           </div>
 
-          <div className="companies-details-tabs" role="tablist" aria-label="Company detail tabs">
+          {selectedCompanyId && (
+            <div className="companies-details-topbar companies-details-tools-row">
+              {activeDetailsTab === 'locations' ? (
+                <div className="companies-details-toolbar">
+                  <input
+                    className="cp-search"
+                    type="search"
+                    placeholder="Search jde locations..."
+                    value={locationsSearch}
+                    onChange={e => {
+                      const next = e.target.value
+                      setLocationsSearch(next)
+                      locationsCardRef.current?.setSearchValue(next)
+                    }}
+                  />
+                  <button
+                    className="cp-btn cp-btn-primary"
+                    onClick={() => locationsCardRef.current?.openAddForm()}
+                  >
+                    + Add JDE Location
+                  </button>
+                </div>
+              ) : (
+                <div className="companies-details-toolbar">
+                  <input
+                    className="cp-search"
+                    type="search"
+                    placeholder="Search jde co assignments..."
+                    value={assignmentsSearch}
+                    onChange={e => {
+                      const next = e.target.value
+                      setAssignmentsSearch(next)
+                      assignmentsCardRef.current?.setSearchValue(next)
+                    }}
+                  />
+                  <button
+                    className="cp-btn cp-btn-primary"
+                    onClick={() => assignmentsCardRef.current?.openAddForm()}
+                  >
+                    + Add JDE Co Assignment
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="companies-details-tabs companies-details-tabs-row" role="tablist" aria-label="Company detail tabs">
             <button
               className={`companies-tab-btn${activeDetailsTab === 'locations' ? ' active' : ''}`}
               role="tab"
@@ -567,10 +652,14 @@ export function CompaniesPage() {
             </div>
           ) : activeDetailsTab === 'locations' ? (
             <CardPage
+              ref={locationsCardRef}
               key={`locations-${selectedCompanyId}`}
               config={{
                 title: 'JDE Locations',
                 description: 'Create, edit, and delete locations related to the selected company.',
+                hideHeaderCopy: true,
+                hideHeaderActions: true,
+                hideRowDeleteAction: true,
                 idField: 'cr113_jde_locationid',
                 service: locationsService,
                 defaultSortKey: 'cr113_coloc_id',
@@ -595,21 +684,21 @@ export function CompaniesPage() {
                   {
                     key: 'cr113_coloc_city',
                     label: 'City',
-                    showOnCard: true,
+                    showOnCard: false,
                     editable: true,
                     placeholder: 'e.g. Dallas',
                   },
                   {
                     key: 'cr113_coloc_state',
                     label: 'State',
-                    showOnCard: true,
+                    showOnCard: false,
                     editable: true,
                     placeholder: 'e.g. TX',
                   },
                   {
                     key: 'cr113_coloc_segment_namename',
                     label: 'Location Segment',
-                    showOnCard: true,
+                    showOnCard: false,
                     editable: false,
                   },
                   {
@@ -624,7 +713,7 @@ export function CompaniesPage() {
                   {
                     key: 'cr113_div_namename',
                     label: 'Division',
-                    showOnCard: true,
+                    showOnCard: false,
                     editable: false,
                   },
                   {
@@ -639,7 +728,7 @@ export function CompaniesPage() {
                   {
                     key: 'cr113_group_namename',
                     label: 'Group',
-                    showOnCard: true,
+                    showOnCard: false,
                     editable: false,
                   },
                   {
@@ -654,7 +743,7 @@ export function CompaniesPage() {
                   {
                     key: 'cr113_otc_namename',
                     label: 'OTC',
-                    showOnCard: true,
+                    showOnCard: false,
                     editable: false,
                   },
                   {
@@ -671,10 +760,14 @@ export function CompaniesPage() {
             />
           ) : (
             <CardPage
+              ref={assignmentsCardRef}
               key={`assignments-${selectedCompanyId}`}
               config={{
                 title: 'JDE Co Assignments',
                 description: 'Create, edit, and delete assignments related to the selected company.',
+                hideHeaderCopy: true,
+                hideHeaderActions: true,
+                hideRowDeleteAction: true,
                 idField: 'cr113_jde_co_assignmentid',
                 service: assignmentsService,
                 defaultSortKey: 'cr113_assign_id',
@@ -683,10 +776,8 @@ export function CompaniesPage() {
                   {
                     key: 'cr113_assign_id',
                     label: 'Assignment ID',
-                    showOnCard: true,
-                    editable: true,
-                    required: true,
-                    placeholder: 'e.g. ASSIGN-001',
+                    showOnCard: false,
+                    editable: false,
                   },
                   {
                     key: 'cr113_managernamename',
@@ -723,7 +814,8 @@ export function CompaniesPage() {
             />
           )}
         </div>
-      </section>
+        </section>
+      </div>
     </div>
   )
 }
