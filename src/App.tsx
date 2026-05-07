@@ -13,10 +13,10 @@ import { UserManagementPage } from './pages/UserManagementPage'
 import { PageModeProvider } from './components/page-mode'
 
 const PRIMARY_NAV = [
-  { id: 'home', label: 'Home', icon: '🏠', component: <HomePage /> },
-  { id: 'companies', label: 'JDE Companies', icon: '🏢', component: <CompaniesPage /> },
-  { id: 'locations', label: 'JDE Locations', icon: '📍', component: <LocationsPage /> },
-  { id: 'managers', label: 'JDE Managers', icon: '🧑‍💼', component: <ManagersHubPage /> },
+  { id: 'home', label: 'Home', icon: '🏠', component: <HomePage />, hidden: false },
+  { id: 'companies', label: 'JDE Companies', icon: '🏢', component: <CompaniesPage />, hidden: false },
+  { id: 'locations', label: 'JDE Locations', icon: '📍', component: <LocationsPage />, hidden: true },
+  { id: 'managers', label: 'JDE Managers', icon: '🧑‍💼', component: <ManagersHubPage />, hidden: false },
 ] as const
 
 
@@ -77,7 +77,7 @@ function App() {
         </div>
 
         <nav className="side-nav" role="navigation">
-          {PRIMARY_NAV.map(item => (
+          {PRIMARY_NAV.filter(item => !item.hidden).map(item => (
             <button
               key={item.id}
               className={`side-nav-btn${activePage === item.id ? ' active' : ''}`}

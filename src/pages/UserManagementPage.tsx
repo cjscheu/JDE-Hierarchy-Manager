@@ -52,10 +52,10 @@ export function UserManagementPage() {
 
   return (
     <section className="refs-page">
-      <div className="refs-header">
+{/*       <div className="refs-header">
         <h2 className="refs-title">User Management</h2>
         <p className="refs-description">Manage admin and power users.</p>
-      </div>
+      </div> */}
 
       <div className="refs-tabs" role="tablist" aria-label="User management tabs">
         {USER_MANAGEMENT_TABS.map((tab) => (

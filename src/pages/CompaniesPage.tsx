@@ -10,6 +10,7 @@ import { Cr113_jde_divsService } from '../generated/services/Cr113_jde_divsServi
 import { Cr113_jde_groupsService } from '../generated/services/Cr113_jde_groupsService'
 import { Cr113_jde_otcsService } from '../generated/services/Cr113_jde_otcsService'
 import { Cr113_jde_co_assignmentsService } from '../generated/services/Cr113_jde_co_assignmentsService'
+import { Cr113_jde_loc_assignmentsService } from '../generated/services/Cr113_jde_loc_assignmentsService'
 import { Cr113_jde_managersService } from '../generated/services/Cr113_jde_managersService'
 import { Cr113_jde_rolesesService } from '../generated/services/Cr113_jde_rolesesService'
 
@@ -60,6 +61,17 @@ const buildLocationPayload = (record: Record<string, string>, companyId: string)
   if (groupBind) payload['cr113_GROUP_NAME@odata.bind'] = groupBind
   if (otcBind) payload['cr113_OTC_NAME@odata.bind'] = otcBind
 
+  return payload
+}
+
+const buildLocationAssignmentPayload = (record: Record<string, string>, locationId: string) => {
+  const { cr113_empl_id, cr113_rolename, ...rest } = record
+  const payload: Record<string, string> = { ...rest }
+  payload['cr113_LocationCode@odata.bind'] = `/cr113_jde_locations(${locationId})`
+  const managerBind = toLookupBind('cr113_jde_managers', cr113_empl_id)
+  const roleBind = toLookupBind('cr113_jde_roleses', cr113_rolename)
+  if (managerBind) payload['cr113_Empl_Id@odata.bind'] = managerBind
+  if (roleBind) payload['cr113_RoleName@odata.bind'] = roleBind
   return payload
 }
 
@@ -166,6 +178,13 @@ export function CompaniesPage() {
   const [companiesSearch, setCompaniesSearch] = useState('')
   const [locationsSearch, setLocationsSearch] = useState('')
   const [assignmentsSearch, setAssignmentsSearch] = useState('')
+
+  // drilldown: location row → location assignments popup
+  const drilldownAssignmentsCardRef = useRef<CardPageHandle | null>(null)
+  const [drilldownLocationId, setDrilldownLocationId] = useState<string | null>(null)
+  const [drilldownLocationName, setDrilldownLocationName] = useState('')
+  const [drilldownOpen, setDrilldownOpen] = useState(false)
+  const [drilldownAssignmentsSearch, setDrilldownAssignmentsSearch] = useState('')
 
   useEffect(() => {
     const loadOptions = async () => {
@@ -365,6 +384,54 @@ export function CompaniesPage() {
     delete: Cr113_jde_locationsService.delete,
   }
 
+  const drilldownAssignmentsService = {
+    getAll: async () => {
+      if (!drilldownLocationId) return { success: true, data: [] }
+      const [assignmentsRes, managersRes, rolesRes] = await Promise.all([
+        Cr113_jde_loc_assignmentsService.getAll(),
+        Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_empl_id'] }),
+        Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'] }),
+      ])
+      if (!assignmentsRes.success) return assignmentsRes
+      const managerById = new Map<string, string>(
+        (managersRes.data ?? []).map(item => [item.cr113_jde_managerid, item.cr113_manager_name ?? item.cr113_empl_id])
+      )
+      const roleById = new Map<string, string>(
+        (rolesRes.data ?? []).map(item => [item.cr113_jde_rolesid, item.cr113_role_name])
+      )
+      const data = (assignmentsRes.data ?? [])
+        .filter(row => row._cr113_locationcode_value === drilldownLocationId)
+        .map(row => ({
+          ...row,
+          cr113_empl_id: row._cr113_empl_id_value ?? '',
+          cr113_rolename: row._cr113_rolename_value ?? '',
+          cr113_empl_idname:
+            row.cr113_empl_idname ??
+            (row._cr113_empl_id_value ? managerById.get(row._cr113_empl_id_value) : undefined) ??
+            '',
+          cr113_rolenamename:
+            row.cr113_rolenamename ??
+            (row._cr113_rolename_value ? roleById.get(row._cr113_rolename_value) : undefined) ??
+            '',
+        }))
+      return { ...assignmentsRes, data }
+    },
+    create: async (record: Record<string, string>) => {
+      if (!drilldownLocationId) throw new Error('Select a location before adding an assignment.')
+      return Cr113_jde_loc_assignmentsService.create(
+        buildLocationAssignmentPayload(record, drilldownLocationId) as unknown as Parameters<typeof Cr113_jde_loc_assignmentsService.create>[0]
+      )
+    },
+    update: async (id: string, changes: Record<string, string>) => {
+      if (!drilldownLocationId) throw new Error('Select a location before editing assignments.')
+      return Cr113_jde_loc_assignmentsService.update(
+        id,
+        buildLocationAssignmentPayload(changes, drilldownLocationId) as unknown as Parameters<typeof Cr113_jde_loc_assignmentsService.update>[1]
+      )
+    },
+    delete: Cr113_jde_loc_assignmentsService.delete,
+  }
+
   const assignmentsService = {
     getAll: async () => {
       if (!selectedCompanyId) {
@@ -437,10 +504,10 @@ export function CompaniesPage() {
 
   return (
     <div className="companies-page">
-      <section className="companies-page-title-card">
+{/*       <section className="companies-page-title-card">
         <h2 className="companies-page-title">JDE Companies</h2>
         <p className="companies-page-subtitle">Manage JDE company records and related locations and assignments.</p>
-      </section>
+      </section> */}
 
       <div className="companies-layout">
         <section className="companies-main">
@@ -664,6 +731,12 @@ export function CompaniesPage() {
                 service: locationsService,
                 defaultSortKey: 'cr113_coloc_id',
                 defaultSortDir: 'asc',
+                onRowDoubleClick: row => {
+                  setDrilldownLocationId(String(row.cr113_jde_locationid))
+                  setDrilldownLocationName(String(row.cr113_coloc_name ?? row.cr113_coloc_id ?? ''))
+                  setDrilldownAssignmentsSearch('')
+                  setDrilldownOpen(true)
+                },
                 fields: [
                   {
                     key: 'cr113_coloc_id',
@@ -818,6 +891,93 @@ export function CompaniesPage() {
         </div>
         </section>
       </div>
+
+      {/* Location Assignments Drilldown Modal */}
+      {drilldownOpen && drilldownLocationId && (
+        <div
+          className="cp-overlay"
+          onMouseDown={() => { setDrilldownOpen(false); setDrilldownAssignmentsSearch('') }}
+        >
+          <div className="loc-drilldown-modal" onMouseDown={e => e.stopPropagation()}>
+            <div className="loc-drilldown-header">
+              <h3 className="loc-drilldown-title">Location Assignments — {drilldownLocationName}</h3>
+              <button
+                className="cp-modal-close"
+                onClick={() => { setDrilldownOpen(false); setDrilldownAssignmentsSearch('') }}
+              >×</button>
+            </div>
+            <div className="loc-drilldown-toolbar">
+              <input
+                className="cp-search"
+                type="search"
+                placeholder="Search location assignments..."
+                value={drilldownAssignmentsSearch}
+                onChange={e => {
+                  const next = e.target.value
+                  setDrilldownAssignmentsSearch(next)
+                  drilldownAssignmentsCardRef.current?.setSearchValue(next)
+                }}
+              />
+              <button
+                className="cp-btn cp-btn-primary"
+                onClick={() => drilldownAssignmentsCardRef.current?.openAddForm()}
+              >
+                + Add JDE Location Assignment
+              </button>
+            </div>
+            <div className="loc-drilldown-body">
+              <CardPage
+                ref={drilldownAssignmentsCardRef}
+                key={`drilldown-assignments-${drilldownLocationId}`}
+                config={{
+                  title: 'JDE Location Assignments',
+                  hideHeaderCopy: true,
+                  hideHeaderActions: true,
+                  hideRowDeleteAction: true,
+                  idField: 'cr113_jde_loc_assignmentid',
+                  service: drilldownAssignmentsService,
+                  defaultSortKey: 'cr113_rolenamename',
+                  defaultSortDir: 'asc',
+                  fields: [
+                    {
+                      key: 'cr113_rolenamename',
+                      label: 'Role',
+                      showOnCard: true,
+                      editable: false,
+                    },
+                    {
+                      key: 'cr113_rolename',
+                      label: 'Role',
+                      inputType: 'select',
+                      editable: true,
+                      required: true,
+                      options: roleOptions,
+                      showOnCard: false,
+                      placeholder: 'Select role',
+                    },
+                    {
+                      key: 'cr113_empl_idname',
+                      label: 'Manager',
+                      showOnCard: true,
+                      editable: false,
+                    },
+                    {
+                      key: 'cr113_empl_id',
+                      label: 'Manager',
+                      inputType: 'select',
+                      editable: true,
+                      required: true,
+                      options: managerOptions,
+                      showOnCard: false,
+                      placeholder: 'Select manager',
+                    },
+                  ],
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

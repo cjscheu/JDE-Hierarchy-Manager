@@ -53,6 +53,8 @@ export interface CardPageConfig {
   onRowSelect?: (row: any) => void
   selectedRowId?: string | null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRowDoubleClick?: (row: any) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onRowsLoaded?: (rows: any[]) => void
 }
 
@@ -80,6 +82,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
     defaultSortDir: defaultSortDirProp,
     onRowSelect,
     selectedRowId,
+    onRowDoubleClick,
     onRowsLoaded,
   } = config
   const pageMode = usePageMode()
@@ -300,6 +303,8 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                 key={rowId}
                 className={onRowSelect ? `cp-row-selectable${isSelected ? ' cp-row-selected' : ''}` : undefined}
                 onClick={onRowSelect ? () => onRowSelect(row) : undefined}
+                onDoubleClick={onRowDoubleClick ? () => onRowDoubleClick(row) : undefined}
+                title={onRowDoubleClick ? 'Double-click to view related assignments' : undefined}
                 aria-selected={isSelected}
               >
                 {tableFields.map(f => (

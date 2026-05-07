@@ -29,12 +29,12 @@ export function DataManagementPage() {
 
   return (
     <section className="refs-page">
-      <div className="refs-header">
+{/*       <div className="refs-header">
         <h2 className="refs-title">Data Management</h2>
         <p className="refs-description">
           Use tabs to manage reference tables, managers, and assignment records.
         </p>
-      </div>
+      </div> */}
 
       <div className="refs-tabs" role="tablist" aria-label="Data management tabs">
         {DATA_MANAGEMENT_TABS.map(tab => (

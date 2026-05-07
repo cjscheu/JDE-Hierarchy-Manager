@@ -289,10 +289,10 @@ export function ManagersHubPage() {
   }
   return (
     <div className="companies-page managers-page">
-      <section className="companies-page-title-card">
+{/*       <section className="companies-page-title-card">
         <h2 className="companies-page-title">JDE Managers</h2>
         <p className="companies-page-subtitle">Manage JDE managers and related assignment records.</p>
-      </section>
+      </section> */}
 
       <div className="companies-layout">
         <section className="companies-main">

@@ -68,4 +68,7 @@
 
 -on the JDE Managers Page, remove Manager Name and replace with First Name and Last Name.  sort order should now be Last Name ascending order
 -revert back to using one column called Manager Name but it should be composed of First Name Last Name
--
+
+-on the JDE Companies page, when a user clicks a row on the main card, those related locations appear on the details card.  add the ability when the user double clicks a row on the details card, a page will pop up with the related location assignments card (from the JDE Locations page).  closing the new page with return to the JDE Companies page with the same selections
+-hide the JDE Locations navigation page button on the left hand pane
+-********** removed header cards on pages.  seems redundant for now.  may change later if needed
