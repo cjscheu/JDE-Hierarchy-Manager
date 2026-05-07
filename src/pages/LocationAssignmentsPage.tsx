@@ -82,7 +82,7 @@ export function LocationAssignmentsPage() {
   return (
     <CardPage
       config={{
-        title: 'JDE Location Assignments',
+        title: 'Location Assignments',
         description: 'Manage manager and role assignments at the location level.',
         idField: 'cr113_jde_loc_assignmentid',
         service: enrichedService,

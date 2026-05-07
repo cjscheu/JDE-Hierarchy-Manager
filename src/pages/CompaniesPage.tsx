@@ -517,7 +517,7 @@ export function CompaniesPage() {
                 <input
                   className="cp-search"
                   type="search"
-                  placeholder="Search jde companies..."
+                  placeholder="Search companies..."
                   value={companiesSearch}
                   onChange={e => {
                     const next = e.target.value
@@ -529,7 +529,7 @@ export function CompaniesPage() {
                   className="cp-btn cp-btn-primary"
                   onClick={() => companiesCardRef.current?.openAddForm()}
                 >
-                  + Add JDE Company
+                  + Add Company
                 </button>
               </div>
             </div>
@@ -655,7 +655,7 @@ export function CompaniesPage() {
                   <input
                     className="cp-search"
                     type="search"
-                    placeholder="Search jde locations..."
+                    placeholder="Search locations..."
                     value={locationsSearch}
                     onChange={e => {
                       const next = e.target.value
@@ -667,7 +667,7 @@ export function CompaniesPage() {
                     className="cp-btn cp-btn-primary"
                     onClick={() => locationsCardRef.current?.openAddForm()}
                   >
-                    + Add JDE Location
+                    + Add Location
                   </button>
                 </div>
               ) : (
@@ -675,7 +675,7 @@ export function CompaniesPage() {
                   <input
                     className="cp-search"
                     type="search"
-                    placeholder="Search jde co assignments..."
+                    placeholder="Search assignments..."
                     value={assignmentsSearch}
                     onChange={e => {
                       const next = e.target.value
@@ -687,7 +687,7 @@ export function CompaniesPage() {
                     className="cp-btn cp-btn-primary"
                     onClick={() => assignmentsCardRef.current?.openAddForm()}
                   >
-                    + Add JDE Co Assignment
+                    + Add Assignment
                   </button>
                 </div>
               )}
@@ -701,7 +701,7 @@ export function CompaniesPage() {
               aria-selected={activeDetailsTab === 'locations'}
               onClick={() => setActiveDetailsTab('locations')}
             >
-              JDE Locations
+              Locations
             </button>
             <button
               className={`companies-tab-btn${activeDetailsTab === 'assignments' ? ' active' : ''}`}
@@ -709,20 +709,20 @@ export function CompaniesPage() {
               aria-selected={activeDetailsTab === 'assignments'}
               onClick={() => setActiveDetailsTab('assignments')}
             >
-              JDE Co Assignments
+              Company Assignments
             </button>
           </div>
 
           {!selectedCompanyId ? (
             <div className="companies-details-empty">
-              Select a company in the main table to view and manage related locations and co assignments.
+              Select a company in the main table to view and manage related locations and company assignments.
             </div>
           ) : activeDetailsTab === 'locations' ? (
             <CardPage
               ref={locationsCardRef}
               key={`locations-${selectedCompanyId}`}
               config={{
-                title: 'JDE Locations',
+                title: 'Locations',
                 description: 'Create, edit, and delete locations related to the selected company.',
                 hideHeaderCopy: true,
                 hideHeaderActions: true,
@@ -836,7 +836,7 @@ export function CompaniesPage() {
               ref={assignmentsCardRef}
               key={`assignments-${selectedCompanyId}`}
               config={{
-                title: 'JDE Co Assignments',
+                title: 'Company Assignments',
                 description: 'Create, edit, and delete assignments related to the selected company.',
                 hideHeaderCopy: true,
                 hideHeaderActions: true,
@@ -922,7 +922,7 @@ export function CompaniesPage() {
                 className="cp-btn cp-btn-primary"
                 onClick={() => drilldownAssignmentsCardRef.current?.openAddForm()}
               >
-                + Add JDE Location Assignment
+                + Add Assignment
               </button>
             </div>
             <div className="loc-drilldown-body">
@@ -930,7 +930,7 @@ export function CompaniesPage() {
                 ref={drilldownAssignmentsCardRef}
                 key={`drilldown-assignments-${drilldownLocationId}`}
                 config={{
-                  title: 'JDE Location Assignments',
+                  title: 'Location Assignments',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,
                   hideRowDeleteAction: true,

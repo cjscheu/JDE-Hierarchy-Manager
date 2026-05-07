@@ -102,3 +102,6 @@
 -when light mode is toggled on the app, the user name is still colored white and is not visible, please correct
 
 -there is an extra divider about the user name, please remove it
+
+-update JDE Co Assignment text to Company Assignments and JDE Location Assignments text to Location Assignments
+-on the add and edit JDE Location Assignment popup pages, the title header should read Add Location Assignment and Edit Location Assignment

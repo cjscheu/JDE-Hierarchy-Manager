@@ -450,7 +450,7 @@ export function ManagersHubPage() {
                       className="cp-btn cp-btn-primary"
                       onClick={() => locationAssignmentsCardRef.current?.openAddForm()}
                     >
-                      + Add JDE Location Assignment
+                      + Add Location Assignment
                     </button>
                   </div>
                 )}
@@ -547,7 +547,7 @@ export function ManagersHubPage() {
                 ref={locationAssignmentsCardRef}
                 key={`manager-location-assignments-${selectedManagerId}`}
                 config={{
-                  title: 'JDE Location Assignments',
+                  title: 'Location Assignments',
                   description: 'Create, edit, and delete location assignments related to the selected manager.',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,

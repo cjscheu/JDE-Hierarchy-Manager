@@ -520,7 +520,7 @@ export function LocationsPage() {
                     className="cp-btn cp-btn-primary"
                     onClick={() => assignmentsCardRef.current?.openAddForm()}
                   >
-                    + Add JDE Location Assignment
+                    + Add Location Assignment
                   </button>
                 </div>
               </div>
@@ -535,7 +535,7 @@ export function LocationsPage() {
                 ref={assignmentsCardRef}
                 key={`location-assignments-${selectedLocationId}`}
                 config={{
-                  title: 'JDE Location Assignments',
+                  title: 'Location Assignments',
                   description: 'Create, edit, and delete assignments related to the selected location.',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,
