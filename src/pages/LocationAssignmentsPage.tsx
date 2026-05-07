@@ -33,7 +33,14 @@ export function LocationAssignmentsPage() {
         Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name'] }),
         Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'], orderBy: ['cr113_role_name asc'] }),
       ])
-      const rawLocations = (locationsRes.data ?? []).map(l => ({ value: l.cr113_jde_locationid, label: l.cr113_coloc_id ?? l.cr113_coloc_name ?? '' }))
+      const rawLocations = (locationsRes.data ?? []).map(l => {
+        const locationCode = l.cr113_coloc_id?.trim() ?? ''
+        const locationName = l.cr113_coloc_name?.trim() ?? ''
+        return {
+          value: l.cr113_jde_locationid,
+          label: locationCode && locationName ? `${locationCode} - ${locationName}` : locationCode || locationName,
+        }
+      })
       rawLocations.sort((a, b) => { const an = parseFloat(a.label), bn = parseFloat(b.label); return isFinite(an) && isFinite(bn) ? an - bn : a.label.localeCompare(b.label) })
       setLocationOptions(rawLocations)
       setManagerOptions((managersRes.data ?? []).map(m => ({ value: m.cr113_jde_managerid, label: m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`.trim() })).sort((a, b) => a.label.localeCompare(b.label)))

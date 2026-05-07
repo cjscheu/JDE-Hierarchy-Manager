@@ -15,6 +15,8 @@ export interface FieldDef {
   showOnCard?: boolean
   /** included in the add/edit form */
   editable?: boolean
+  /** included only when editing an existing record */
+  editOnly?: boolean
   /** required in the form */
   required?: boolean
   /** placeholder text */
@@ -158,7 +160,9 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   })
 
   const tableFields = filteredFields.filter(f => f.showOnCard)
-  const editableFields = filteredFields.filter(f => f.editable)
+  const getEditableFields = (isEdit: boolean) =>
+    filteredFields.filter(f => f.editable && (!f.editOnly || isEdit))
+  const editableFields = getEditableFields(editTarget != null)
 
   const filtered = search.trim()
     ? rows.filter(r =>
@@ -196,7 +200,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   const openEdit = (row: Row) => {
     setEditTarget(row)
     const vals: Record<string, string> = {}
-    editableFields.forEach(f => { vals[f.key] = String(row[f.key] ?? '') })
+    getEditableFields(true).forEach(f => { vals[f.key] = String(row[f.key] ?? '') })
     setFormValues(vals)
     setFormError(null)
     setModalOpen(true)
@@ -215,8 +219,9 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
 
   // ── save ──
   const handleSave = async () => {
+    const activeEditableFields = getEditableFields(editTarget != null)
     // validate
-    for (const f of editableFields) {
+    for (const f of activeEditableFields) {
       if (f.required && !formValues[f.key]?.trim()) {
         setFormError(`"${f.label}" is required.`)
         return
@@ -226,7 +231,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
     setFormError(null)
     try {
       const payload: Record<string, string> = {}
-      editableFields.forEach(f => {
+      activeEditableFields.forEach(f => {
         if (formValues[f.key] !== undefined) payload[f.key] = formValues[f.key]
       })
       if (editTarget) {

@@ -32,6 +32,21 @@ const USER_FIELDS: FieldDef[] = [
     required: true,
     placeholder: 'e.g. user@contoso.com',
   },
+  {
+    key: 'cr113_roletype',
+    label: 'Role Type',
+    inputType: 'select',
+    options: [
+      { label: 'Admin', value: '1' },
+      { label: 'Power User', value: '2' },
+      { label: 'Super User', value: '3' },
+    ],
+    showOnCard: false,
+    editable: true,
+    editOnly: true,
+    required: true,
+    placeholder: 'Select role type',
+  },
 ]
 
 const getService = (roleType: 1 | 2 | 3) => ({
@@ -39,7 +54,7 @@ const getService = (roleType: 1 | 2 | 3) => ({
     console.log(`Fetching records for roleType: ${roleType}`)
     const result = await Cr113_user_securitiesService.getAll({
       filter: `cr113_application eq 'Dairy Brands Hierarchy Manager' and cr113_roletype eq ${roleType}`,
-      select: ['cr113_username', 'cr113_email', 'cr113_user_securityid'],
+      select: ['cr113_username', 'cr113_email', 'cr113_roletype', 'cr113_user_securityid'],
     })
     console.log('API Response:', result)
     return { success: result.success, data: result.data || [] }
@@ -56,7 +71,16 @@ const getService = (roleType: 1 | 2 | 3) => ({
     return { success: result.success, data: result.data }
   },
   update: async (id: string, changes: Record<string, any>): Promise<{ success: boolean }> => {
-    const result = await Cr113_user_securitiesService.update(id, changes)
+    const payload = {
+      ...changes,
+      ...(changes.cr113_roletype !== undefined
+        ? { cr113_roletype: Number(changes.cr113_roletype) as 1 | 2 | 3 }
+        : {}),
+    }
+    const result = await Cr113_user_securitiesService.update(
+      id,
+      payload as Parameters<typeof Cr113_user_securitiesService.update>[1]
+    )
     if (!result.success) {
       throw new Error('Unable to update user security record.')
     }

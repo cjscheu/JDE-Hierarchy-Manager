@@ -33,7 +33,14 @@ export function CompanyAssignmentsPage() {
         Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name'] }),
         Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'], orderBy: ['cr113_role_name asc'] }),
       ])
-      const rawCompanies = (companiesRes.data ?? []).map(c => ({ value: c.cr113_jde_companyid, label: c.cr113_co_id ?? c.cr113_co_desc ?? '' }))
+      const rawCompanies = (companiesRes.data ?? []).map(c => {
+        const companyCode = c.cr113_co_id?.trim() ?? ''
+        const companyName = c.cr113_co_desc?.trim() ?? ''
+        return {
+          value: c.cr113_jde_companyid,
+          label: companyCode && companyName ? `${companyCode} - ${companyName}` : companyCode || companyName,
+        }
+      })
       rawCompanies.sort((a, b) => { const an = parseFloat(a.label), bn = parseFloat(b.label); return isFinite(an) && isFinite(bn) ? an - bn : a.label.localeCompare(b.label) })
       setCompanyOptions(rawCompanies)
       setManagerOptions((managersRes.data ?? []).map(m => ({ value: m.cr113_jde_managerid, label: m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`.trim() })).sort((a, b) => a.label.localeCompare(b.label)))
