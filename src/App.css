@@ -344,7 +344,7 @@ body::before {
 .network-user-text {
   font-size: 0.9rem;
   font-weight: 550;
-  color: #fff;
+  color: var(--sidebar-foreground);
   line-height: 1.3;
   flex: 1;
 }

@@ -98,3 +98,5 @@
 -on the edit Admin user page, the edit Power Users Page and the Edit Super Users page, add the dropdown field for Role Type
 -on the Add JDE Company Assignment card, the Company dropdown field shows the Company Code.  It should show the Company Code with a space then dash and space then Company Name
 -on the Add JDE Location Assignment card, the Location dropdown field shows the Location Code.  It should show the Location Code with a space then dash and space then Location Name
+
+-when light mode is toggled on the app, the user name is still colored white and is not visible, please correct
