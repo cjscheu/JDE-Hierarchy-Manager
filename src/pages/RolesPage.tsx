@@ -1,5 +1,6 @@
 import { CardPage } from '../components/CardPage'
 import { Cr113_jde_rolesesService } from '../generated/services/Cr113_jde_rolesesService'
+import { ensureRoleCanBeDeleted } from './deleteGuards'
 
 export function RolesPage() {
   return (
@@ -8,7 +9,15 @@ export function RolesPage() {
         title: 'Roles',
         description: 'Manage JDE roles that can be assigned to managers.',
         idField: 'cr113_jde_rolesid',
-        service: Cr113_jde_rolesesService,
+        service: {
+          getAll: Cr113_jde_rolesesService.getAll,
+          create: Cr113_jde_rolesesService.create,
+          update: Cr113_jde_rolesesService.update,
+          delete: async (id: string) => {
+            await ensureRoleCanBeDeleted(id)
+            await Cr113_jde_rolesesService.delete(id)
+          },
+        },
         fields: [
           {
             key: 'cr113_role_name',

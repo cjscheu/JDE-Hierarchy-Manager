@@ -1,5 +1,6 @@
 import { CardPage } from '../components/CardPage'
 import { Cr113_jde_ledger_typesService } from '../generated/services/Cr113_jde_ledger_typesService'
+import { ensureLedgerTypeCanBeDeleted } from './deleteGuards'
 
 export function LedgerTypesPage() {
   return (
@@ -8,7 +9,15 @@ export function LedgerTypesPage() {
         title: 'Ledger Types',
         description: 'Manage ledger types used by companies.',
         idField: 'cr113_jde_ledger_typeid',
-        service: Cr113_jde_ledger_typesService,
+        service: {
+          getAll: Cr113_jde_ledger_typesService.getAll,
+          create: Cr113_jde_ledger_typesService.create,
+          update: Cr113_jde_ledger_typesService.update,
+          delete: async (id: string) => {
+            await ensureLedgerTypeCanBeDeleted(id)
+            await Cr113_jde_ledger_typesService.delete(id)
+          },
+        },
         fields: [
           {
             key: 'cr113_co_ledger_type_name',

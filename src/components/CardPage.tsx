@@ -93,6 +93,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   const [rows, setRows] = useState<Row[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   // modal state
   const [modalOpen, setModalOpen] = useState(false)
@@ -114,6 +115,12 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   // sort
   const [sortKey, setSortKey] = useState<string | null>(defaultSortKey ?? null)
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>(defaultSortDirProp ?? 'asc')
+
+  useEffect(() => {
+    if (!success) return
+    const timer = window.setTimeout(() => setSuccess(null), 3500)
+    return () => window.clearTimeout(timer)
+  }, [success])
 
   const handleSort = (key: string) => {
     if (sortKey === key) {
@@ -242,11 +249,14 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
     setDeleting(true)
     try {
       await service.delete(String(deleteTarget[idField]))
-      setDeleteTarget(null)
+      setError(null)
+      setSuccess('Record deleted successfully.')
       await load()
     } catch (e) {
+      setSuccess(null)
       setError(e instanceof Error ? e.message : String(e))
     } finally {
+      setDeleteTarget(null)
       setDeleting(false)
     }
   }
@@ -351,6 +361,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   return (
     <div className="cp-page">
       {error && <div className="cp-error">{error}</div>}
+      {success && <div className="cp-success">{success}</div>}
 
       {showHeader ? (
         <div className="cp-card-shell">
@@ -449,6 +460,9 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                 <strong>{primaryField ? String(deleteTarget[primaryField.key] ?? 'this record') : 'this record'}</strong>?
                 This cannot be undone.
               </p>
+              <p>
+                Warning: if this record is referenced by related tables, deletion will be blocked to prevent data loss.
+              </p>
             </div>
             <div className="cp-modal-footer">
               <button className="cp-btn cp-btn-secondary" onClick={() => setDeleteTarget(null)} disabled={deleting}>
@@ -457,6 +471,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
               <button className="cp-btn cp-btn-danger" onClick={handleDelete} disabled={deleting}>
                 {deleting ? 'Deleting…' : 'Delete'}
               </button>
+              {/* Automatically close modal after delete */}
             </div>
           </div>
         </div>

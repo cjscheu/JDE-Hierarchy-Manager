@@ -1,5 +1,6 @@
 import { CardPage } from '../components/CardPage'
 import { Cr113_jde_groupsService } from '../generated/services/Cr113_jde_groupsService'
+import { ensureGroupCanBeDeleted } from './deleteGuards'
 
 export function GroupsPage() {
   return (
@@ -8,7 +9,15 @@ export function GroupsPage() {
         title: 'Groups',
         description: 'Manage location groups.',
         idField: 'cr113_jde_groupid',
-        service: Cr113_jde_groupsService,
+        service: {
+          getAll: Cr113_jde_groupsService.getAll,
+          create: Cr113_jde_groupsService.create,
+          update: Cr113_jde_groupsService.update,
+          delete: async (id: string) => {
+            await ensureGroupCanBeDeleted(id)
+            await Cr113_jde_groupsService.delete(id)
+          },
+        },
         fields: [
           {
             key: 'cr113_group_name',

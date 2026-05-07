@@ -72,3 +72,12 @@
 -on the JDE Companies page, when a user clicks a row on the main card, those related locations appear on the details card.  add the ability when the user double clicks a row on the details card, a page will pop up with the related location assignments card (from the JDE Locations page).  closing the new page with return to the JDE Companies page with the same selections
 -hide the JDE Locations navigation page button on the left hand pane
 -********** removed header cards on pages.  seems redundant for now.  may change later if needed ***block commented those rows out
+
+5/7/2026
+-remove Division ID from Add Division page card
+-in the data management and user management pages, when a user click the delete command, a prompt should pop up warning of the change.  If the deletion is going to have an impact in other related tables (losing records), deletion is not allowed
+-on the add new JDE Manager and the edit JDE Manager pages, include fields for First Name and Last Name
+-on the Data Managment page, remove the Employee ID field on the +Add JDE Manager page form
+-after deleting a record, close the Confirm Delete prompt either way if a record is deleted or not.  If the record is delete, provide a confirmation in green just like the red confirmation message if it can't delete the record
+-on the location assignments pop up prompt page, increase the vertical size of the card and the table in the card should maximize to the size of the card
+-on the JDE Managers page, there is now a blank container card behind the main card.  Remove this card but nothing else should change

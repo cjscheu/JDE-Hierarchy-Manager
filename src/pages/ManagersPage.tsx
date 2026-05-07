@@ -1,5 +1,6 @@
 import { CardPage } from '../components/CardPage'
 import { Cr113_jde_managersService } from '../generated/services/Cr113_jde_managersService'
+import { ensureManagerCanBeDeleted } from './deleteGuards'
 
 export function ManagersPage() {
   return (
@@ -8,7 +9,15 @@ export function ManagersPage() {
         title: 'JDE Managers',
         description: 'Manage manager contact and profile data.',
         idField: 'cr113_jde_managerid',
-        service: Cr113_jde_managersService,
+        service: {
+          getAll: Cr113_jde_managersService.getAll,
+          create: Cr113_jde_managersService.create,
+          update: Cr113_jde_managersService.update,
+          delete: async (id: string) => {
+            await ensureManagerCanBeDeleted(id)
+            await Cr113_jde_managersService.delete(id)
+          },
+        },
         fields: [
           {
             key: 'cr113_first_name',
@@ -25,14 +34,6 @@ export function ManagersPage() {
             editable: true,
             placeholder: 'e.g. Doe',
             required: true,
-          },
-          {
-            key: 'cr113_empl_id',
-            label: 'Employee ID',
-            showOnCard: false,
-            editable: true,
-            required: true,
-            placeholder: 'e.g. E12345',
           },
           {
             key: 'cr113_position_title',

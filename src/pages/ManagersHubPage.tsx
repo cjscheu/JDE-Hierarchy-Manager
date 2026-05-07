@@ -296,100 +296,110 @@ export function ManagersHubPage() {
 
       <div className="companies-layout">
         <section className="companies-main">
-          <div className="companies-main-shell">
-            <div className="companies-main-topbar">
-              <div className="companies-main-toolbar">
-                <CardPage
-                  ref={managersCardRef}
-                  config={{
-                    title: 'JDE Managers',
-                    description: 'Manage JDE manager records. Select a row to load assignment details.',
-                    hideHeaderCopy: true,
-                    hideHeaderActions: false,
-                    hideRowDeleteAction: true,
-                    idField: 'cr113_jde_managerid',
-                    service: {
-                      async getAll(options: any = {}) {
-                        const res = await Cr113_jde_managersService.getAll(options)
-                        return {
-                          ...res,
-                          data: (res.data ?? []).map((row: any) => ({
-                            ...row,
-                            cr113_manager_name: `${row.cr113_first_name ?? ''} ${row.cr113_last_name ?? ''}`.trim(),
-                          })),
-                        }
-                      },
-                      create: Cr113_jde_managersService.create,
-                      update: Cr113_jde_managersService.update,
-                      delete: Cr113_jde_managersService.delete,
-                    },
-                    defaultSortKey: 'cr113_last_name',
-                    defaultSortDir: 'asc',
-                    selectedRowId: selectedManagerId,
-                    onRowSelect: row => {
-                      setSelectedManagerId(String(row.cr113_jde_managerid))
-                      setSelectedManagerName(String(row.cr113_manager_name ?? row.cr113_empl_id ?? ''))
-                    },
-                    onRowsLoaded: rows => {
-                      // keep CardPage search in sync with managersSearch state
-                      // CardPage now manages its own search state
+          <CardPage
+            ref={managersCardRef}
+            config={{
+              title: 'JDE Managers',
+              description: 'Manage JDE manager records. Select a row to load assignment details.',
+              hideHeaderCopy: true,
+              hideHeaderActions: false,
+              hideRowDeleteAction: true,
+              idField: 'cr113_jde_managerid',
+              service: {
+                async getAll(options: any = {}) {
+                  const res = await Cr113_jde_managersService.getAll(options)
+                  return {
+                    ...res,
+                    data: (res.data ?? []).map((row: any) => ({
+                      ...row,
+                      cr113_manager_name: `${row.cr113_first_name ?? ''} ${row.cr113_last_name ?? ''}`.trim(),
+                    })),
+                  }
+                },
+                create: Cr113_jde_managersService.create,
+                update: Cr113_jde_managersService.update,
+                delete: Cr113_jde_managersService.delete,
+              },
+              defaultSortKey: 'cr113_last_name',
+              defaultSortDir: 'asc',
+              selectedRowId: selectedManagerId,
+              onRowSelect: row => {
+                setSelectedManagerId(String(row.cr113_jde_managerid))
+                setSelectedManagerName(String(row.cr113_manager_name ?? row.cr113_empl_id ?? ''))
+              },
+              onRowsLoaded: rows => {
+                // keep CardPage search in sync with managersSearch state
+                // CardPage now manages its own search state
 
-                      if (rows.length === 0) {
-                        setSelectedManagerId(null)
-                        setSelectedManagerName('')
-                        return
-                      }
+                if (rows.length === 0) {
+                  setSelectedManagerId(null)
+                  setSelectedManagerName('')
+                  return
+                }
 
-                      const selectedStillExists = selectedManagerId
-                        ? rows.some(row => String(row.cr113_jde_managerid) === selectedManagerId)
-                        : false
+                const selectedStillExists = selectedManagerId
+                  ? rows.some(row => String(row.cr113_jde_managerid) === selectedManagerId)
+                  : false
 
-                      if (!selectedStillExists) {
-                        setSelectedManagerId(null)
-                        setSelectedManagerName('')
-                      }
-                    },
-                    fields: [
-                      {
-                        key: 'cr113_manager_name',
-                        label: 'Manager Name',
-                        showOnCard: true,
-                        editable: false,
-                      },
-                      {
-                        key: 'cr113_position_title',
-                        label: 'Position Title',
-                        showOnCard: true,
-                        editable: true,
-                        placeholder: 'e.g. Operations Manager',
-                      },
-                      {
-                        key: 'cr113_email',
-                        label: 'Email',
-                        showOnCard: true,
-                        editable: true,
-                        placeholder: 'e.g. user@contoso.com',
-                      },
-                      {
-                        key: 'cr113_chat',
-                        label: 'Chat Handle',
-                        showOnCard: false,
-                        editable: true,
-                        placeholder: 'Optional',
-                      },
-                      {
-                        key: 'cr113_manager_ak',
-                        label: 'Alternate Key',
-                        showOnCard: false,
-                        editable: true,
-                        placeholder: 'Optional alternate key',
-                      },
-                    ],
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+                if (!selectedStillExists) {
+                  setSelectedManagerId(null)
+                  setSelectedManagerName('')
+                }
+              },
+              fields: [
+                {
+                  key: 'cr113_manager_name',
+                  label: 'Manager Name',
+                  showOnCard: true,
+                  editable: false,
+                },
+                {
+                  key: 'cr113_first_name',
+                  label: 'First Name',
+                  showOnCard: false,
+                  editable: true,
+                  required: true,
+                  placeholder: 'e.g. Jane',
+                },
+                {
+                  key: 'cr113_last_name',
+                  label: 'Last Name',
+                  showOnCard: false,
+                  editable: true,
+                  required: true,
+                  placeholder: 'e.g. Doe',
+                },
+                {
+                  key: 'cr113_position_title',
+                  label: 'Position Title',
+                  showOnCard: true,
+                  editable: true,
+                  placeholder: 'e.g. Operations Manager',
+                },
+                {
+                  key: 'cr113_email',
+                  label: 'Email',
+                  showOnCard: true,
+                  editable: true,
+                  placeholder: 'e.g. user@contoso.com',
+                },
+                {
+                  key: 'cr113_chat',
+                  label: 'Chat Handle',
+                  showOnCard: false,
+                  editable: true,
+                  placeholder: 'Optional',
+                },
+                {
+                  key: 'cr113_manager_ak',
+                  label: 'Alternate Key',
+                  showOnCard: false,
+                  editable: true,
+                  placeholder: 'Optional alternate key',
+                },
+              ],
+            }}
+          />
         </section>
         <section className="companies-details">
           <div className="companies-details-shell">
