@@ -2,8 +2,13 @@ import { Cr113_jde_companiesService } from '../generated/services/Cr113_jde_comp
 import { Cr113_jde_locationsService } from '../generated/services/Cr113_jde_locationsService'
 import { Cr113_jde_co_assignmentsService } from '../generated/services/Cr113_jde_co_assignmentsService'
 import { Cr113_jde_loc_assignmentsService } from '../generated/services/Cr113_jde_loc_assignmentsService'
+import { canDeleteAnyRecord } from '../security/access'
 
 const ensureNoDependencies = (count: number, dependencyLabel: string) => {
+  if (canDeleteAnyRecord()) {
+    return
+  }
+
   if (count > 0) {
     throw new Error(`Delete blocked: this record is used by ${count} ${dependencyLabel}. Remove dependent records first.`)
   }

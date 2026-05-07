@@ -81,3 +81,16 @@
 -after deleting a record, close the Confirm Delete prompt either way if a record is deleted or not.  If the record is delete, provide a confirmation in green just like the red confirmation message if it can't delete the record
 -on the location assignments pop up prompt page, increase the vertical size of the card and the table in the card should maximize to the size of the card
 -on the JDE Managers page, there is now a blank container card behind the main card.  Remove this card but nothing else should change
+
+-all table headers and row fonts should be the same size
+-I need to implement security. Users in the admin table have access to all pages, users in the power users table have access to Home, JDE Companies and JDE Managers pages. All other users only have access to the Home page.
+-hide the JDE Location Page navigation from the left hand pane
+-on the Data Management page, add tabs for cr113_jde_co_assignments and cr113_jde_loc_assignments;  also make the tab header row the same width as the current card on the page
+-on the User Management page, amake the tab header row the same width as the current card on the page
+-on the User Management page, add a tab for Super Users.  Same logic as the other tabs except filter on Application called Dairy Brands Hierarchy Manager and Role Type of Super or value 3
+-on the Add and Edit Admin Users page, add fields for User Name, Email.
+-on the Add and Edit Power Users page, add fields for User Name, Email.
+-on the Add and Edit Super Users page, add fields for User Name, Email.
+-I need to update security. Users in the Super Users table have access to everything and have the ability to delete any record.  Users in the admin table cannot see the Super Users tab on the User Management page and cannot see the Company Assignment and Location Assigments on the Date Management page.  Admin users still do not have the ability to delete records if there are impacting records in other related tables
+-on the JDE Company Assignments card table, hide the Assignment ID column; The Company, Manager and Role columns are showing a dash instead of data.  These columns should be pulling in data
+-on the JDE Locaiton Assignments card table, hide the Assignment ID column; The Location, and Role columns are showing a dash instead of data.  These columns should be pulling in data

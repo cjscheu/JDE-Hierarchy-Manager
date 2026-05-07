@@ -346,7 +346,24 @@ body::before {
   font-weight: 550;
   color: #fff;
   line-height: 1.3;
+  flex: 1;
 }
+
+.role-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.role-badge-super  { background: #7c3aed; color: #fff; }
+.role-badge-admin  { background: #2563eb; color: #fff; }
+.role-badge-power  { background: #16a34a; color: #fff; }
+.role-badge-basic  { background: #6b7280; color: #fff; }
 
 .theme-toggle-wrap {
   display: flex;
@@ -670,8 +687,6 @@ body::before {
 .refs-tabs,
 .cp-card-shell,
 .cp-table-wrap-standalone,
-.companies-main-shell,
-.companies-details-shell,
 .companies-details-empty {
   zoom: 0.855;
 }
@@ -713,6 +728,19 @@ body::before {
   border-bottom: 1px solid var(--border);
   padding: 0 4px;
   background: transparent;
+}
+
+.data-management-page .refs-tabs {
+  width: min(90%, 1008px);
+  margin-inline: auto;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.user-management-page .refs-tabs {
+  width: min(90%, 1008px);
+  margin-inline: auto;
 }
 
 .refs-tab-btn {

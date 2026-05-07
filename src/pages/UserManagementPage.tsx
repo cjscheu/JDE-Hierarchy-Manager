@@ -1,22 +1,40 @@
 import { useState } from 'react'
 import { CardPage } from '../components/CardPage'
 import { Cr113_user_securitiesService } from '../generated/services/Cr113_user_securitiesService'
+import type { AccessRole } from '../security/access'
 
 // Define USER_MANAGEMENT_TABS constant with explicit types
-const USER_MANAGEMENT_TABS: { id: 'admin' | 'power'; label: string; roleType: 1 | 2 }[] = [
+const USER_MANAGEMENT_TABS: { id: 'admin' | 'power' | 'super'; label: string; roleType: 1 | 2 | 3 }[] = [
   { id: 'admin', label: 'Admin Users', roleType: 1 },
   { id: 'power', label: 'Power Users', roleType: 2 },
+  { id: 'super', label: 'Super Users', roleType: 3 },
 ]
 
 // Update USER_FIELDS to include key property
 import type { FieldDef } from '../components/CardPage'
 
 const USER_FIELDS: FieldDef[] = [
-  { key: 'cr113_username', label: 'Username', inputType: 'text', showOnCard: true },
-  { key: 'cr113_email', label: 'Email', inputType: 'text', showOnCard: true },
+  {
+    key: 'cr113_username',
+    label: 'User Name',
+    inputType: 'text',
+    showOnCard: true,
+    editable: true,
+    required: true,
+    placeholder: 'e.g. Jane Doe',
+  },
+  {
+    key: 'cr113_email',
+    label: 'Email',
+    inputType: 'text',
+    showOnCard: true,
+    editable: true,
+    required: true,
+    placeholder: 'e.g. user@contoso.com',
+  },
 ]
 
-const getService = (roleType: 1 | 2) => ({
+const getService = (roleType: 1 | 2 | 3) => ({
   getAll: async (): Promise<{ success: boolean; data: any[] }> => {
     console.log(`Fetching records for roleType: ${roleType}`)
     const result = await Cr113_user_securitiesService.getAll({
@@ -30,15 +48,18 @@ const getService = (roleType: 1 | 2) => ({
     const result = await Cr113_user_securitiesService.create({
       ...record,
       cr113_application: 'Dairy Brands Hierarchy Manager',
-      cr113_roletype: roleType,
-      ownerid: 'default-owner-id',
-      owneridtype: 'default-owner-type',
-      statecode: 0,
-    })
+      cr113_roletype: roleType as any,
+    } as any)
+    if (!result.success) {
+      throw new Error('Unable to create user security record.')
+    }
     return { success: result.success, data: result.data }
   },
   update: async (id: string, changes: Record<string, any>): Promise<{ success: boolean }> => {
     const result = await Cr113_user_securitiesService.update(id, changes)
+    if (!result.success) {
+      throw new Error('Unable to update user security record.')
+    }
     return { success: result.success }
   },
   delete: async (id: string): Promise<void> => {
@@ -46,25 +67,29 @@ const getService = (roleType: 1 | 2) => ({
   },
 })
 
-export function UserManagementPage() {
+export function UserManagementPage({ accessRole = 'basic' }: { accessRole?: AccessRole }) {
   console.log('UserManagementPage rendered')
-  const [activeTab, setActiveTab] = useState<'admin' | 'power'>(USER_MANAGEMENT_TABS[0].id)
+  const [activeTab, setActiveTab] = useState<'admin' | 'power' | 'super'>(USER_MANAGEMENT_TABS[0].id)
+  const visibleTabs = USER_MANAGEMENT_TABS.filter(tab =>
+    accessRole === 'admin' ? tab.id !== 'super' : true
+  )
+  const currentTab = visibleTabs.find(tab => tab.id === activeTab) ?? visibleTabs[0]
 
   return (
-    <section className="refs-page">
+    <section className="refs-page user-management-page">
 {/*       <div className="refs-header">
         <h2 className="refs-title">User Management</h2>
         <p className="refs-description">Manage admin and power users.</p>
       </div> */}
 
       <div className="refs-tabs" role="tablist" aria-label="User management tabs">
-        {USER_MANAGEMENT_TABS.map((tab) => (
+        {visibleTabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
             role="tab"
-            aria-selected={activeTab === tab.id}
-            className={`refs-tab-btn${activeTab === tab.id ? ' active' : ''}`}
+            aria-selected={currentTab.id === tab.id}
+            className={`refs-tab-btn${currentTab.id === tab.id ? ' active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.label}
@@ -73,9 +98,9 @@ export function UserManagementPage() {
       </div>
 
       <div className="refs-tab-panel" role="tabpanel">
-        {USER_MANAGEMENT_TABS.map(
+        {visibleTabs.map(
           (tab) =>
-            activeTab === tab.id && (
+            currentTab.id === tab.id && (
               <CardPage
                 key={tab.id}
                 config={{
