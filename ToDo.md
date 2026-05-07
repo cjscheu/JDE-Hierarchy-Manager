@@ -100,3 +100,5 @@
 -on the Add JDE Location Assignment card, the Location dropdown field shows the Location Code.  It should show the Location Code with a space then dash and space then Location Name
 
 -when light mode is toggled on the app, the user name is still colored white and is not visible, please correct
+
+-there is an extra divider about the user name, please remove it

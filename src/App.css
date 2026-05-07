@@ -322,12 +322,6 @@ body::before {
   flex-shrink: 0;
 }
 
-.sidebar-footer-divider {
-  height: 1px;
-  margin: 0 2px 12px;
-  background: var(--sidebar-border);
-}
-
 .network-user {
   display: flex;
   align-items: center;

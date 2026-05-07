@@ -189,8 +189,6 @@ function App() {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="sidebar-footer-divider" role="presentation" />
-
           <div className="network-user" aria-label="DFA network user">
             <UserRound className="network-user-icon" size={18} aria-hidden="true" />
             <span className="network-user-text">{networkUserName}</span>
