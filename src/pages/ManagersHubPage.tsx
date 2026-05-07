@@ -64,7 +64,7 @@ export function ManagersHubPage() {
   const [selectedManagerName, setSelectedManagerName] = useState('')
   const [activeDetailsTab, setActiveDetailsTab] = useState<'company' | 'location'>('company')
 
-  const [managersSearch, setManagersSearch] = useState('')
+  // Removed unused managersSearch state
   const [companyAssignmentsSearch, setCompanyAssignmentsSearch] = useState('')
   const [locationAssignmentsSearch, setLocationAssignmentsSearch] = useState('')
 
@@ -287,7 +287,6 @@ export function ManagersHubPage() {
     },
     delete: Cr113_jde_loc_assignmentsService.delete,
   }
-
   return (
     <div className="companies-page managers-page">
       <section className="companies-page-title-card">
@@ -300,116 +299,98 @@ export function ManagersHubPage() {
           <div className="companies-main-shell">
             <div className="companies-main-topbar">
               <div className="companies-main-toolbar">
-                <input
-                  className="cp-search"
-                  type="search"
-                  placeholder="Search jde managers..."
-                  value={managersSearch}
-                  onChange={e => {
-                    const next = e.target.value
-                    setManagersSearch(next)
-                    managersCardRef.current?.setSearchValue(next)
+                <CardPage
+                  ref={managersCardRef}
+                  config={{
+                    title: 'JDE Managers',
+                    description: 'Manage JDE manager records. Select a row to load assignment details.',
+                    hideHeaderCopy: true,
+                    hideHeaderActions: false,
+                    hideRowDeleteAction: true,
+                    idField: 'cr113_jde_managerid',
+                    service: {
+                      async getAll(options: any = {}) {
+                        const res = await Cr113_jde_managersService.getAll(options)
+                        return {
+                          ...res,
+                          data: (res.data ?? []).map((row: any) => ({
+                            ...row,
+                            cr113_manager_name: `${row.cr113_first_name ?? ''} ${row.cr113_last_name ?? ''}`.trim(),
+                          })),
+                        }
+                      },
+                      create: Cr113_jde_managersService.create,
+                      update: Cr113_jde_managersService.update,
+                      delete: Cr113_jde_managersService.delete,
+                    },
+                    defaultSortKey: 'cr113_last_name',
+                    defaultSortDir: 'asc',
+                    selectedRowId: selectedManagerId,
+                    onRowSelect: row => {
+                      setSelectedManagerId(String(row.cr113_jde_managerid))
+                      setSelectedManagerName(String(row.cr113_manager_name ?? row.cr113_empl_id ?? ''))
+                    },
+                    onRowsLoaded: rows => {
+                      // keep CardPage search in sync with managersSearch state
+                      // CardPage now manages its own search state
+
+                      if (rows.length === 0) {
+                        setSelectedManagerId(null)
+                        setSelectedManagerName('')
+                        return
+                      }
+
+                      const selectedStillExists = selectedManagerId
+                        ? rows.some(row => String(row.cr113_jde_managerid) === selectedManagerId)
+                        : false
+
+                      if (!selectedStillExists) {
+                        setSelectedManagerId(null)
+                        setSelectedManagerName('')
+                      }
+                    },
+                    fields: [
+                      {
+                        key: 'cr113_manager_name',
+                        label: 'Manager Name',
+                        showOnCard: true,
+                        editable: false,
+                      },
+                      {
+                        key: 'cr113_position_title',
+                        label: 'Position Title',
+                        showOnCard: true,
+                        editable: true,
+                        placeholder: 'e.g. Operations Manager',
+                      },
+                      {
+                        key: 'cr113_email',
+                        label: 'Email',
+                        showOnCard: true,
+                        editable: true,
+                        placeholder: 'e.g. user@contoso.com',
+                      },
+                      {
+                        key: 'cr113_chat',
+                        label: 'Chat Handle',
+                        showOnCard: false,
+                        editable: true,
+                        placeholder: 'Optional',
+                      },
+                      {
+                        key: 'cr113_manager_ak',
+                        label: 'Alternate Key',
+                        showOnCard: false,
+                        editable: true,
+                        placeholder: 'Optional alternate key',
+                      },
+                    ],
                   }}
                 />
-                <button
-                  className="cp-btn cp-btn-primary"
-                  onClick={() => managersCardRef.current?.openAddForm()}
-                >
-                  + Add JDE Manager
-                </button>
               </div>
             </div>
-
-            <CardPage
-              ref={managersCardRef}
-              config={{
-                title: 'JDE Managers',
-                description: 'Manage JDE manager records. Select a row to load assignment details.',
-                hideHeaderCopy: true,
-                hideHeaderActions: true,
-                hideRowDeleteAction: true,
-                idField: 'cr113_jde_managerid',
-                service: Cr113_jde_managersService,
-                defaultSortKey: 'cr113_manager_name',
-                defaultSortDir: 'asc',
-                selectedRowId: selectedManagerId,
-                onRowSelect: row => {
-                  setSelectedManagerId(String(row.cr113_jde_managerid))
-                  setSelectedManagerName(String(row.cr113_manager_name ?? row.cr113_empl_id ?? ''))
-                },
-                onRowsLoaded: rows => {
-                  if (rows.length === 0) {
-                    setSelectedManagerId(null)
-                    setSelectedManagerName('')
-                    return
-                  }
-
-                  const selectedStillExists = selectedManagerId
-                    ? rows.some(row => String(row.cr113_jde_managerid) === selectedManagerId)
-                    : false
-
-                  if (!selectedStillExists) {
-                    setSelectedManagerId(null)
-                    setSelectedManagerName('')
-                  }
-                },
-                fields: [
-                  {
-                    key: 'cr113_manager_name',
-                    label: 'Manager Name',
-                    showOnCard: true,
-                    editable: false,
-                  },
-                  {
-                    key: 'cr113_first_name',
-                    label: 'First Name',
-                    showOnCard: false,
-                    editable: true,
-                    required: true,
-                    placeholder: 'e.g. Jane',
-                  },
-                  {
-                    key: 'cr113_last_name',
-                    label: 'Last Name',
-                    showOnCard: false,
-                    editable: true,
-                    required: true,
-                    placeholder: 'e.g. Doe',
-                  },
-                  {
-                    key: 'cr113_position_title',
-                    label: 'Position Title',
-                    showOnCard: true,
-                    editable: true,
-                    placeholder: 'e.g. Operations Manager',
-                  },
-                  {
-                    key: 'cr113_email',
-                    label: 'Email',
-                    showOnCard: true,
-                    editable: true,
-                    placeholder: 'e.g. user@contoso.com',
-                  },
-                  {
-                    key: 'cr113_chat',
-                    label: 'Chat Handle',
-                    showOnCard: false,
-                    editable: true,
-                    placeholder: 'Optional',
-                  },
-                  {
-                    key: 'cr113_manager_ak',
-                    label: 'Alternate Key',
-                    showOnCard: false,
-                    editable: true,
-                    placeholder: 'Optional alternate key',
-                  },
-                ],
-              }}
-            />
           </div>
         </section>
-
         <section className="companies-details">
           <div className="companies-details-shell">
             <div className="companies-details-header">
@@ -490,20 +471,20 @@ export function ManagersHubPage() {
                 Select a manager in the main table to view and manage company and location assignments.
               </div>
             ) : activeDetailsTab === 'company' ? (
-                  <CardPage
-                    ref={companyAssignmentsCardRef}
-                    key={`manager-company-assignments-${selectedManagerId}`}
-                    config={{
-                      title: 'JDE Company Assignments',
-                      description: 'Create, edit, and delete company assignments related to the selected manager.',
-                      hideHeaderCopy: true,
-                      hideHeaderActions: true,
-                      hideRowDeleteAction: true,
-                      idField: 'cr113_jde_co_assignmentid',
-                      service: companyAssignmentsService,
-                      defaultSortKey: 'cr113_companycodecode',
-                      defaultSortDir: 'asc',
-                      fields: [
+              <CardPage
+                ref={companyAssignmentsCardRef}
+                key={`manager-company-assignments-${selectedManagerId}`}
+                config={{
+                  title: 'JDE Company Assignments',
+                  description: 'Create, edit, and delete company assignments related to the selected manager.',
+                  hideHeaderCopy: true,
+                  hideHeaderActions: true,
+                  hideRowDeleteAction: true,
+                  idField: 'cr113_jde_co_assignmentid',
+                  service: companyAssignmentsService,
+                  defaultSortKey: 'cr113_companycodecode',
+                  defaultSortDir: 'asc',
+                  fields: [
                     {
                       key: 'cr113_assign_id',
                       label: 'Assignment ID',
@@ -625,5 +606,5 @@ export function ManagersHubPage() {
         </section>
       </div>
     </div>
-  )
+  );
 }

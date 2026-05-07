@@ -11,11 +11,20 @@ export function ManagersPage() {
         service: Cr113_jde_managersService,
         fields: [
           {
-            key: 'cr113_manager_name',
-            label: 'Manager Name',
+            key: 'cr113_first_name',
+            label: 'First Name',
             showOnCard: true,
             editable: true,
-            placeholder: 'e.g. Jane Doe',
+            placeholder: 'e.g. Jane',
+            required: true,
+          },
+          {
+            key: 'cr113_last_name',
+            label: 'Last Name',
+            showOnCard: true,
+            editable: true,
+            placeholder: 'e.g. Doe',
+            required: true,
           },
           {
             key: 'cr113_empl_id',
@@ -54,6 +63,8 @@ export function ManagersPage() {
             placeholder: 'Optional alternate key',
           },
         ],
+        defaultSortKey: 'cr113_last_name',
+        defaultSortDir: 'asc',
       }}
     />
   )

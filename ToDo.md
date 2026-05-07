@@ -65,3 +65,7 @@
 -Instead of separate cards for Admin and power users, make the user management page one card with a tab for Admin Users and a tab for Power Users
 
 -back to user management: i created a table called cr113_usersecurity in dataverse.  This table will be used by many apps.  for this app you will need to filter on column cr113_application for "Dairy Brands Hierarchy Manager".  For the admin tab, you will need to filter on the column called cr113_roletype for "Admin". For the power users tab, you will need to filter on the column called cr113_roletype for "Power User".  Keep that in mind when adding new users to the table
+
+-on the JDE Managers Page, remove Manager Name and replace with First Name and Last Name.  sort order should now be Last Name ascending order
+-revert back to using one column called Manager Name but it should be composed of First Name Last Name
+-

@@ -1,3 +1,10 @@
+/* Flex alignment for CardPage header actions */
+.cp-header-actions-flex {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
 /* ─── CIP Theme tokens ──────────────────────────────────────────────────────── */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -761,7 +768,7 @@ body::before {
 }
 
 .cp-header-actions-only {
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 /* search box */

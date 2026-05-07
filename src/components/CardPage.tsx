@@ -356,18 +356,20 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                 {description && <p className="cp-desc">{description}</p>}
               </div>
             )}
-            {showHeaderActions && <div className="cp-header-actions">
-              <input
-                className="cp-search"
-                type="search"
-                placeholder={`Search ${title.toLowerCase()}…`}
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-              <button className="cp-btn cp-btn-primary" onClick={openAdd}>
-                + Add {singularTitle}
-              </button>
-            </div>}
+            {showHeaderActions && (
+              <div className="cp-header-actions cp-header-actions-flex">
+                <input
+                  className="cp-search"
+                  type="search"
+                  placeholder={`Search ${title.toLowerCase()}…`}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+                <button className="cp-btn cp-btn-primary" onClick={openAdd}>
+                  + Add {singularTitle}
+                </button>
+              </div>
+            )}
           </div>
 
           {tableSection}
