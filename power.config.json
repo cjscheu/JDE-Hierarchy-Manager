@@ -64,6 +64,10 @@
         "jde_types": {
           "entitySetName": "cr113_jde_types",
           "logicalName": "cr113_jde_type"
+        },
+        "user_securities": {
+          "entitySetName": "cr113_user_securities",
+          "logicalName": "cr113_user_security"
         }
       },
       "environmentVariableName": ""

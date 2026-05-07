@@ -96,7 +96,10 @@ function App() {
               <button
                 key={item.id}
                 className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
-                onClick={() => setActivePage(item.id as NavId)}
+                onClick={() => {
+                  console.log('Sidebar click:', item.id);
+                  setActivePage(item.id as NavId);
+                }}
               >
                 <span style={{ marginRight: 10 }} aria-hidden="true">{item.icon}</span>
                 {item.label}

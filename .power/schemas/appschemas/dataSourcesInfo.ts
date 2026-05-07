@@ -95,5 +95,12 @@ export const dataSourcesInfo = {
     "primaryKey": "cr113_jde_typeid",
     "dataSourceType": "Dataverse",
     "apis": {}
+  },
+  "cr113_user_securities": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "cr113_user_securityid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
   }
 };

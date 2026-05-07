@@ -63,3 +63,5 @@
 
 -add page below Data Management called User Management.  This page should have two card side by side.  Left card should be an admin table with Email, Display Name as columns.  Have the ability to add, edit and delete.  The right side card should be a power user table with Email, Display Name as columns.  Have the ability to add, edit and delete
 -Instead of separate cards for Admin and power users, make the user management page one card with a tab for Admin Users and a tab for Power Users
+
+-back to user management: i created a table called cr113_usersecurity in dataverse.  This table will be used by many apps.  for this app you will need to filter on column cr113_application for "Dairy Brands Hierarchy Manager".  For the admin tab, you will need to filter on the column called cr113_roletype for "Admin". For the power users tab, you will need to filter on the column called cr113_roletype for "Power User".  Keep that in mind when adding new users to the table

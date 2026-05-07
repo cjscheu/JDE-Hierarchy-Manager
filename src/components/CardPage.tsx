@@ -125,7 +125,9 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
     setLoading(true)
     setError(null)
     try {
+      console.log('CardPage: calling service.getAll')
       const res = await service.getAll()
+      console.log('CardPage: service.getAll result', res)
       const nextRows = res?.data ?? []
       setRows(nextRows)
       onRowsLoaded?.(nextRows)
