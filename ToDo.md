@@ -139,3 +139,7 @@
 -on the Assignments page and within the Companies tab:  Column order should be cr113_CO_ID as Company Code, cr113_co_desc as Company Name, cr113_segment_name as Company Segment, cr113_segment_type as Company Type, cr113_ledger_type as Company Ledger, cr113_co_ak as Alternate Key, modifiedon as Modified Date.  All of columns can be removed from the Companies tab.  Update the fields on the Add Company pop up page and the edit Company pop up page
 -on the Data Tables page, remove the action buttons.  Each row can be edited by double clicking.  Please put a delete icon in its own column on the right side of the table; the modified date is not correct, change it to user time
 -on the Data Tables page Companies tab, the rows for Company Segment, Company Type and Company Ledger are empty.  Also, the delete action column should not have a header...it should be blank and the column should be only as wide as the delete icon
+
+-on the Data Tables page Companies tab, the data for Company Segment, Company Type and Company Ledger are pulling a GUID string when it should be pulling the lookup value
+-on the Data Tables page Companies tab, after double clicking the row, the edit Company pop up page, the lookup fields should be dropdowns
+-on the Data Tables page Companies tab, default sort is Company Code ascending order

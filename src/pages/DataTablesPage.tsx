@@ -25,6 +25,8 @@ type DataTableDef = {
   idField: string;
 };
 
+type LookupOption = { label: string; value: string };
+
 // List of all Dataverse tables/services to show as tabs
 const DATA_TABLES: DataTableDef[] = [
   {
@@ -135,6 +137,29 @@ function toUserTime(value: unknown) {
   return date.toLocaleString();
 }
 
+const toLookupBind = (entitySet: string, id?: string) => (id ? `/${entitySet}(${id})` : undefined);
+
+function buildCompaniesPayload(record: Record<string, unknown>) {
+  const payload: Record<string, unknown> = { ...record };
+  const segmentBind = toLookupBind('cr113_jde_co_segments', String(record.cr113_segment_name ?? ''));
+  const typeBind = toLookupBind('cr113_jde_types', String(record.cr113_segment_type ?? ''));
+  const ledgerBind = toLookupBind('cr113_jde_ledger_types', String(record.cr113_ledger_type ?? ''));
+
+  delete payload.cr113_segment_namename;
+  delete payload.cr113_segment_typename;
+  delete payload.cr113_ledger_typename;
+
+  if (record.cr113_segment_name !== undefined) delete payload.cr113_segment_name;
+  if (record.cr113_segment_type !== undefined) delete payload.cr113_segment_type;
+  if (record.cr113_ledger_type !== undefined) delete payload.cr113_ledger_type;
+
+  if (segmentBind) payload['cr113_SEGMENT_NAME@odata.bind'] = segmentBind;
+  if (typeBind) payload['cr113_SEGMENT_TYPE@odata.bind'] = typeBind;
+  if (ledgerBind) payload['cr113_LEDGER_TYPE@odata.bind'] = ledgerBind;
+
+  return payload;
+}
+
 function baseColumnName(key: string) {
   return key.split('@')[0];
 }
@@ -174,7 +199,11 @@ function entityMetadataToFields(meta: any): FieldDef[] {
     }));
 }
 
-function getCompaniesTabFields(): FieldDef[] {
+function getCompaniesTabFields(
+  segmentOptions: LookupOption[],
+  typeOptions: LookupOption[],
+  ledgerOptions: LookupOption[],
+): FieldDef[] {
   return [
     {
       key: 'cr113_co_id',
@@ -196,22 +225,52 @@ function getCompaniesTabFields(): FieldDef[] {
       key: 'cr113_segment_namename',
       label: 'Company Segment',
       showOnCard: true,
-      editable: true,
+      editable: false,
       inputType: 'text',
+    },
+    {
+      key: 'cr113_segment_name',
+      label: 'Company Segment',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: segmentOptions,
+      placeholder: 'Select company segment',
     },
     {
       key: 'cr113_segment_typename',
       label: 'Company Type',
       showOnCard: true,
-      editable: true,
+      editable: false,
       inputType: 'text',
+    },
+    {
+      key: 'cr113_segment_type',
+      label: 'Company Type',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: typeOptions,
+      placeholder: 'Select company type',
     },
     {
       key: 'cr113_ledger_typename',
       label: 'Company Ledger',
       showOnCard: true,
-      editable: true,
+      editable: false,
       inputType: 'text',
+    },
+    {
+      key: 'cr113_ledger_type',
+      label: 'Company Ledger',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: ledgerOptions,
+      placeholder: 'Select company ledger',
     },
     {
       key: 'cr113_co_ak',
@@ -230,9 +289,15 @@ function getCompaniesTabFields(): FieldDef[] {
   ];
 }
 
-function getConfiguredFields(tabId: string, fields: FieldDef[]): FieldDef[] {
+function getConfiguredFields(
+  tabId: string,
+  fields: FieldDef[],
+  segmentOptions: LookupOption[],
+  typeOptions: LookupOption[],
+  ledgerOptions: LookupOption[],
+): FieldDef[] {
   if (tabId === 'jde_companies') {
-    return getCompaniesTabFields();
+    return getCompaniesTabFields(segmentOptions, typeOptions, ledgerOptions);
   }
   return fields;
 }
@@ -241,6 +306,25 @@ export function DataTablesPage() {
   const [activeTab, setActiveTab] = useState(DATA_TABLES[0].id);
   const [fieldsByTab, setFieldsByTab] = useState<Record<string, FieldDef[]>>({});
   const [loadingTabs, setLoadingTabs] = useState<Record<string, boolean>>({});
+  const [companySegmentOptions, setCompanySegmentOptions] = useState<LookupOption[]>([]);
+  const [companyTypeOptions, setCompanyTypeOptions] = useState<LookupOption[]>([]);
+  const [companyLedgerOptions, setCompanyLedgerOptions] = useState<LookupOption[]>([]);
+
+  useEffect(() => {
+    const loadCompanyLookupOptions = async () => {
+      const [segmentsRes, typesRes, ledgersRes] = await Promise.all([
+        Cr113_jde_co_segmentsService.getAll({ select: ['cr113_jde_co_segmentid', 'cr113_co_segment_name'], orderBy: ['cr113_co_segment_name asc'] }),
+        Cr113_jde_typesService.getAll({ select: ['cr113_jde_typeid', 'cr113_co_type_name'], orderBy: ['cr113_co_type_name asc'] }),
+        Cr113_jde_ledger_typesService.getAll({ select: ['cr113_jde_ledger_typeid', 'cr113_co_ledger_type_name'], orderBy: ['cr113_co_ledger_type_name asc'] }),
+      ]);
+
+      setCompanySegmentOptions((segmentsRes.data ?? []).map((s: any) => ({ value: s.cr113_jde_co_segmentid, label: s.cr113_co_segment_name })));
+      setCompanyTypeOptions((typesRes.data ?? []).map((t: any) => ({ value: t.cr113_jde_typeid, label: t.cr113_co_type_name })));
+      setCompanyLedgerOptions((ledgersRes.data ?? []).map((l: any) => ({ value: l.cr113_jde_ledger_typeid, label: l.cr113_co_ledger_type_name })));
+    };
+
+    void loadCompanyLookupOptions();
+  }, []);
 
   useEffect(() => {
     DATA_TABLES.forEach(async tab => {
@@ -260,41 +344,82 @@ export function DataTablesPage() {
   }, []);
 
   const active = DATA_TABLES.find(tab => tab.id === activeTab) || DATA_TABLES[0];
-  const fields = getConfiguredFields(active.id, fieldsByTab[active.id] || []);
+  const fields = getConfiguredFields(
+    active.id,
+    fieldsByTab[active.id] || [],
+    companySegmentOptions,
+    companyTypeOptions,
+    companyLedgerOptions,
+  );
   const loading = loadingTabs[active.id];
 
   const wrappedService: CardPageConfig['service'] = {
     getAll: async () => {
+      if (active.id === 'jde_companies') {
+        const [result, segmentsRes, typesRes, ledgersRes] = await Promise.all([
+          active.service.getAll(),
+          Cr113_jde_co_segmentsService.getAll({ select: ['cr113_jde_co_segmentid', 'cr113_co_segment_name'] }),
+          Cr113_jde_typesService.getAll({ select: ['cr113_jde_typeid', 'cr113_co_type_name'] }),
+          Cr113_jde_ledger_typesService.getAll({ select: ['cr113_jde_ledger_typeid', 'cr113_co_ledger_type_name'] }),
+        ]);
+
+        const rawRows = normalizeRows(result);
+        const segmentById = new Map((segmentsRes.data ?? []).map((s: any) => [s.cr113_jde_co_segmentid, s.cr113_co_segment_name]));
+        const typeById = new Map((typesRes.data ?? []).map((t: any) => [t.cr113_jde_typeid, t.cr113_co_type_name]));
+        const ledgerById = new Map((ledgersRes.data ?? []).map((l: any) => [l.cr113_jde_ledger_typeid, l.cr113_co_ledger_type_name]));
+
+        const data = rawRows.map(row => ({
+          ...row,
+          ...(row.modifiedon !== undefined ? { modifiedon: toUserTime(row.modifiedon) } : {}),
+          cr113_segment_name:
+            (row.cr113_segment_name as string | undefined) ??
+            (row._cr113_segment_name_value as string | undefined) ??
+            '',
+          cr113_segment_namename:
+            (row.cr113_segment_namename as string | undefined) ??
+            (row._cr113_segment_name_value ? segmentById.get(String(row._cr113_segment_name_value)) : undefined) ??
+            '',
+          cr113_segment_type:
+            (row.cr113_segment_type as string | undefined) ??
+            (row._cr113_segment_type_value as string | undefined) ??
+            '',
+          cr113_segment_typename:
+            (row.cr113_segment_typename as string | undefined) ??
+            (row._cr113_segment_type_value ? typeById.get(String(row._cr113_segment_type_value)) : undefined) ??
+            '',
+          cr113_ledger_type:
+            (row.cr113_ledger_type as string | undefined) ??
+            (row._cr113_ledger_type_value as string | undefined) ??
+            '',
+          cr113_ledger_typename:
+            (row.cr113_ledger_typename as string | undefined) ??
+            (row._cr113_ledger_type_value ? ledgerById.get(String(row._cr113_ledger_type_value)) : undefined) ??
+            '',
+        }));
+
+        return {
+          ...(result as object),
+          data,
+        };
+      }
+
       const result = await active.service.getAll();
       const rawRows = normalizeRows(result);
       const data = rawRows.map(row => ({
         ...row,
         ...(row.modifiedon !== undefined ? { modifiedon: toUserTime(row.modifiedon) } : {}),
-        ...(active.id === 'jde_companies' ? {
-          cr113_segment_namename:
-            (row.cr113_segment_namename as string | undefined) ??
-            (row.cr113_segment_name as string | undefined) ??
-            (row._cr113_segment_name_value as string | undefined) ??
-            '',
-          cr113_segment_typename:
-            (row.cr113_segment_typename as string | undefined) ??
-            (row.cr113_segment_type as string | undefined) ??
-            (row._cr113_segment_type_value as string | undefined) ??
-            '',
-          cr113_ledger_typename:
-            (row.cr113_ledger_typename as string | undefined) ??
-            (row.cr113_ledger_type as string | undefined) ??
-            (row._cr113_ledger_type_value as string | undefined) ??
-            '',
-        } : {}),
       }));
       return {
         ...(result as object),
         data,
       };
     },
-    create: (record) => active.service.create(record),
-    update: (id, changes) => active.service.update(id, changes),
+    create: (record) => active.id === 'jde_companies'
+      ? active.service.create(buildCompaniesPayload(record as Record<string, unknown>))
+      : active.service.create(record),
+    update: (id, changes) => active.id === 'jde_companies'
+      ? active.service.update(id, buildCompaniesPayload(changes as Record<string, unknown>))
+      : active.service.update(id, changes),
     delete: (id) => active.service.delete(id),
   };
 
@@ -309,6 +434,12 @@ export function DataTablesPage() {
     hideRowDeleteAction: false,
     enableRowDoubleClickEdit: true,
     rowDeleteIconOnly: true,
+    ...(active.id === 'jde_companies'
+      ? {
+          defaultSortKey: 'cr113_co_id' as const,
+          defaultSortDir: 'asc' as const,
+        }
+      : {}),
     onRowsLoaded: (rows) => {
       setFieldsByTab(prev => {
         const existing = prev[active.id] ?? [];
