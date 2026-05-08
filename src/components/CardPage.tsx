@@ -37,6 +37,10 @@ export interface CardPageConfig {
   hideRowDeleteAction?: boolean
   /** render edit/delete actions above table instead of in table Actions column */
   actionsInHeader?: boolean
+  /** opens edit modal when a row is double-clicked */
+  enableRowDoubleClickEdit?: boolean
+  /** render delete action in table as icon-only */
+  rowDeleteIconOnly?: boolean
   /** attribute that uniquely identifies a record (GUID) */
   idField: string
   fields: FieldDef[]
@@ -80,6 +84,8 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
     hideRowEditAction,
     hideRowDeleteAction,
     actionsInHeader,
+    enableRowDoubleClickEdit,
+    rowDeleteIconOnly,
     idField,
     fields,
     service,
@@ -354,7 +360,11 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                   </span>
                 </th>
               ))}
-              {showRowActionsColumn && <th className="cp-col-actions">Actions</th>}
+              {showRowActionsColumn && (
+                <th className={`cp-col-actions${rowDeleteIconOnly && !showRowEditAction && showRowDeleteAction ? ' cp-col-actions-icononly' : ''}`}>
+                  {rowDeleteIconOnly && !showRowEditAction && showRowDeleteAction ? '' : 'Actions'}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -382,15 +392,18 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                     if (actionsInHeader) setSelectedActionRowId(rowId)
                     onRowSelect?.(row)
                   }}
-                  onDoubleClick={onRowDoubleClick ? () => onRowDoubleClick(row) : undefined}
-                  title={onRowDoubleClick ? 'Double-click to view related assignments' : undefined}
+                  onDoubleClick={enableRowDoubleClickEdit || onRowDoubleClick ? () => {
+                    if (enableRowDoubleClickEdit) openEdit(row)
+                    onRowDoubleClick?.(row)
+                  } : undefined}
+                  title={enableRowDoubleClickEdit ? 'Double-click to edit' : onRowDoubleClick ? 'Double-click to view related assignments' : undefined}
                   aria-selected={isSelected}
                 >
                   {tableFields.map(f => (
                     <td key={f.key}>{row[f.key] ?? '—'}</td>
                   ))}
                   {showRowActionsColumn && (
-                    <td className="cp-col-actions">
+                    <td className={`cp-col-actions${rowDeleteIconOnly && !showRowEditAction && showRowDeleteAction ? ' cp-col-actions-icononly' : ''}`}>
                       {showRowEditAction && (
                         <button
                           className="cp-btn cp-btn-ghost"
@@ -405,7 +418,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                       )}
                       {showRowDeleteAction && (
                         <button
-                          className="cp-btn cp-btn-danger-ghost"
+                          className={`cp-btn cp-btn-danger-ghost${rowDeleteIconOnly ? ' cp-btn-icon-only' : ''}`}
                           onClick={e => {
                             e.stopPropagation()
                             if (pageMode === 'app-review') {
@@ -417,7 +430,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                           }}
                           title="Delete"
                         >
-                          🗑 Delete
+                          {rowDeleteIconOnly ? '🗑' : '🗑 Delete'}
                         </button>
                       )}
                     </td>

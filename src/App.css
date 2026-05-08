@@ -895,6 +895,12 @@ body::before {
 .cp-btn-danger-ghost { background: transparent; color: var(--danger); border-color: transparent; padding: 6px 10px; font-size: 13px; }
 .cp-btn-danger-ghost:hover:not(:disabled) { background: var(--danger-soft); }
 
+.cp-btn-icon-only {
+  min-width: 2rem;
+  justify-content: center;
+  padding: 6px 8px;
+}
+
 .cp-btn-danger { background: var(--danger); color: #fff; }
 .cp-btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
 
@@ -982,6 +988,14 @@ body::before {
 .cp-row-selected:hover { background: var(--accent-soft); }
 
 .cp-col-actions { text-align: right; width: 160px; white-space: nowrap; }
+.cp-col-actions-icononly {
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  text-align: center;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
 .cp-td-empty { padding: 48px; text-align: center; color: var(--text-faint); }
 
 /* ─── Location Assignments Drilldown Modal ───────────────────────────────────── */

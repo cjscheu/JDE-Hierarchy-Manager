@@ -128,6 +128,13 @@ function normalizeRows(result: unknown): Record<string, unknown>[] {
   return [];
 }
 
+function toUserTime(value: unknown) {
+  if (typeof value !== 'string') return value;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
+}
+
 function baseColumnName(key: string) {
   return key.split('@')[0];
 }
@@ -167,6 +174,69 @@ function entityMetadataToFields(meta: any): FieldDef[] {
     }));
 }
 
+function getCompaniesTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_co_id',
+      label: 'Company Code',
+      showOnCard: true,
+      editable: true,
+      required: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_co_desc',
+      label: 'Company Name',
+      showOnCard: true,
+      editable: true,
+      required: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_segment_namename',
+      label: 'Company Segment',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_segment_typename',
+      label: 'Company Type',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_ledger_typename',
+      label: 'Company Ledger',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_co_ak',
+      label: 'Alternate Key',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+function getConfiguredFields(tabId: string, fields: FieldDef[]): FieldDef[] {
+  if (tabId === 'jde_companies') {
+    return getCompaniesTabFields();
+  }
+  return fields;
+}
+
 export function DataTablesPage() {
   const [activeTab, setActiveTab] = useState(DATA_TABLES[0].id);
   const [fieldsByTab, setFieldsByTab] = useState<Record<string, FieldDef[]>>({});
@@ -190,13 +260,34 @@ export function DataTablesPage() {
   }, []);
 
   const active = DATA_TABLES.find(tab => tab.id === activeTab) || DATA_TABLES[0];
-  const fields = fieldsByTab[active.id] || [];
+  const fields = getConfiguredFields(active.id, fieldsByTab[active.id] || []);
   const loading = loadingTabs[active.id];
 
   const wrappedService: CardPageConfig['service'] = {
     getAll: async () => {
       const result = await active.service.getAll();
-      const data = normalizeRows(result);
+      const rawRows = normalizeRows(result);
+      const data = rawRows.map(row => ({
+        ...row,
+        ...(row.modifiedon !== undefined ? { modifiedon: toUserTime(row.modifiedon) } : {}),
+        ...(active.id === 'jde_companies' ? {
+          cr113_segment_namename:
+            (row.cr113_segment_namename as string | undefined) ??
+            (row.cr113_segment_name as string | undefined) ??
+            (row._cr113_segment_name_value as string | undefined) ??
+            '',
+          cr113_segment_typename:
+            (row.cr113_segment_typename as string | undefined) ??
+            (row.cr113_segment_type as string | undefined) ??
+            (row._cr113_segment_type_value as string | undefined) ??
+            '',
+          cr113_ledger_typename:
+            (row.cr113_ledger_typename as string | undefined) ??
+            (row.cr113_ledger_type as string | undefined) ??
+            (row._cr113_ledger_type_value as string | undefined) ??
+            '',
+        } : {}),
+      }));
       return {
         ...(result as object),
         data,
@@ -213,9 +304,11 @@ export function DataTablesPage() {
     idField: active.idField,
     fields,
     service: wrappedService,
-    actionsInHeader: true,
-    hideRowEditAction: false,
+    actionsInHeader: false,
+    hideRowEditAction: true,
     hideRowDeleteAction: false,
+    enableRowDoubleClickEdit: true,
+    rowDeleteIconOnly: true,
     onRowsLoaded: (rows) => {
       setFieldsByTab(prev => {
         const existing = prev[active.id] ?? [];
