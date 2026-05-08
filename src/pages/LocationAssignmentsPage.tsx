@@ -85,6 +85,8 @@ export function LocationAssignmentsPage() {
         title: 'Location Assignments',
         description: 'Manage manager and role assignments at the location level.',
         idField: 'cr113_jde_loc_assignmentid',
+        defaultSortKey: 'cr113_locationcodename',
+        defaultSortDir: 'asc',
         service: enrichedService,
         fields: [
           {

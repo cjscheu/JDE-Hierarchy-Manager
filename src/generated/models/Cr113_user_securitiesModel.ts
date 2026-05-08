@@ -25,7 +25,6 @@ export interface Cr113_user_securitiesBase {
   cr113_secid?: string;
   cr113_user_securityid: string;
   cr113_username?: string;
-  cr113_usertype?: string;
   importsequencenumber?: number;
   overriddencreatedon?: string;
   ownerid: string;

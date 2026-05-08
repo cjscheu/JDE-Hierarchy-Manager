@@ -35,6 +35,8 @@ export interface CardPageConfig {
   hideRowEditAction?: boolean
   /** hides delete action from row actions */
   hideRowDeleteAction?: boolean
+  /** render edit/delete actions above table instead of in table Actions column */
+  actionsInHeader?: boolean
   /** attribute that uniquely identifies a record (GUID) */
   idField: string
   fields: FieldDef[]
@@ -77,6 +79,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
     hideHeaderActions,
     hideRowEditAction,
     hideRowDeleteAction,
+    actionsInHeader,
     idField,
     fields,
     service,
@@ -277,10 +280,61 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   const showHeader = showHeaderCopy || showHeaderActions
   const showRowEditAction = !(hideRowEditAction || pageMode === 'references')
   const showRowDeleteAction = !(hideRowDeleteAction || pageMode === 'references')
-  const showRowActionsColumn = showRowEditAction || showRowDeleteAction
+  const showRowActionsColumn = (showRowEditAction || showRowDeleteAction) && !actionsInHeader
+  const [selectedActionRowId, setSelectedActionRowId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!actionsInHeader) return
+    if (rows.length === 0) {
+      setSelectedActionRowId(null)
+      return
+    }
+    if (selectedActionRowId && rows.some(r => String(r[idField]) === selectedActionRowId)) return
+    setSelectedActionRowId(String(rows[0][idField]))
+  }, [actionsInHeader, rows, idField, selectedActionRowId])
+
+  // Actions row above table (Data Tables page mode)
+  const actionsRow = (row: Row) => (
+    <div className="cp-table-actions-row">
+      {showRowEditAction && (
+        <button
+          className="cp-btn cp-btn-ghost"
+          onClick={e => {
+            e.stopPropagation();
+            openEdit(row);
+          }}
+          title="Edit"
+        >
+          ✏️ Edit
+        </button>
+      )}
+      {showRowDeleteAction && (
+        <button
+          className="cp-btn cp-btn-danger-ghost"
+          onClick={e => {
+            e.stopPropagation();
+            if (pageMode === 'app-review') {
+              void deleteById(String(row[idField]));
+              return;
+            }
+            setDeleteTarget(row);
+          }}
+          title="Delete"
+        >
+          🗑 Delete
+        </button>
+      )}
+    </div>
+  );
 
   const tableSection = (
     <div className={`cp-table-wrap${showHeader ? '' : ' cp-table-wrap-standalone'}`}>
+      {actionsInHeader && rows.length > 0 && (
+        <div className="cp-table-actions-toolbar">
+          <span className="cp-table-actions-label">Actions:</span>
+          {actionsRow(rows.find(r => String(r[idField]) === selectedActionRowId) || rows[0])}
+        </div>
+      )}
       <div className="cp-table-scroll">
         <table className="cp-table">
           <thead>
@@ -316,53 +370,59 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
             )}
             {sortedFiltered.map(row => {
               const rowId = String(row[idField])
-              const isSelected = selectedRowId != null && rowId === selectedRowId
+              const externalSelected = selectedRowId != null && rowId === selectedRowId
+              const internalSelected = actionsInHeader && selectedActionRowId != null && rowId === selectedActionRowId
+              const isSelected = externalSelected || internalSelected
+              const rowIsSelectable = actionsInHeader || Boolean(onRowSelect)
               return (
-              <tr
-                key={rowId}
-                className={onRowSelect ? `cp-row-selectable${isSelected ? ' cp-row-selected' : ''}` : undefined}
-                onClick={onRowSelect ? () => onRowSelect(row) : undefined}
-                onDoubleClick={onRowDoubleClick ? () => onRowDoubleClick(row) : undefined}
-                title={onRowDoubleClick ? 'Double-click to view related assignments' : undefined}
-                aria-selected={isSelected}
-              >
-                {tableFields.map(f => (
-                  <td key={f.key}>{row[f.key] ?? '—'}</td>
-                ))}
-                {showRowActionsColumn && (
-                  <td className="cp-col-actions">
-                    {showRowEditAction && (
-                      <button
-                        className="cp-btn cp-btn-ghost"
-                        onClick={e => {
-                          e.stopPropagation()
-                          openEdit(row)
-                        }}
-                        title="Edit"
-                      >
-                        ✏️ Edit
-                      </button>
-                    )}
-                    {showRowDeleteAction && (
-                      <button
-                        className="cp-btn cp-btn-danger-ghost"
-                        onClick={e => {
-                          e.stopPropagation()
-                          if (pageMode === 'app-review') {
-                            void deleteById(String(row[idField]))
-                            return
-                          }
+                <tr
+                  key={rowId}
+                  className={rowIsSelectable ? `cp-row-selectable${isSelected ? ' cp-row-selected' : ''}` : undefined}
+                  onClick={() => {
+                    if (actionsInHeader) setSelectedActionRowId(rowId)
+                    onRowSelect?.(row)
+                  }}
+                  onDoubleClick={onRowDoubleClick ? () => onRowDoubleClick(row) : undefined}
+                  title={onRowDoubleClick ? 'Double-click to view related assignments' : undefined}
+                  aria-selected={isSelected}
+                >
+                  {tableFields.map(f => (
+                    <td key={f.key}>{row[f.key] ?? '—'}</td>
+                  ))}
+                  {showRowActionsColumn && (
+                    <td className="cp-col-actions">
+                      {showRowEditAction && (
+                        <button
+                          className="cp-btn cp-btn-ghost"
+                          onClick={e => {
+                            e.stopPropagation()
+                            openEdit(row)
+                          }}
+                          title="Edit"
+                        >
+                          ✏️ Edit
+                        </button>
+                      )}
+                      {showRowDeleteAction && (
+                        <button
+                          className="cp-btn cp-btn-danger-ghost"
+                          onClick={e => {
+                            e.stopPropagation()
+                            if (pageMode === 'app-review') {
+                              void deleteById(String(row[idField]))
+                              return
+                            }
 
-                          setDeleteTarget(row)
-                        }}
-                        title="Delete"
-                      >
-                        🗑 Delete
-                      </button>
-                    )}
-                  </td>
-                )}
-              </tr>
+                            setDeleteTarget(row)
+                          }}
+                          title="Delete"
+                        >
+                          🗑 Delete
+                        </button>
+                      )}
+                    </td>
+                  )}
+                </tr>
               )
             })}
           </tbody>

@@ -84,14 +84,6 @@
           "x-ms-schema-name": "cr113_UserName",
           "maxLength": 100
         },
-        "cr113_usertype": {
-          "type": "string",
-          "title": "User Type",
-          "x-ms-dataverse-attribute": "cr113_usertype",
-          "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "cr113_UserType",
-          "maxLength": 100
-        },
         "createdby": {
           "type": "string",
           "title": "Created By",

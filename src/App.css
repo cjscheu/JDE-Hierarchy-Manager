@@ -686,12 +686,21 @@ body::before {
 }
 
 /* ─── References page ───────────────────────────────────────────────────────── */
+
 .refs-page {
-  width: min(90%, 1080px);
+  width: 100%;
+  max-width: 100vw;
   margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: 13px;
+}
+
+.data-management-page:not(.data-tables-page),
+.user-management-page,
+.manager-assignments-page {
+  width: min(90%, 1080px);
+  max-width: 1080px;
 }
 
 .refs-header {
@@ -715,6 +724,7 @@ body::before {
   color: var(--text-muted);
 }
 
+
 .refs-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -722,11 +732,20 @@ body::before {
   border-bottom: 1px solid var(--border);
   padding: 0 4px;
   background: transparent;
+  justify-content: flex-start;
 }
 
 .data-management-page .refs-tabs {
   width: min(90%, 1008px);
   margin-inline: auto;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.data-tables-page .refs-tabs {
+  width: 100%;
+  margin-inline: 0;
   flex-wrap: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
@@ -776,8 +795,34 @@ body::before {
 .cp-page { display: flex; flex-direction: column; gap: 16px; }
 
 .cp-page > :not(.cp-overlay) {
-  width: min(90%, 1008px);
+  width: 100%;
+  max-width: 100vw;
   margin-inline: auto;
+}
+
+.data-management-page:not(.data-tables-page) .cp-page > :not(.cp-overlay),
+.user-management-page .cp-page > :not(.cp-overlay),
+.manager-assignments-page .cp-page > :not(.cp-overlay) {
+  width: min(90%, 1008px);
+  max-width: 1008px;
+}
+/* Data Tables actions toolbar above table headers */
+.cp-table-actions-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px 0;
+}
+
+.cp-table-actions-label {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.cp-table-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .cp-header {

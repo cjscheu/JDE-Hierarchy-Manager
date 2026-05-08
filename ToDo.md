@@ -126,3 +126,12 @@
 -on the data tables page, remove the container above the main card that says Data Tables
 
 -On the Data Tables page, each card tab should contain the raw tables from Dataverse including all columns.  The actions column for edit and delete should be moved up in the card header above the table headers underneath the search field and command button.  The width of the card should dynamically fit to the width of the page; the card tabs should be be aligned to the left side of the card
+-the tabs on top of the data tables page cards should be the same width as the card
+-The action column on all pages should revert back prior to last change.  The only page with the Action column not in the table card is the Data Tables page
+-on the data tables page card, remove the header and the search field and command button should be aligned to the left side of the card  The command button should stay align on the right side of the search field
+-on the Data Tables page card, all tables are empty.  Records should be populating in the card
+-on the Data Tables page card, please use the actual column name for the headers.  The current headers are too wide.  Also, rows need to be selectable.  As of right now, the edit and delete commands are not working properly because I can't select individual records
+-in those data table card headers, remove the text after the @ character'; Also, remove all dataverse system generated columns from the card.  Leave only the columns that were created by the user
+-a column was removed from cr113_user_security called cr113_usertype.  please update the app accordingly
+-on the Assignments page, the Company Assignment tab page should default sorted by Company in ascending order
+-on the Assignments page, the Location Assignment tab page should default sorted by Location in ascending order

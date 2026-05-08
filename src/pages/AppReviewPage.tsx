@@ -1,6 +1,7 @@
-import { DataManagementPage } from './DataManagementPage'
+
+import { DataTablesPage } from './DataTablesPage'
 
 export function AppReviewPage() {
-  // Render only the DataManagementPage for super users, no extra header
-  return <DataManagementPage accessRole="super" />;
+  // Render the DataTablesPage for super users, no extra header
+  return <DataTablesPage />;
 }
