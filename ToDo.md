@@ -143,3 +143,5 @@
 -on the Data Tables page Companies tab, the data for Company Segment, Company Type and Company Ledger are pulling a GUID string when it should be pulling the lookup value
 -on the Data Tables page Companies tab, after double clicking the row, the edit Company pop up page, the lookup fields should be dropdowns
 -on the Data Tables page Companies tab, default sort is Company Code ascending order
+
+-on the Data Tables page, the main card currently shows 7 rows, change that to 10 rows

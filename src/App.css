@@ -751,6 +751,10 @@ body::before {
   overflow-y: hidden;
 }
 
+.data-tables-page .cp-table-scroll {
+  max-height: calc(44px * 16);
+}
+
 .user-management-page .refs-tabs {
   width: min(90%, 1008px);
   margin-inline: auto;
