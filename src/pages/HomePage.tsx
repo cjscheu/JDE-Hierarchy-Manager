@@ -6,7 +6,7 @@ export function HomePage() {
         <p className="home-descriptor">A Power App code app powered by Copilot Studio. Manage company and location data<br />and manager assignments — all from one interface.</p>
       </div>
 
-      <div className="home-cards">
+{/*       <div className="home-cards">
         <div className="home-info-card">
           <div className="home-info-icon" aria-hidden="true">01</div>
           <div className="home-info-text">
@@ -28,7 +28,7 @@ export function HomePage() {
             <span>COMING SOON! Ask questions, get instant answers and guided assistance from a Copilot studio agent — directly in this app.</span>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

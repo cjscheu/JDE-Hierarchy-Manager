@@ -16,37 +16,26 @@ const DATA_MANAGEMENT_TABS = [
   { id: 'divisions', label: 'Divisions', component: <DivsPage /> },
   { id: 'groups', label: 'Groups', component: <GroupsPage /> },
   { id: 'roles', label: 'Roles', component: <RolesPage /> },
+  { id: 'jde-managers', label: 'Managers', component: <ManagersPage /> },
   { id: 'co-segments', label: 'Company Segments', component: <CoSegmentsPage /> },
   { id: 'loc-segments', label: 'Location Segments', component: <LocationSegmentsPage /> },
   { id: 'ledger-types', label: 'Ledger Types', component: <LedgerTypesPage /> },
   { id: 'company-types', label: 'Company Types', component: <TypesPage /> },
-  { id: 'otcs', label: 'OTC Type', component: <OtcsPage /> },
-  { id: 'jde-managers', label: 'JDE Managers', component: <ManagersPage /> },
+  { id: 'otcs', label: 'OTC Types', component: <OtcsPage /> },
   { id: 'jde-co-assignments', label: 'Company Assignments', component: <CompanyAssignmentsPage /> },
   { id: 'jde-loc-assignments', label: 'Location Assignments', component: <LocationAssignmentsPage /> },
 ] as const
 
 type DataManagementTabId = typeof DATA_MANAGEMENT_TABS[number]['id']
 
-export function DataManagementPage({ accessRole = 'basic' }: { accessRole?: AccessRole }) {
+export function DataManagementPage({ accessRole: _accessRole = 'basic' }: { accessRole?: AccessRole }) {
   const [activeTab, setActiveTab] = useState<DataManagementTabId>('divisions')
-  const visibleTabs = DATA_MANAGEMENT_TABS.filter(tab =>
-    accessRole === 'admin'
-      ? tab.id !== 'jde-co-assignments' && tab.id !== 'jde-loc-assignments'
-      : true
-  )
+  const visibleTabs = DATA_MANAGEMENT_TABS
   const active = visibleTabs.find(tab => tab.id === activeTab) ?? visibleTabs[0]
 
   return (
     <section className="refs-page data-management-page">
-{/*       <div className="refs-header">
-        <h2 className="refs-title">Data Management</h2>
-        <p className="refs-description">
-          Use tabs to manage reference tables, managers, and assignment records.
-        </p>
-      </div> */}
-
-      <div className="refs-tabs" role="tablist" aria-label="Data management tabs">
+      <div className="refs-tabs" role="tablist" aria-label="Application management tabs">
         {visibleTabs.map(tab => (
           <button
             key={tab.id}

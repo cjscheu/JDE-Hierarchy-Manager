@@ -105,3 +105,24 @@
 
 -update JDE Co Assignment text to Company Assignments and JDE Location Assignments text to Location Assignments
 -on the add and edit JDE Location Assignment popup pages, the title header should read Add Location Assignment and Edit Location Assignment
+
+5/8/2026
+-on the JDE Managers page, the details card has two tabs: rename JDE Company Assignments to Company Assignments and JDE Location Assignment to Location Assignmments.  Change the command buttons +Add JDE Company Assignment to +Add Assignment and +Add Location Assignment to +Add Assignment
+-on the JDE Managers page, within the add company assignment prompt, the company dropdown selection shows just the company code now.  It should so the Company Code space dash space Company name
+-on the JDE Managers page, within the add location assignment prompt, the location dropdown selection shows just the location code now.  It should so the Location space dash space Location name
+-on the JDE Manager Page main card, change the search filed called Search jde managers... to search managers....; Also, on the same card, change the +Add JDE Manager command button to +Add Manager
+-on the Data Management Page tab called Company Assignments, change the header JDE Company Assignments to Company Assignments.  Change the search field from search jde company assignments... to search assignments..; change the +Add JDE Company Assignment to +Add Assignment;  Change the header on the Edit JDE Company Assignment to Edit Company Assignment
+-on the Data Management Page tab called Location Assignments, change the search field from search location assignments... to search assignments..; change the +Add JDE Location Assignment to +Add Assignment
+-create new page under JDE Managers called Assignments.  This page should have one table card with two tabs: Company Assignments and JDE Assignments.  That card should be similar to the card used on the Data Management Page
+-Rename the Navigation page links:  JDE Companies to Companies, JDE Managers to Managers, Data Management to Review Data 
+-Create a divider below User Managment called Super; Duplicate the Data Management page and call it App Review and put it in the Super section of the Navigation pane
+-Change the Navigation page User Management to Manage Users; The Super section of the Navigation pane should only be accessible to users in the Super table
+-on the Review Data page, users in the admin table should have access to the Company Assignments and Location Assignments tab
+-on the App Review page, there are no restrictions when deleting records.  No pop-up prompt is needed on this page
+-Change the Admin section in the Navigation pane to say Admin Management; the Review Data page should be Data; the Manage Users page should be Users
+-Change the Super section in the Navigation pane to say Super Management; the App Review page should say Data Management
+-Change Data Management page in the Super Management section to Application Management
+-Change Application Management page in the Super Management section to Data Tables
+-on the data tables page, remove the container above the main card that says Data Tables
+
+-On the Data Tables page, each card tab should contain the raw tables from Dataverse including all columns.  The actions column for edit and delete should be moved up in the card header above the table headers.  The width of the card should dynamically fit to the width of the page

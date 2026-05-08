@@ -118,6 +118,22 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   const [sortKey, setSortKey] = useState<string | null>(defaultSortKey ?? null)
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>(defaultSortDirProp ?? 'asc')
 
+  const deleteById = async (id: string) => {
+    setDeleting(true)
+    try {
+      await service.delete(id)
+      setError(null)
+      setSuccess('Record deleted successfully.')
+      await load()
+    } catch (e) {
+      setSuccess(null)
+      setError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setDeleteTarget(null)
+      setDeleting(false)
+    }
+  }
+
   useEffect(() => {
     if (!success) return
     const timer = window.setTimeout(() => setSuccess(null), 3500)
@@ -251,19 +267,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   // ── delete ──
   const handleDelete = async () => {
     if (!deleteTarget) return
-    setDeleting(true)
-    try {
-      await service.delete(String(deleteTarget[idField]))
-      setError(null)
-      setSuccess('Record deleted successfully.')
-      await load()
-    } catch (e) {
-      setSuccess(null)
-      setError(e instanceof Error ? e.message : String(e))
-    } finally {
-      setDeleteTarget(null)
-      setDeleting(false)
-    }
+    await deleteById(String(deleteTarget[idField]))
   }
 
   // ── primary display field (first visible field) ──
@@ -344,6 +348,11 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                         className="cp-btn cp-btn-danger-ghost"
                         onClick={e => {
                           e.stopPropagation()
+                          if (pageMode === 'app-review') {
+                            void deleteById(String(row[idField]))
+                            return
+                          }
+
                           setDeleteTarget(row)
                         }}
                         title="Delete"
@@ -452,7 +461,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
       )}
 
       {/* Delete confirm modal */}
-      {showRowDeleteAction && deleteTarget && (
+      {showRowDeleteAction && deleteTarget && pageMode !== 'app-review' && (
         <div className="cp-overlay" onMouseDown={() => !deleting && setDeleteTarget(null)}>
           <div className="cp-modal cp-modal-sm" onMouseDown={e => e.stopPropagation()}>
             <div className="cp-modal-header">

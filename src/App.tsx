@@ -10,38 +10,47 @@ import { LocationsPage } from './pages/LocationsPage'
 import { ManagersHubPage } from './pages/ManagersHubPage'
 import { DataManagementPage } from './pages/DataManagementPage'
 import { UserManagementPage } from './pages/UserManagementPage'
+import { AppReviewPage } from './pages/AppReviewPage'
 import { PageModeProvider } from './components/page-mode'
 import { Cr113_user_securitiesService } from './generated/services/Cr113_user_securitiesService'
 import { setCurrentAccessRole, type AccessRole } from './security/access'
+import { ManagerAssignmentsPage } from './pages/ManagerAssignmentsPage'
 
 const PRIMARY_NAV = [
   { id: 'home', label: 'Home', icon: '🏠', component: <HomePage />, hidden: false },
-  { id: 'companies', label: 'JDE Companies', icon: '🏢', component: <CompaniesPage />, hidden: false },
+  { id: 'companies', label: 'Companies', icon: '🏢', component: <CompaniesPage />, hidden: false },
   { id: 'locations', label: 'JDE Locations', icon: '📍', component: <LocationsPage />, hidden: true },
-  { id: 'managers', label: 'JDE Managers', icon: '🧑‍💼', component: <ManagersHubPage />, hidden: false },
+  { id: 'managers', label: 'Managers', icon: '🧑‍💼', component: <ManagersHubPage />, hidden: false },
+  { id: 'manager-assignments', label: 'Assignments', icon: '📋', component: <ManagerAssignmentsPage />, hidden: false },
 ] as const
+
 
 
 const ADMIN_NAV = [
-  { id: 'data-management', label: 'Data Management', icon: '🗄️', component: <DataManagementPage /> },
-  { id: 'user-management', label: 'User Management', icon: '👤', component: <UserManagementPage /> },
+  { id: 'data-management', label: 'Data', icon: '🗄️', component: <DataManagementPage /> },
+  { id: 'user-management', label: 'Users', icon: '👤', component: <UserManagementPage /> },
 ] as const
 
-const NAV = [...PRIMARY_NAV, ...ADMIN_NAV] as const
+const SUPER_NAV = [
+  { id: 'app-review', label: 'Data Tables', icon: '🧪', component: <AppReviewPage /> },
+] as const
+
+const NAV = [...PRIMARY_NAV, ...ADMIN_NAV, ...SUPER_NAV] as const
 
 type NavId = typeof NAV[number]['id']
 
 const APP_SECURITY_NAME = 'Dairy Brands Hierarchy Manager'
 const BASIC_NAV: NavId[] = ['home']
 const POWER_NAV: NavId[] = ['home', 'companies', 'managers']
-const ADMIN_NAV_IDS: NavId[] = NAV.map(item => item.id)
+const ADMIN_NAV_IDS: NavId[] = [...PRIMARY_NAV, ...ADMIN_NAV].map(item => item.id)
+const SUPER_NAV_IDS: NavId[] = NAV.map(item => item.id)
 
 function normalizeValue(value?: string | null) {
   return value?.trim().toLowerCase() ?? ''
 }
 
 function getAllowedNavIds(role: AccessRole) {
-  if (role === 'super') return new Set<NavId>(ADMIN_NAV_IDS)
+  if (role === 'super') return new Set<NavId>(SUPER_NAV_IDS)
   if (role === 'admin') return new Set<NavId>(ADMIN_NAV_IDS)
   if (role === 'power') return new Set<NavId>(POWER_NAV)
   return new Set<NavId>(BASIC_NAV)
@@ -91,6 +100,7 @@ function App() {
   const allowedNavIds = getAllowedNavIds(accessRole)
   const visiblePrimaryNav = PRIMARY_NAV.filter(item => allowedNavIds.has(item.id) && !item.hidden)
   const visibleAdminNav = ADMIN_NAV.filter(item => allowedNavIds.has(item.id))
+  const visibleSuperNav = SUPER_NAV.filter(item => allowedNavIds.has(item.id))
 
   const active = NAV.find(n => n.id === activePage) ?? NAV[0]
 
@@ -170,10 +180,30 @@ function App() {
           {visibleAdminNav.length > 0 && (
             <>
               <div className="side-nav-divider" role="presentation" />
-              <div className="side-nav-section-label">Admin</div>
+              <div className="side-nav-section-label">Admin Management</div>
 
               <div className="side-nav-group">
                 {visibleAdminNav.map(item => (
+                  <button
+                    key={item.id}
+                    className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
+                    onClick={() => setActivePage(item.id as NavId)}
+                  >
+                    <span style={{ marginRight: 10 }} aria-hidden="true">{item.icon}</span>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {accessRole === 'super' && visibleSuperNav.length > 0 && (
+            <>
+              <div className="side-nav-divider" role="presentation" />
+              <div className="side-nav-section-label">Super Management</div>
+
+              <div className="side-nav-group">
+                {visibleSuperNav.map(item => (
                   <button
                     key={item.id}
                     className={`side-nav-btn side-nav-btn-sub${activePage === item.id ? ' active' : ''}`}
@@ -223,6 +253,10 @@ function App() {
           <PageModeProvider mode="default">
             {active.id === 'data-management' ? (
               <DataManagementPage accessRole={accessRole} />
+            ) : active.id === 'app-review' ? (
+              <PageModeProvider mode="app-review">
+                <AppReviewPage />
+              </PageModeProvider>
             ) : active.id === 'user-management' ? (
               <UserManagementPage accessRole={accessRole} />
             ) : (

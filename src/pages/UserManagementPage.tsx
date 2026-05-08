@@ -5,9 +5,9 @@ import type { AccessRole } from '../security/access'
 
 // Define USER_MANAGEMENT_TABS constant with explicit types
 const USER_MANAGEMENT_TABS: { id: 'admin' | 'power' | 'super'; label: string; roleType: 1 | 2 | 3 }[] = [
-  { id: 'admin', label: 'Admin Users', roleType: 1 },
-  { id: 'power', label: 'Power Users', roleType: 2 },
-  { id: 'super', label: 'Super Users', roleType: 3 },
+  { id: 'admin', label: 'Admin', roleType: 1 },
+  { id: 'power', label: 'Power User', roleType: 2 },
+  { id: 'super', label: 'Super User', roleType: 3 },
 ]
 
 // Update USER_FIELDS to include key property

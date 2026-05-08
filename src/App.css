@@ -737,6 +737,14 @@ body::before {
   margin-inline: auto;
 }
 
+.manager-assignments-page .refs-tabs {
+  width: min(90%, 1008px);
+  margin-inline: auto;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .refs-tab-btn {
   border: 0;
   border-bottom: 2px solid transparent;

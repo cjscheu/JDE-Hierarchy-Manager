@@ -87,13 +87,19 @@ export function ManagersHubPage() {
 
       setCompanyOptions(
         (companiesRes.data ?? [])
-          .map(item => ({
-            value: item.cr113_jde_companyid,
-            label: item.cr113_co_id ?? '',
-          }))
+          .map(item => {
+            const code = item.cr113_co_id ?? ''
+            const name = item.cr113_co_desc?.trim() ?? ''
+
+            return {
+              value: item.cr113_jde_companyid,
+              label: name ? `${code} - ${name}` : code,
+              sortKey: code,
+            }
+          })
           .sort((a, b) => {
-            const aNum = Number.parseFloat(a.label)
-            const bNum = Number.parseFloat(b.label)
+            const aNum = Number.parseFloat(a.sortKey)
+            const bNum = Number.parseFloat(b.sortKey)
             const aIsNum = Number.isFinite(aNum)
             const bIsNum = Number.isFinite(bNum)
 
@@ -101,18 +107,25 @@ export function ManagersHubPage() {
             if (aIsNum) return -1
             if (bIsNum) return 1
 
-            return a.label.localeCompare(b.label)
+            return a.sortKey.localeCompare(b.sortKey)
           })
+          .map(({ value, label }) => ({ value, label }))
       )
       setLocationOptions(
         (locationsRes.data ?? [])
-          .map(item => ({
-            value: item.cr113_jde_locationid,
-            label: item.cr113_coloc_id ?? '',
-          }))
+          .map(item => {
+            const code = item.cr113_coloc_id ?? ''
+            const name = item.cr113_coloc_name?.trim() ?? ''
+
+            return {
+              value: item.cr113_jde_locationid,
+              label: name ? `${code} - ${name}` : code,
+              sortKey: code,
+            }
+          })
           .sort((a, b) => {
-            const aNum = Number.parseFloat(a.label)
-            const bNum = Number.parseFloat(b.label)
+            const aNum = Number.parseFloat(a.sortKey)
+            const bNum = Number.parseFloat(b.sortKey)
             const aIsNum = Number.isFinite(aNum)
             const bIsNum = Number.isFinite(bNum)
 
@@ -120,8 +133,9 @@ export function ManagersHubPage() {
             if (aIsNum) return -1
             if (bIsNum) return 1
 
-            return a.label.localeCompare(b.label)
+            return a.sortKey.localeCompare(b.sortKey)
           })
+          .map(({ value, label }) => ({ value, label }))
       )
       setRoleOptions(
         (rolesRes.data ?? []).map(item => ({
@@ -299,7 +313,7 @@ export function ManagersHubPage() {
           <CardPage
             ref={managersCardRef}
             config={{
-              title: 'JDE Managers',
+              title: 'Managers',
               description: 'Manage JDE manager records. Select a row to load assignment details.',
               hideHeaderCopy: true,
               hideHeaderActions: false,
@@ -430,7 +444,7 @@ export function ManagersHubPage() {
                       className="cp-btn cp-btn-primary"
                       onClick={() => companyAssignmentsCardRef.current?.openAddForm()}
                     >
-                      + Add JDE Company Assignment
+                      + Add Assignment
                     </button>
                   </div>
                 ) : (
@@ -450,7 +464,7 @@ export function ManagersHubPage() {
                       className="cp-btn cp-btn-primary"
                       onClick={() => locationAssignmentsCardRef.current?.openAddForm()}
                     >
-                      + Add Location Assignment
+                      + Add Assignment
                     </button>
                   </div>
                 )}
@@ -464,7 +478,7 @@ export function ManagersHubPage() {
                 aria-selected={activeDetailsTab === 'company'}
                 onClick={() => setActiveDetailsTab('company')}
               >
-                JDE Company Assignments
+                Company Assignments
               </button>
               <button
                 className={`companies-tab-btn${activeDetailsTab === 'location' ? ' active' : ''}`}
@@ -472,7 +486,7 @@ export function ManagersHubPage() {
                 aria-selected={activeDetailsTab === 'location'}
                 onClick={() => setActiveDetailsTab('location')}
               >
-                JDE Location Assignments
+                Location Assignments
               </button>
             </div>
 
@@ -485,7 +499,7 @@ export function ManagersHubPage() {
                 ref={companyAssignmentsCardRef}
                 key={`manager-company-assignments-${selectedManagerId}`}
                 config={{
-                  title: 'JDE Company Assignments',
+                  title: 'Company Assignments',
                   description: 'Create, edit, and delete company assignments related to the selected manager.',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,

@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 
-export type PageMode = 'default' | 'references'
+export type PageMode = 'default' | 'references' | 'app-review'
 
 const PageModeContext = createContext<PageMode>('default')
 

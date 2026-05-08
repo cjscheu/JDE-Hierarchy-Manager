@@ -82,7 +82,7 @@ export function CompanyAssignmentsPage() {
   return (
     <CardPage
       config={{
-        title: 'JDE Company Assignments',
+          title: 'Company Assignments',
         description: 'Manage manager and role assignments at the company level.',
         idField: 'cr113_jde_co_assignmentid',
         service: enrichedService,
