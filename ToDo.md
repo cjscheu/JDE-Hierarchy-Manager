@@ -125,4 +125,4 @@
 -Change Application Management page in the Super Management section to Data Tables
 -on the data tables page, remove the container above the main card that says Data Tables
 
--On the Data Tables page, each card tab should contain the raw tables from Dataverse including all columns.  The actions column for edit and delete should be moved up in the card header above the table headers.  The width of the card should dynamically fit to the width of the page
+-On the Data Tables page, each card tab should contain the raw tables from Dataverse including all columns.  The actions column for edit and delete should be moved up in the card header above the table headers underneath the search field and command button.  The width of the card should dynamically fit to the width of the page; the card tabs should be be aligned to the left side of the card
