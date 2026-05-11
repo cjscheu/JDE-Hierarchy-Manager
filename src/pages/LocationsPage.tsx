@@ -43,13 +43,15 @@ const buildLocationPayload = (record: Record<string, string>) => {
 
 const buildLocationAssignmentPayload = (record: Record<string, string>, locationId: string) => {
   const {
+    cr113_locationcode,
     cr113_empl_id,
     cr113_rolename,
     ...rest
   } = record
 
   const payload: Record<string, string> = { ...rest }
-  payload['cr113_LocationCode@odata.bind'] = `/${'cr113_jde_locations'}(${locationId})`
+  const locationBind = toLookupBind('cr113_jde_locations', locationId)
+  if (locationBind) payload['cr113_LocationCode@odata.bind'] = locationBind
 
   const managerBind = toLookupBind('cr113_jde_managers', cr113_empl_id)
   const roleBind = toLookupBind('cr113_jde_roleses', cr113_rolename)
@@ -251,7 +253,9 @@ export function LocationsPage() {
       }
 
       const [assignmentsRes, managersRes, rolesRes] = await Promise.all([
-        Cr113_jde_loc_assignmentsService.getAll(),
+        Cr113_jde_loc_assignmentsService.getAll({
+          filter: `_cr113_locationcode_value eq ${selectedLocationId}`,
+        }),
         Cr113_jde_managersService.getAll({
           select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_empl_id'],
         }),
@@ -272,7 +276,6 @@ export function LocationsPage() {
       )
 
       const data = (assignmentsRes.data ?? [])
-        .filter(row => row._cr113_locationcode_value === selectedLocationId)
         .map(row => ({
           ...row,
           cr113_empl_id: row._cr113_empl_id_value ?? '',

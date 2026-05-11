@@ -15,6 +15,7 @@ import { Cr113_jde_co_segmentsService } from '../generated/services/Cr113_jde_co
 import { Cr113_jde_location_segmentsService } from '../generated/services/Cr113_jde_location_segmentsService';
 import { Cr113_user_securitiesService } from '../generated/services/Cr113_user_securitiesService';
 import { Cr113_jde_ledger_typesService } from '../generated/services/Cr113_jde_ledger_typesService';
+import { getAllPages } from '../utils/dataversePaging';
 
 type DataTableDef = {
   id: string;
@@ -403,7 +404,9 @@ export function DataTablesPage() {
         };
       }
 
-      const result = await active.service.getAll();
+      const result = active.id === 'jde_loc_assignments'
+        ? await getAllPages(active.service)
+        : await active.service.getAll();
       const rawRows = normalizeRows(result);
       const data = rawRows.map(row => ({
         ...row,

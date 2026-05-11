@@ -232,7 +232,9 @@ export function ManagersHubPage() {
       }
 
       const [assignmentsRes, locationsRes, rolesRes] = await Promise.all([
-        Cr113_jde_loc_assignmentsService.getAll(),
+        Cr113_jde_loc_assignmentsService.getAll({
+          filter: `_cr113_empl_id_value eq ${selectedManagerId}`,
+        }),
         Cr113_jde_locationsService.getAll({
           select: ['cr113_jde_locationid', 'cr113_coloc_name', 'cr113_coloc_id'],
         }),
@@ -256,7 +258,6 @@ export function ManagersHubPage() {
       )
 
       const data = (assignmentsRes.data ?? [])
-        .filter(row => row._cr113_empl_id_value === selectedManagerId)
         .map(row => ({
           ...row,
           cr113_locationcode: row._cr113_locationcode_value ?? '',

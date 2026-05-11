@@ -145,3 +145,8 @@
 -on the Data Tables page Companies tab, default sort is Company Code ascending order
 
 -on the Data Tables page, the main card currently shows 7 rows, change that to 10 rows
+
+5/11/2026
+-on the add Location Assigment pop up page, the location code is not being submitted into the table.  The location does not need to be selected by the user becuase the page is opened by double clicking the valid location row on the location page.  When a user add a location assignment, the location, the role and the manager all need to be loaded into the location assignment table.  Right now, the only columns being loaded are Role and Manager
+-I just noticed there are a high number of rows missing in the location assignment pages..for instance,  Location 178-01 has three records in the cr113_jde_loc_assignments table, however, no rows show up the location assignment page on the app.  Location 178-01 is one example, there are many other location codes missing from the page
+-Records are still missing from the Location Assignment cards on the Assignments page, the data page and the data tables pages
