@@ -13,7 +13,7 @@ const USER_MANAGEMENT_TABS: { id: 'admin' | 'power' | 'super'; label: string; ro
 // Update USER_FIELDS to include key property
 import type { FieldDef } from '../components/CardPage'
 
-const USER_FIELDS: FieldDef[] = [
+const getUserFields = (tabId: 'admin' | 'power' | 'super'): FieldDef[] => [
   {
     key: 'cr113_username',
     label: 'User Name',
@@ -36,11 +36,16 @@ const USER_FIELDS: FieldDef[] = [
     key: 'cr113_roletype',
     label: 'Role Type',
     inputType: 'select',
-    options: [
-      { label: 'Admin', value: '1' },
-      { label: 'Power User', value: '2' },
-      { label: 'Super User', value: '3' },
-    ],
+    options: tabId === 'super'
+      ? [
+          { label: 'Admin', value: '1' },
+          { label: 'Power User', value: '2' },
+          { label: 'Super User', value: '3' },
+        ]
+      : [
+          { label: 'Admin', value: '1' },
+          { label: 'Power User', value: '2' },
+        ],
     showOnCard: false,
     editable: true,
     editOnly: true,
@@ -130,9 +135,11 @@ export function UserManagementPage({ accessRole = 'basic' }: { accessRole?: Acce
                 config={{
                   title: tab.label,
                   description: `Manage ${tab.label.toLowerCase()}.`,
+                  hideRowEditAction: true,
+                  enableRowDoubleClickEdit: true,
                   idField: 'cr113_user_securityid',
                   service: getService(tab.roleType),
-                  fields: USER_FIELDS,
+                  fields: getUserFields(tab.id),
                 }}
               />
             )

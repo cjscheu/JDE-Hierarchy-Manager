@@ -543,7 +543,9 @@ export function CompaniesPage() {
                 description: 'Manage JDE company records. Select a row to load related details.',
                 hideHeaderCopy: true,
                 hideHeaderActions: true,
+                hideRowEditAction: true,
                 hideRowDeleteAction: true,
+                enableRowDoubleClickEdit: true,
                 idField: 'cr113_jde_companyid',
                 service: companiesService,
                 defaultSortKey: 'cr113_co_id',
@@ -728,17 +730,13 @@ export function CompaniesPage() {
                 description: 'Create, edit, and delete locations related to the selected company.',
                 hideHeaderCopy: true,
                 hideHeaderActions: true,
+                hideRowEditAction: true,
                 hideRowDeleteAction: true,
+                enableRowDoubleClickEdit: true,
                 idField: 'cr113_jde_locationid',
                 service: locationsService,
                 defaultSortKey: 'cr113_coloc_id',
                 defaultSortDir: 'asc',
-                onRowDoubleClick: row => {
-                  setDrilldownLocationId(String(row.cr113_jde_locationid))
-                  setDrilldownLocationName(String(row.cr113_coloc_name ?? row.cr113_coloc_id ?? ''))
-                  setDrilldownAssignmentsSearch('')
-                  setDrilldownOpen(true)
-                },
                 fields: [
                   {
                     key: 'cr113_coloc_id',
@@ -842,7 +840,9 @@ export function CompaniesPage() {
                 description: 'Create, edit, and delete assignments related to the selected company.',
                 hideHeaderCopy: true,
                 hideHeaderActions: true,
+                hideRowEditAction: true,
                 hideRowDeleteAction: true,
+                enableRowDoubleClickEdit: true,
                 idField: 'cr113_jde_co_assignmentid',
                 service: assignmentsService,
                 defaultSortKey: 'cr113_rolenamename',
@@ -866,7 +866,16 @@ export function CompaniesPage() {
                     label: 'Role',
                     inputType: 'select',
                     editable: true,
-                    options: roleOptions,
+                    options: ({ formValues, editTarget, rows }) => {
+                      const currentRoleId = formValues.cr113_rolename ?? String(editTarget?.cr113_rolename ?? '')
+                      const usedRoleIds = new Set(
+                        rows
+                          .map(r => String(r.cr113_rolename ?? ''))
+                          .filter(Boolean)
+                      )
+                      usedRoleIds.delete(currentRoleId)
+                      return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId)
+                    },
                     showOnCard: false,
                     placeholder: 'Select role',
                   },
@@ -898,14 +907,24 @@ export function CompaniesPage() {
       {drilldownOpen && drilldownLocationId && (
         <div
           className="cp-overlay"
-          onMouseDown={() => { setDrilldownOpen(false); setDrilldownAssignmentsSearch('') }}
+          onMouseDown={() => {
+            setDrilldownOpen(false)
+            setDrilldownAssignmentsSearch('')
+            setDrilldownLocationId(null)
+            setDrilldownLocationName('')
+          }}
         >
           <div className="loc-drilldown-modal" onMouseDown={e => e.stopPropagation()}>
             <div className="loc-drilldown-header">
               <h3 className="loc-drilldown-title">Location Assignments — {drilldownLocationName}</h3>
               <button
                 className="cp-modal-close"
-                onClick={() => { setDrilldownOpen(false); setDrilldownAssignmentsSearch('') }}
+                onClick={() => {
+                  setDrilldownOpen(false)
+                  setDrilldownAssignmentsSearch('')
+                  setDrilldownLocationId(null)
+                  setDrilldownLocationName('')
+                }}
               >×</button>
             </div>
             <div className="loc-drilldown-toolbar">
@@ -935,7 +954,9 @@ export function CompaniesPage() {
                   title: 'Location Assignments',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,
+                  hideRowEditAction: true,
                   hideRowDeleteAction: true,
+                  enableRowDoubleClickEdit: true,
                   idField: 'cr113_jde_loc_assignmentid',
                   service: drilldownAssignmentsService,
                   defaultSortKey: 'cr113_rolenamename',
@@ -953,7 +974,16 @@ export function CompaniesPage() {
                       inputType: 'select',
                       editable: true,
                       required: true,
-                      options: roleOptions,
+                      options: ({ formValues, editTarget, rows }) => {
+                        const currentRoleId = formValues.cr113_rolename ?? String(editTarget?.cr113_rolename ?? '')
+                        const usedRoleIds = new Set(
+                          rows
+                            .map(r => String(r.cr113_rolename ?? ''))
+                            .filter(Boolean)
+                        )
+                        usedRoleIds.delete(currentRoleId)
+                        return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId)
+                      },
                       showOnCard: false,
                       placeholder: 'Select role',
                     },

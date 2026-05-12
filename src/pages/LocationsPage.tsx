@@ -567,7 +567,16 @@ export function LocationsPage() {
                       inputType: 'select',
                       editable: true,
                       required: true,
-                      options: roleOptions,
+                      options: ({ formValues, editTarget, rows }) => {
+                        const currentRoleId = formValues.cr113_rolename ?? String(editTarget?.cr113_rolename ?? '')
+                        const usedRoleIds = new Set(
+                          rows
+                            .map(r => String(r.cr113_rolename ?? ''))
+                            .filter(Boolean)
+                        )
+                        usedRoleIds.delete(currentRoleId)
+                        return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId)
+                      },
                       showOnCard: false,
                       placeholder: 'Select role',
                     },

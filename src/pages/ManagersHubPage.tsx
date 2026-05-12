@@ -59,6 +59,8 @@ export function ManagersHubPage() {
   const [companyOptions, setCompanyOptions] = useState<LookupOption[]>([])
   const [locationOptions, setLocationOptions] = useState<LookupOption[]>([])
   const [roleOptions, setRoleOptions] = useState<LookupOption[]>([])
+  const [usedCompanyRolesByCompany, setUsedCompanyRolesByCompany] = useState<Record<string, string[]>>({})
+  const [usedLocationRolesByLocation, setUsedLocationRolesByLocation] = useState<Record<string, string[]>>({})
 
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null)
   const [selectedManagerName, setSelectedManagerName] = useState('')
@@ -178,7 +180,24 @@ export function ManagersHubPage() {
         (rolesRes.data ?? []).map(item => [item.cr113_jde_rolesid, item.cr113_role_name])
       )
 
-      const data = (assignmentsRes.data ?? [])
+      const allAssignments = assignmentsRes.data ?? []
+      const companyRoleUsage = new Map<string, Set<string>>()
+      allAssignments.forEach(row => {
+        const companyId = row._cr113_companycode_value ?? ''
+        const roleId = row._cr113_rolename_value ?? ''
+        if (!companyId || !roleId) return
+
+        const roleSet = companyRoleUsage.get(companyId) ?? new Set<string>()
+        roleSet.add(roleId)
+        companyRoleUsage.set(companyId, roleSet)
+      })
+      setUsedCompanyRolesByCompany(
+        Object.fromEntries(
+          Array.from(companyRoleUsage.entries()).map(([companyId, roleSet]) => [companyId, Array.from(roleSet)])
+        )
+      )
+
+      const data = allAssignments
         .filter(row => row._cr113_managername_value === selectedManagerId)
         .map(row => ({
           ...row,
@@ -232,9 +251,7 @@ export function ManagersHubPage() {
       }
 
       const [assignmentsRes, locationsRes, rolesRes] = await Promise.all([
-        Cr113_jde_loc_assignmentsService.getAll({
-          filter: `_cr113_empl_id_value eq ${selectedManagerId}`,
-        }),
+        Cr113_jde_loc_assignmentsService.getAll(),
         Cr113_jde_locationsService.getAll({
           select: ['cr113_jde_locationid', 'cr113_coloc_name', 'cr113_coloc_id'],
         }),
@@ -257,7 +274,25 @@ export function ManagersHubPage() {
         (rolesRes.data ?? []).map(item => [item.cr113_jde_rolesid, item.cr113_role_name])
       )
 
-      const data = (assignmentsRes.data ?? [])
+      const allAssignments = assignmentsRes.data ?? []
+      const locationRoleUsage = new Map<string, Set<string>>()
+      allAssignments.forEach(row => {
+        const locationId = row._cr113_locationcode_value ?? ''
+        const roleId = row._cr113_rolename_value ?? ''
+        if (!locationId || !roleId) return
+
+        const roleSet = locationRoleUsage.get(locationId) ?? new Set<string>()
+        roleSet.add(roleId)
+        locationRoleUsage.set(locationId, roleSet)
+      })
+      setUsedLocationRolesByLocation(
+        Object.fromEntries(
+          Array.from(locationRoleUsage.entries()).map(([locationId, roleSet]) => [locationId, Array.from(roleSet)])
+        )
+      )
+
+      const data = allAssignments
+        .filter(row => row._cr113_empl_id_value === selectedManagerId)
         .map(row => ({
           ...row,
           cr113_locationcode: row._cr113_locationcode_value ?? '',
@@ -318,7 +353,9 @@ export function ManagersHubPage() {
               description: 'Manage JDE manager records. Select a row to load assignment details.',
               hideHeaderCopy: true,
               hideHeaderActions: false,
+              hideRowEditAction: true,
               hideRowDeleteAction: true,
+              enableRowDoubleClickEdit: true,
               idField: 'cr113_jde_managerid',
               service: {
                 async getAll(options: any = {}) {
@@ -504,7 +541,9 @@ export function ManagersHubPage() {
                   description: 'Create, edit, and delete company assignments related to the selected manager.',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,
+                  hideRowEditAction: true,
                   hideRowDeleteAction: true,
+                  enableRowDoubleClickEdit: true,
                   idField: 'cr113_jde_co_assignmentid',
                   service: companyAssignmentsService,
                   defaultSortKey: 'cr113_companycodecode',
@@ -550,7 +589,16 @@ export function ManagersHubPage() {
                       inputType: 'select',
                       editable: true,
                       required: true,
-                      options: roleOptions,
+                      options: ({ formValues, editTarget }) => {
+                        const selectedCompanyId = formValues.cr113_companycode ?? String(editTarget?.cr113_companycode ?? '')
+                        const currentRoleId = formValues.cr113_rolename ?? String(editTarget?.cr113_rolename ?? '')
+                        if (!selectedCompanyId) return roleOptions
+
+                        const usedRoleIds = new Set(usedCompanyRolesByCompany[selectedCompanyId] ?? [])
+                        usedRoleIds.delete(currentRoleId)
+
+                        return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId)
+                      },
                       showOnCard: false,
                       placeholder: 'Select role',
                     },
@@ -566,7 +614,9 @@ export function ManagersHubPage() {
                   description: 'Create, edit, and delete location assignments related to the selected manager.',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,
+                  hideRowEditAction: true,
                   hideRowDeleteAction: true,
+                  enableRowDoubleClickEdit: true,
                   idField: 'cr113_jde_loc_assignmentid',
                   service: locationAssignmentsService,
                   defaultSortKey: 'cr113_locationcodecode',
@@ -612,7 +662,16 @@ export function ManagersHubPage() {
                       inputType: 'select',
                       editable: true,
                       required: true,
-                      options: roleOptions,
+                      options: ({ formValues, editTarget }) => {
+                        const selectedLocationId = formValues.cr113_locationcode ?? String(editTarget?.cr113_locationcode ?? '')
+                        const currentRoleId = formValues.cr113_rolename ?? String(editTarget?.cr113_rolename ?? '')
+                        if (!selectedLocationId) return roleOptions
+
+                        const usedRoleIds = new Set(usedLocationRolesByLocation[selectedLocationId] ?? [])
+                        usedRoleIds.delete(currentRoleId)
+
+                        return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId)
+                      },
                       showOnCard: false,
                       placeholder: 'Select role',
                     },

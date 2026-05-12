@@ -174,6 +174,19 @@ function buildCompanyAssignmentsPayload(record: Record<string, unknown>) {
   return payload;
 }
 
+function buildLocationAssignmentsPayload(record: Record<string, unknown>) {
+  const payload: Record<string, unknown> = {};
+  const locationBind = toLookupBind('cr113_jde_locations', String(record.cr113_locationcode ?? ''));
+  const roleBind = toLookupBind('cr113_jde_roleses', String(record.cr113_roleid ?? ''));
+  const managerBind = toLookupBind('cr113_jde_managers', String(record.cr113_empl_id ?? ''));
+
+  if (locationBind) payload['cr113_LocationCode@odata.bind'] = locationBind;
+  if (roleBind) payload['cr113_RoleName@odata.bind'] = roleBind;
+  if (managerBind) payload['cr113_Empl_Id@odata.bind'] = managerBind;
+
+  return payload;
+}
+
 function baseColumnName(key: string) {
   return key.split('@')[0];
 }
@@ -350,11 +363,109 @@ function getCompanyAssignmentsTabFields(
       editable: true,
       required: true,
       inputType: 'select',
-      options: roleOptions,
+      options: ({ formValues, editTarget, rows }) => {
+        const selectedCompanyId = formValues.cr113_companycode ?? String(editTarget?.cr113_companycode ?? '')
+        const currentRoleId = formValues.cr113_roleid ?? String(editTarget?.cr113_roleid ?? '')
+        if (!selectedCompanyId) return roleOptions
+
+        const usedRoleIds = new Set(
+          rows
+            .filter(r => String(r.cr113_companycode ?? '') === selectedCompanyId)
+            .map(r => String(r.cr113_roleid ?? ''))
+            .filter(Boolean)
+        )
+        usedRoleIds.delete(currentRoleId)
+
+        return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId)
+      },
       placeholder: 'Select role',
     },
     {
       key: 'cr113_managerid',
+      label: 'Manager',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: managerOptions,
+      placeholder: 'Select manager',
+    },
+  ];
+}
+
+function getLocationAssignmentsTabFields(
+  locationOptions: LookupOption[],
+  roleOptions: LookupOption[],
+  managerOptions: LookupOption[],
+): FieldDef[] {
+  return [
+    {
+      key: 'LocationCombined',
+      label: 'Location',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_rolename',
+      label: 'Role',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_empl_name',
+      label: 'Manager',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_empl_chat',
+      label: 'Chat',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+    },
+    // Form fields (not shown on card)
+    {
+      key: 'cr113_locationcode',
+      label: 'Location',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: locationOptions,
+      placeholder: 'Select location',
+    },
+    {
+      key: 'cr113_roleid',
+      label: 'Role',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: ({ formValues, editTarget, rows }) => {
+        const selectedLocationId = formValues.cr113_locationcode ?? String(editTarget?.cr113_locationcode ?? '');
+        const currentRoleId = formValues.cr113_roleid ?? String(editTarget?.cr113_roleid ?? '');
+        if (!selectedLocationId) return roleOptions;
+
+        const usedRoleIds = new Set(
+          rows
+            .filter(r => String(r.cr113_locationcode ?? '') === selectedLocationId)
+            .map(r => String(r.cr113_roleid ?? ''))
+            .filter(Boolean)
+        );
+        usedRoleIds.delete(currentRoleId);
+
+        return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId);
+      },
+      placeholder: 'Select role',
+    },
+    {
+      key: 'cr113_empl_id',
       label: 'Manager',
       showOnCard: false,
       editable: true,
@@ -375,6 +486,7 @@ function getConfiguredFields(
   assignmentCompanyOptions: LookupOption[],
   assignmentRoleOptions: LookupOption[],
   assignmentManagerOptions: LookupOption[],
+  assignmentLocationOptions: LookupOption[],
 ): FieldDef[] {
   if (tabId === 'jde_companies') {
     return getCompaniesTabFields(segmentOptions, typeOptions, ledgerOptions);
@@ -382,6 +494,13 @@ function getConfiguredFields(
   if (tabId === 'jde_co_assignments') {
     return getCompanyAssignmentsTabFields(
       assignmentCompanyOptions,
+      assignmentRoleOptions,
+      assignmentManagerOptions,
+    );
+  }
+  if (tabId === 'jde_loc_assignments') {
+    return getLocationAssignmentsTabFields(
+      assignmentLocationOptions,
       assignmentRoleOptions,
       assignmentManagerOptions,
     );
@@ -397,16 +516,18 @@ export function DataTablesPage() {
   const [companyTypeOptions, setCompanyTypeOptions] = useState<LookupOption[]>([]);
   const [companyLedgerOptions, setCompanyLedgerOptions] = useState<LookupOption[]>([]);
   const [assignmentCompanyOptions, setAssignmentCompanyOptions] = useState<LookupOption[]>([]);
+  const [assignmentLocationOptions, setAssignmentLocationOptions] = useState<LookupOption[]>([]);
   const [assignmentRoleOptions, setAssignmentRoleOptions] = useState<LookupOption[]>([]);
   const [assignmentManagerOptions, setAssignmentManagerOptions] = useState<LookupOption[]>([]);
 
   useEffect(() => {
     const loadCompanyLookupOptions = async () => {
-      const [segmentsRes, typesRes, ledgersRes, companiesRes, rolesRes, managersRes] = await Promise.all([
+      const [segmentsRes, typesRes, ledgersRes, companiesRes, locationsRes, rolesRes, managersRes] = await Promise.all([
         Cr113_jde_co_segmentsService.getAll({ select: ['cr113_jde_co_segmentid', 'cr113_co_segment_name'], orderBy: ['cr113_co_segment_name asc'] }),
         Cr113_jde_typesService.getAll({ select: ['cr113_jde_typeid', 'cr113_co_type_name'], orderBy: ['cr113_co_type_name asc'] }),
         Cr113_jde_ledger_typesService.getAll({ select: ['cr113_jde_ledger_typeid', 'cr113_co_ledger_type_name'], orderBy: ['cr113_co_ledger_type_name asc'] }),
         Cr113_jde_companiesService.getAll({ select: ['cr113_jde_companyid', 'cr113_co_id', 'cr113_co_desc'] }),
+        Cr113_jde_locationsService.getAll({ select: ['cr113_jde_locationid', 'cr113_coloc_id', 'cr113_coloc_name'] }),
         Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'], orderBy: ['cr113_role_name asc'] }),
         Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name', 'cr113_chat'], orderBy: ['cr113_manager_name asc'] }),
       ]);
@@ -419,6 +540,14 @@ export function DataTablesPage() {
           .map((c: any) => ({
             value: c.cr113_jde_companyid,
             label: `${c.cr113_co_id ?? ''} - ${c.cr113_co_desc ?? ''}`.trim(),
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true, sensitivity: 'base' }))
+      );
+      setAssignmentLocationOptions(
+        (locationsRes.data ?? [])
+          .map((l: any) => ({
+            value: l.cr113_jde_locationid,
+            label: `${l.cr113_coloc_id ?? ''} - ${l.cr113_coloc_name ?? ''}`.trim(),
           }))
           .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true, sensitivity: 'base' }))
       );
@@ -461,6 +590,7 @@ export function DataTablesPage() {
     assignmentCompanyOptions,
     assignmentRoleOptions,
     assignmentManagerOptions,
+    assignmentLocationOptions,
   );
   const loading = loadingTabs[active.id];
 
@@ -554,6 +684,48 @@ export function DataTablesPage() {
         return { ...assignmentsRes, data };
       }
 
+      if (active.id === 'jde_loc_assignments') {
+        const [assignmentsRes, locationsRes, rolesRes, managersRes] = await Promise.all([
+          getAllPages(Cr113_jde_loc_assignmentsService),
+          Cr113_jde_locationsService.getAll({ select: ['cr113_jde_locationid', 'cr113_coloc_id', 'cr113_coloc_name'] }),
+          Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'] }),
+          Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name', 'cr113_chat'] }),
+        ]);
+        if (!assignmentsRes.success) return assignmentsRes;
+
+        // Removed unused locationById and locationCodeById
+        const roleById = new Map(
+          (rolesRes.data ?? []).map((r: any) => [r.cr113_jde_rolesid, r.cr113_role_name ?? ''])
+        );
+        const managerById = new Map(
+          (managersRes.data ?? []).map((m: any) => [
+            m.cr113_jde_managerid,
+            (m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`).trim(),
+          ])
+        );
+        const chatByManagerId = new Map(
+          (managersRes.data ?? []).map((m: any) => [m.cr113_jde_managerid, m.cr113_chat ?? ''])
+        );
+
+        const data = (assignmentsRes.data ?? []).map((row: any) => {
+          const colocId = locationsRes.data?.find((l: any) => l.cr113_jde_locationid === row._cr113_locationcode_value)?.cr113_coloc_id ?? '';
+          const colocName = locationsRes.data?.find((l: any) => l.cr113_jde_locationid === row._cr113_locationcode_value)?.cr113_coloc_name ?? '';
+          return {
+            cr113_jde_loc_assignmentid: row.cr113_jde_loc_assignmentid,
+            LocationCombined: colocId && colocName ? `${colocId} - ${colocName}` : (colocId || colocName),
+            cr113_LocationCodeSort: colocId ?? '',
+            cr113_locationcode: row._cr113_locationcode_value ?? '',
+            cr113_rolename: row.cr113_rolename ?? (row._cr113_rolename_value ? roleById.get(String(row._cr113_rolename_value)) : ''),
+            cr113_empl_name: row.cr113_empl_name ?? (row._cr113_empl_id_value ? managerById.get(String(row._cr113_empl_id_value)) : ''),
+            cr113_empl_chat: row._cr113_empl_id_value ? chatByManagerId.get(String(row._cr113_empl_id_value)) ?? '' : '',
+            modifiedon: row.modifiedon ? toUserTime(row.modifiedon) : '',
+            cr113_roleid: row._cr113_rolename_value ?? '',
+            cr113_empl_id: row._cr113_empl_id_value ?? '',
+          };
+        });
+        return { ...assignmentsRes, data };
+      }
+
       const result = active.id === 'jde_loc_assignments'
         ? await getAllPages(active.service)
         : await active.service.getAll();
@@ -571,11 +743,15 @@ export function DataTablesPage() {
       ? active.service.create(buildCompaniesPayload(record as Record<string, unknown>))
       : active.id === 'jde_co_assignments'
         ? active.service.create(buildCompanyAssignmentsPayload(record as Record<string, unknown>))
+      : active.id === 'jde_loc_assignments'
+        ? active.service.create(buildLocationAssignmentsPayload(record as Record<string, unknown>))
       : active.service.create(record),
     update: (id, changes) => active.id === 'jde_companies'
       ? active.service.update(id, buildCompaniesPayload(changes as Record<string, unknown>))
       : active.id === 'jde_co_assignments'
         ? active.service.update(id, buildCompanyAssignmentsPayload(changes as Record<string, unknown>))
+      : active.id === 'jde_loc_assignments'
+        ? active.service.update(id, buildLocationAssignmentsPayload(changes as Record<string, unknown>))
       : active.service.update(id, changes),
     delete: (id) => active.service.delete(id),
   };
@@ -590,7 +766,7 @@ export function DataTablesPage() {
     hideRowEditAction: true,
     hideRowDeleteAction: false,
     enableRowDoubleClickEdit: true,
-    rowDeleteIconOnly: true,
+    rowDeleteIconOnly: false,
     ...(
       active.id === 'jde_companies'
         ? {
@@ -602,6 +778,11 @@ export function DataTablesPage() {
               defaultSortKey: 'cr113_CompanyCodeSort' as const,
               defaultSortDir: 'asc' as const,
             }
+          : active.id === 'jde_loc_assignments'
+            ? {
+                defaultSortKey: 'LocationCombined' as const,
+                defaultSortDir: 'asc' as const,
+              }
           : {}
     ),
     onRowsLoaded: (rows) => {

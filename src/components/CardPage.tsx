@@ -10,7 +10,11 @@ export interface FieldDef {
   /** input control type in add/edit form */
   inputType?: 'text' | 'select'
   /** options for select inputs */
-  options?: Array<{ label: string; value: string }>
+  options?: Array<{ label: string; value: string }> | ((context: {
+    formValues: Record<string, string>
+    editTarget: Record<string, any> | null
+    rows: Array<Record<string, any>>
+  }) => Array<{ label: string; value: string }>)
   /** shown on the card face (first field is the card title) */
   showOnCard?: boolean
   /** included in the add/edit form */
@@ -496,6 +500,11 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                     {f.label}{f.required && <span className="cp-required">*</span>}
                   </span>
                   {f.inputType === 'select' ? (
+                    (() => {
+                      const fieldOptions = typeof f.options === 'function'
+                        ? f.options({ formValues, editTarget, rows })
+                        : (f.options ?? [])
+                      return (
                     <select
                       ref={i === 0 ? firstSelectRef : undefined}
                       className="cp-input"
@@ -504,10 +513,12 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                       onKeyDown={e => { if (e.key === 'Enter') void handleSave() }}
                     >
                       <option value="">{f.placeholder ?? `Select ${f.label}`}</option>
-                      {(f.options ?? []).map(opt => (
+                      {fieldOptions.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}
                     </select>
+                      )
+                    })()
                   ) : (
                     <input
                       ref={i === 0 ? firstInputRef : undefined}

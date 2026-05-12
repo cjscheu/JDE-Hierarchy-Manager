@@ -162,3 +162,16 @@
 -actually remove the chat field from the Add company assignment pop up.  This should be auto populate the table when adding a new record
 -on the Assignments page, remove the edit and delete buttons and column; when a user double clicks, the edit form should open.  This applies to both tab cards: Company Assignments and Location Assignments
 -on the Data page, remove the edit and delete buttons and column; when a user double clicks, the edit form should open.  This applies to all tab cards on the page
+
+-any time a user is adding a new company assignment or location assignement, the Role dropdown should only include role that have not been selected already for that company or location
+-on the Managers page, all roles are still available to choose from when adding a new company assignemtn or location assignment.  All other pages are working correctly
+-on the Users page, users in the admin table should not be able to see Super Users as on option in the Role Type dropdowns
+-on the Companies page, replace the edit button columns on all cards with the double click functionality
+-on the Managers page, replace the edit button columns on all cards  with the double click functionality
+-on the Users page, replace the edit button columns on all cards  with the double click functionality
+-on the Data Tables page, update the delete button icon by adding Delete text to the right of the button
+-on the Location Assignment card tab on the Data Tables page, include only these columns: cr113_LocationCode, cr113_rolename, cr113_empl_name, cr113_empl_chat, and modifiedon with user local time.  Force the cr113_LocationCode column to be a combination of cr113_LocationCode space dash space cr113_locationname and call it Location.  The table should be sorted by Location ascending order by numeric
+-on the Location Assignment card tab on the Data Tables page, the combination column called Location is not there.  Please remove cr113_email_contact, cr113_Assign_ID, cr113_JDE_Loc_ASSIGNMENTID; column order should be Location, Role, Manager, Contact
+-on the Location Assignment card tab on the Data Tables page,  cr113_locationcode and modified date are not on the card. Please add them.  Please remove cr113_email_contact, cr113_Assign_ID, cr113_JDE_Loc_ASSIGNMENTID; column order should be Location Code, Location Name, Role, Manager, Chat, Modified Date
+-on the Location Assignment card tab on the Data Tables page, combine cr113_LocationCode space dash space cr113_locationname and call it Location.  The table should be sorted by Location ascending order by numeric
+-on the Location Assignment card tab on the Data Tables page, the Location field should be populated on the edit location assignment pop up

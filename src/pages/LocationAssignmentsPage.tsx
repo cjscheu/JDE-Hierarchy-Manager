@@ -159,7 +159,21 @@ export function LocationAssignmentsPage() {
             key: 'cr113_rolename',
             label: 'Role',
             inputType: 'select',
-            options: roleOptions,
+            options: ({ formValues, editTarget, rows }) => {
+              const selectedLocationId = formValues.cr113_locationcode ?? String(editTarget?.cr113_locationcode ?? '')
+              const currentRoleId = formValues.cr113_rolename ?? String(editTarget?.cr113_rolename ?? '')
+              if (!selectedLocationId) return roleOptions
+
+              const usedRoleIds = new Set(
+                rows
+                  .filter(r => String(r.cr113_locationcode ?? '') === selectedLocationId)
+                  .map(r => String(r.cr113_rolename ?? ''))
+                  .filter(Boolean)
+              )
+              usedRoleIds.delete(currentRoleId)
+
+              return roleOptions.filter(opt => !usedRoleIds.has(opt.value) || opt.value === currentRoleId)
+            },
             showOnCard: false,
             editable: true,
             required: true,
