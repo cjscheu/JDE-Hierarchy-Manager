@@ -430,8 +430,14 @@ function getLocationAssignmentsTabFields(
 ): FieldDef[] {
   return [
     {
-      key: 'LocationCombined',
-      label: 'Location',
+      key: 'cr113_LocationCode',
+      label: 'Location Code',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_LocationName',
+      label: 'Location Name',
       showOnCard: true,
       editable: false,
     },
@@ -508,31 +514,39 @@ function getLocationAssignmentsTabFields(
 }
 
 function getLocationsTabFields(
-  companyOptions: LookupOption[],
   locationSegmentOptions: LookupOption[],
   divisionOptions: LookupOption[],
   groupOptions: LookupOption[],
   otcOptions: LookupOption[],
 ): FieldDef[] {
   return [
+    // Card columns (showOnCard: true)
     {
-      key: 'LocationCombined',
-      label: 'Location',
+      key: 'cr113_coloc_id',
+      label: 'Location Code',
       showOnCard: true,
       editable: false,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_coloc_name',
+      label: 'Location Name',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
     },
     {
       key: 'cr113_coloc_city',
       label: 'City',
       showOnCard: true,
-      editable: true,
+      editable: false,
       inputType: 'text',
     },
     {
       key: 'cr113_coloc_state',
       label: 'State',
       showOnCard: true,
-      editable: true,
+      editable: false,
       inputType: 'text',
     },
     {
@@ -565,6 +579,7 @@ function getLocationsTabFields(
       showOnCard: true,
       editable: false,
     },
+    // Add popup fields (no editOnly)
     {
       key: 'cr113_coloc_id',
       label: 'Location Code',
@@ -582,23 +597,18 @@ function getLocationsTabFields(
       inputType: 'text',
     },
     {
-      key: 'cr113_co_id',
-      label: 'Company',
+      key: 'cr113_coloc_city',
+      label: 'City',
       showOnCard: false,
       editable: true,
-      required: true,
-      inputType: 'select',
-      options: companyOptions,
-      placeholder: 'Select company',
+      inputType: 'text',
     },
     {
-      key: 'cr113_coloc_segment_name',
-      label: 'Location Segment',
+      key: 'cr113_coloc_state',
+      label: 'State',
       showOnCard: false,
       editable: true,
-      inputType: 'select',
-      options: locationSegmentOptions,
-      placeholder: 'Select location segment',
+      inputType: 'text',
     },
     {
       key: 'cr113_div_name',
@@ -619,6 +629,15 @@ function getLocationsTabFields(
       placeholder: 'Select group',
     },
     {
+      key: 'cr113_coloc_segment_name',
+      label: 'Location Segment',
+      showOnCard: false,
+      editable: true,
+      inputType: 'select',
+      options: locationSegmentOptions,
+      placeholder: 'Select location segment',
+    },
+    {
       key: 'cr113_otc_name',
       label: 'OTC',
       showOnCard: false,
@@ -626,6 +645,53 @@ function getLocationsTabFields(
       inputType: 'select',
       options: otcOptions,
       placeholder: 'Select OTC',
+    },
+  ];
+}
+
+function getManagersTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_first_name',
+      label: 'First Name',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_last_name',
+      label: 'Last Name',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_position_title',
+      label: 'Position Title',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_email',
+      label: 'Email',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_chat',
+      label: 'Chat',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
     },
   ];
 }
@@ -650,7 +716,6 @@ function getConfiguredFields(
   }
   if (tabId === 'jde_locations') {
     return getLocationsTabFields(
-      assignmentCompanyOptions,
       locationSegmentOptions,
       divisionOptions,
       groupOptions,
@@ -670,6 +735,9 @@ function getConfiguredFields(
       assignmentRoleOptions,
       assignmentManagerOptions,
     );
+  }
+  if (tabId === 'jde_managers') {
+    return getManagersTabFields();
   }
   return fields;
 }
@@ -759,7 +827,7 @@ export function DataTablesPage() {
   }, []);
 
   const active = DATA_TABLES.find(tab => tab.id === activeTab) || DATA_TABLES[0];
-  const fields = getConfiguredFields(
+  let fields = getConfiguredFields(
     active.id,
     fieldsByTab[active.id] || [],
     companySegmentOptions,
@@ -774,6 +842,15 @@ export function DataTablesPage() {
     groupOptions,
     otcOptions,
   );
+  // For jde_loc_assignments, ensure Location Code/Name columns and sort
+  if (active.id === 'jde_loc_assignments') {
+    fields = fields.map(f => {
+      if (f.key === 'cr113_LocationCode' || f.key === 'cr113_LocationName') {
+        return { ...f, showOnCard: true };
+      }
+      return f;
+    });
+  }
   const loading = loadingTabs[active.id];
 
   const wrappedService: CardPageConfig['service'] = {
@@ -931,7 +1008,6 @@ export function DataTablesPage() {
         ]);
         if (!assignmentsRes.success) return assignmentsRes;
 
-        // Removed unused locationById and locationCodeById
         const roleById = new Map(
           (rolesRes.data ?? []).map((r: any) => [r.cr113_jde_rolesid, r.cr113_role_name ?? ''])
         );
@@ -946,11 +1022,13 @@ export function DataTablesPage() {
         );
 
         const data = (assignmentsRes.data ?? []).map((row: any) => {
-          const colocId = locationsRes.data?.find((l: any) => l.cr113_jde_locationid === row._cr113_locationcode_value)?.cr113_coloc_id ?? '';
-          const colocName = locationsRes.data?.find((l: any) => l.cr113_jde_locationid === row._cr113_locationcode_value)?.cr113_coloc_name ?? '';
+          const location = locationsRes.data?.find((l: any) => l.cr113_jde_locationid === row._cr113_locationcode_value);
+          const colocId = location?.cr113_coloc_id ?? '';
+          const colocName = location?.cr113_coloc_name ?? '';
           return {
             cr113_jde_loc_assignmentid: row.cr113_jde_loc_assignmentid,
-            LocationCombined: colocId && colocName ? `${colocId} - ${colocName}` : (colocId || colocName),
+            cr113_LocationCode: colocId,
+            cr113_LocationName: colocName,
             cr113_LocationCodeSort: colocId ?? '',
             cr113_locationcode: row._cr113_locationcode_value ?? '',
             cr113_rolename: row.cr113_rolename ?? (row._cr113_rolename_value ? roleById.get(String(row._cr113_rolename_value)) : ''),
@@ -1009,29 +1087,17 @@ export function DataTablesPage() {
     hideRowDeleteAction: false,
     enableRowDoubleClickEdit: true,
     rowDeleteIconOnly: false,
-    ...(
-      active.id === 'jde_companies'
-        ? {
-            defaultSortKey: 'cr113_co_id' as const,
-            defaultSortDir: 'asc' as const,
-          }
-        : active.id === 'jde_locations'
-          ? {
-              defaultSortKey: 'LocationSort' as const,
-              defaultSortDir: 'asc' as const,
-            }
+    ...(active.id === 'jde_companies'
+      ? { defaultSortKey: 'cr113_co_id' as const, defaultSortDir: 'asc' as const }
+      : active.id === 'jde_locations'
+        ? { defaultSortKey: 'LocationSort' as const, defaultSortDir: 'asc' as const }
         : active.id === 'jde_co_assignments'
-          ? {
-              defaultSortKey: 'cr113_CompanyCodeSort' as const,
-              defaultSortDir: 'asc' as const,
-            }
+          ? { defaultSortKey: 'cr113_CompanyCodeSort' as const, defaultSortDir: 'asc' as const }
           : active.id === 'jde_loc_assignments'
-            ? {
-                defaultSortKey: 'LocationCombined' as const,
-                defaultSortDir: 'asc' as const,
-              }
-          : {}
-    ),
+            ? { defaultSortKey: 'cr113_LocationCodeSort' as const, defaultSortDir: 'asc' as const }
+            : active.id === 'jde_managers'
+              ? { defaultSortKey: 'cr113_last_name' as const, defaultSortDir: 'asc' as const }
+            : {}),
     onRowsLoaded: (rows) => {
       setFieldsByTab(prev => {
         const existing = prev[active.id] ?? [];
