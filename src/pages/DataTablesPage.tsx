@@ -91,6 +91,12 @@ const DATA_TABLES: DataTableDef[] = [
     idField: 'cr113_jde_otcid',
   },
   {
+    id: 'jde_ledger_types',
+    label: 'Ledger Types',
+    service: Cr113_jde_ledger_typesService,
+    idField: 'cr113_jde_ledger_typeid',
+  },
+  {
     id: 'jde_co_segments',
     label: 'Company Segments',
     service: Cr113_jde_co_segmentsService,
@@ -104,17 +110,68 @@ const DATA_TABLES: DataTableDef[] = [
   },
   {
     id: 'user_securities',
-    label: 'User Securities',
+    label: 'User Security',
     service: Cr113_user_securitiesService,
     idField: 'cr113_user_securityid',
   },
-  {
-    id: 'jde_ledger_types',
-    label: 'Ledger Types',
-    service: Cr113_jde_ledger_typesService,
-    idField: 'cr113_jde_ledger_typeid',
-  },
 ];
+
+function getUserSecuritiesTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_username',
+      label: 'User Name',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+      required: true,
+    },
+    {
+      key: 'cr113_email',
+      label: 'Email',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+      required: true,
+    },
+    {
+      key: 'cr113_application',
+      label: 'Application',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+      required: true,
+    },
+    // Show alias for Role Type on card, but use value for editing
+    {
+      key: 'cr113_roletypename',
+      label: 'Role Type',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_roletype',
+      label: 'Role Type',
+      showOnCard: false,
+      editable: true,
+      inputType: 'select',
+      options: [
+        { label: 'Admin', value: '1' },
+        { label: 'PowerUser', value: '2' },
+        { label: 'Super User', value: '3' },
+      ],
+      required: true,
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
 
 function normalizeRows(result: unknown): Record<string, unknown>[] {
   const payload = result as {
@@ -354,7 +411,13 @@ function getCompanyAssignmentsTabFields(
   return [
     {
       key: 'cr113_CompanyCode',
-      label: 'Company',
+      label: 'Company Code',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_CompanyName',
+      label: 'Company Name',
       showOnCard: true,
       editable: false,
     },
@@ -696,6 +759,159 @@ function getManagersTabFields(): FieldDef[] {
   ];
 }
 
+function getGroupsTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_group_name',
+      label: 'Group',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+function getDivisionsTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_div_name',
+      label: 'Division',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+function getRolesTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_role_name',
+      label: 'Roles',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+function getTypesTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_co_type_name',
+      label: 'Types',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+function getOtcTypesTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_otc_name',
+      label: 'OTC Types',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+
+function getCompanySegmentsTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_co_segment_name',
+      label: 'Segment Name',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+function getLocationSegmentsTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_coloc_segment_name',
+      label: 'Segment Name',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
+function getLedgerTypesTabFields(): FieldDef[] {
+  return [
+    {
+      key: 'cr113_co_ledger_type_name',
+      label: 'Company Ledger',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+      inputType: 'text',
+    },
+  ];
+}
+
 function getConfiguredFields(
   tabId: string,
   fields: FieldDef[],
@@ -738,6 +954,33 @@ function getConfiguredFields(
   }
   if (tabId === 'jde_managers') {
     return getManagersTabFields();
+  }
+  if (tabId === 'jde_groups') {
+    return getGroupsTabFields();
+  }
+  if (tabId === 'jde_divs') {
+    return getDivisionsTabFields();
+  }
+  if (tabId === 'jde_roleses') {
+    return getRolesTabFields();
+  }
+  if (tabId === 'jde_types') {
+    return getTypesTabFields();
+  }
+  if (tabId === 'jde_otcs') {
+    return getOtcTypesTabFields();
+  }
+  if (tabId === 'jde_co_segments') {
+    return getCompanySegmentsTabFields();
+  }
+  if (tabId === 'jde_location_segments') {
+    return getLocationSegmentsTabFields();
+  }
+  if (tabId === 'jde_ledger_types') {
+    return getLedgerTypesTabFields();
+  }
+  if (tabId === 'user_securities') {
+    return getUserSecuritiesTabFields();
   }
   return fields;
 }
@@ -911,16 +1154,16 @@ export function DataTablesPage() {
           Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_chat'] }),
         ]);
         if (!assignmentsRes.success) return assignmentsRes;
-        const companyById = new Map(
-          (companiesRes.data ?? []).map(c => [
-            c.cr113_jde_companyid,
-            `${c.cr113_co_id ?? ''} - ${c.cr113_co_desc ?? ''}`.trim()
-          ])
-        );
         const companyCodeById = new Map(
           (companiesRes.data ?? []).map(c => [
             c.cr113_jde_companyid,
             String(c.cr113_co_id ?? '').trim(),
+          ])
+        );
+        const companyNameById = new Map(
+          (companiesRes.data ?? []).map(c => [
+            c.cr113_jde_companyid,
+            String(c.cr113_co_desc ?? '').trim(),
           ])
         );
         const roleById = new Map(
@@ -931,7 +1174,8 @@ export function DataTablesPage() {
         );
         const data = (assignmentsRes.data ?? []).map(row => ({
           cr113_jde_co_assignmentid: row.cr113_jde_co_assignmentid,
-          cr113_CompanyCode: companyById.get(String(row._cr113_companycode_value)) ?? '',
+          cr113_CompanyCode: companyCodeById.get(String(row._cr113_companycode_value)) ?? '',
+          cr113_CompanyName: companyNameById.get(String(row._cr113_companycode_value)) ?? '',
           cr113_CompanyCodeSort: companyCodeById.get(String(row._cr113_companycode_value)) ?? '',
           cr113_rolename: row.cr113_rolename ?? (row._cr113_rolename_value ? roleById.get(String(row._cr113_rolename_value)) : ''),
           cr113_manager: row.cr113_manager ?? '',
@@ -1046,10 +1290,21 @@ export function DataTablesPage() {
         ? await getAllPages(active.service)
         : await active.service.getAll();
       const rawRows = normalizeRows(result);
-      const data = rawRows.map(row => ({
+      let data = rawRows.map(row => ({
         ...row,
         ...(row.modifiedon !== undefined ? { modifiedon: toUserTime(row.modifiedon) } : {}),
       }));
+      // For user_securities, show role type alias
+      if (active.id === 'user_securities') {
+        data = data.map(row => {
+          const r = row as any;
+          return {
+            ...row,
+            cr113_roletypename: r.cr113_roletypename ||
+              (r.cr113_roletype === '1' ? 'Admin' : r.cr113_roletype === '2' ? 'PowerUser' : r.cr113_roletype === '3' ? 'Super User' : ''),
+          };
+        });
+      }
       return {
         ...(result as object),
         data,
@@ -1097,6 +1352,24 @@ export function DataTablesPage() {
             ? { defaultSortKey: 'cr113_LocationCodeSort' as const, defaultSortDir: 'asc' as const }
             : active.id === 'jde_managers'
               ? { defaultSortKey: 'cr113_last_name' as const, defaultSortDir: 'asc' as const }
+              : active.id === 'jde_groups'
+                ? { defaultSortKey: 'cr113_group_name' as const, defaultSortDir: 'asc' as const }
+                : active.id === 'jde_divs'
+                  ? { defaultSortKey: 'cr113_div_name' as const, defaultSortDir: 'asc' as const }
+                  : active.id === 'jde_roleses'
+                    ? { defaultSortKey: 'cr113_role_name' as const, defaultSortDir: 'asc' as const }
+                    : active.id === 'jde_types'
+                      ? { defaultSortKey: 'cr113_co_type_name' as const, defaultSortDir: 'asc' as const }
+                      : active.id === 'jde_otcs'
+                        ? { defaultSortKey: 'cr113_otc_name' as const, defaultSortDir: 'asc' as const }
+                        : active.id === 'jde_co_segments'
+                          ? { defaultSortKey: 'cr113_co_segment_name' as const, defaultSortDir: 'asc' as const }
+                          : active.id === 'jde_location_segments'
+                            ? { defaultSortKey: 'cr113_coloc_segment_name' as const, defaultSortDir: 'asc' as const }
+                            : active.id === 'jde_ledger_types'
+                              ? { defaultSortKey: 'cr113_co_ledger_type_name' as const, defaultSortDir: 'asc' as const }
+                              : active.id === 'user_securities'
+                                ? { defaultSortKey: 'cr113_username' as const, defaultSortDir: 'asc' as const }
             : {}),
     onRowsLoaded: (rows) => {
       setFieldsByTab(prev => {
