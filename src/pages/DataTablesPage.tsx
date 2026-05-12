@@ -161,6 +161,19 @@ function buildCompaniesPayload(record: Record<string, unknown>) {
   return payload;
 }
 
+function buildCompanyAssignmentsPayload(record: Record<string, unknown>) {
+  const payload: Record<string, unknown> = {};
+  const companyBind = toLookupBind('cr113_jde_companies', String(record.cr113_companycode ?? ''));
+  const roleBind = toLookupBind('cr113_jde_roleses', String(record.cr113_roleid ?? ''));
+  const managerBind = toLookupBind('cr113_jde_managers', String(record.cr113_managerid ?? ''));
+
+  if (companyBind) payload['cr113_CompanyCode@odata.bind'] = companyBind;
+  if (roleBind) payload['cr113_RoleName@odata.bind'] = roleBind;
+  if (managerBind) payload['cr113_ManagerName@odata.bind'] = managerBind;
+
+  return payload;
+}
+
 function baseColumnName(key: string) {
   return key.split('@')[0];
 }
@@ -290,15 +303,88 @@ function getCompaniesTabFields(
   ];
 }
 
+function getCompanyAssignmentsTabFields(
+  companyOptions: LookupOption[],
+  roleOptions: LookupOption[],
+  managerOptions: LookupOption[],
+): FieldDef[] {
+  return [
+    {
+      key: 'cr113_CompanyCode',
+      label: 'Company',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_rolename',
+      label: 'Role',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_manager',
+      label: 'Manager',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_chat',
+      label: 'Chat',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_companycode',
+      label: 'Company',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: companyOptions,
+      placeholder: 'Select company',
+    },
+    {
+      key: 'cr113_roleid',
+      label: 'Role',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: roleOptions,
+      placeholder: 'Select role',
+    },
+    {
+      key: 'cr113_managerid',
+      label: 'Manager',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: managerOptions,
+      placeholder: 'Select manager',
+    },
+  ];
+}
+
 function getConfiguredFields(
   tabId: string,
   fields: FieldDef[],
   segmentOptions: LookupOption[],
   typeOptions: LookupOption[],
   ledgerOptions: LookupOption[],
+  assignmentCompanyOptions: LookupOption[],
+  assignmentRoleOptions: LookupOption[],
+  assignmentManagerOptions: LookupOption[],
 ): FieldDef[] {
   if (tabId === 'jde_companies') {
     return getCompaniesTabFields(segmentOptions, typeOptions, ledgerOptions);
+  }
+  if (tabId === 'jde_co_assignments') {
+    return getCompanyAssignmentsTabFields(
+      assignmentCompanyOptions,
+      assignmentRoleOptions,
+      assignmentManagerOptions,
+    );
   }
   return fields;
 }
@@ -310,18 +396,39 @@ export function DataTablesPage() {
   const [companySegmentOptions, setCompanySegmentOptions] = useState<LookupOption[]>([]);
   const [companyTypeOptions, setCompanyTypeOptions] = useState<LookupOption[]>([]);
   const [companyLedgerOptions, setCompanyLedgerOptions] = useState<LookupOption[]>([]);
+  const [assignmentCompanyOptions, setAssignmentCompanyOptions] = useState<LookupOption[]>([]);
+  const [assignmentRoleOptions, setAssignmentRoleOptions] = useState<LookupOption[]>([]);
+  const [assignmentManagerOptions, setAssignmentManagerOptions] = useState<LookupOption[]>([]);
 
   useEffect(() => {
     const loadCompanyLookupOptions = async () => {
-      const [segmentsRes, typesRes, ledgersRes] = await Promise.all([
+      const [segmentsRes, typesRes, ledgersRes, companiesRes, rolesRes, managersRes] = await Promise.all([
         Cr113_jde_co_segmentsService.getAll({ select: ['cr113_jde_co_segmentid', 'cr113_co_segment_name'], orderBy: ['cr113_co_segment_name asc'] }),
         Cr113_jde_typesService.getAll({ select: ['cr113_jde_typeid', 'cr113_co_type_name'], orderBy: ['cr113_co_type_name asc'] }),
         Cr113_jde_ledger_typesService.getAll({ select: ['cr113_jde_ledger_typeid', 'cr113_co_ledger_type_name'], orderBy: ['cr113_co_ledger_type_name asc'] }),
+        Cr113_jde_companiesService.getAll({ select: ['cr113_jde_companyid', 'cr113_co_id', 'cr113_co_desc'] }),
+        Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'], orderBy: ['cr113_role_name asc'] }),
+        Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name', 'cr113_chat'], orderBy: ['cr113_manager_name asc'] }),
       ]);
 
       setCompanySegmentOptions((segmentsRes.data ?? []).map((s: any) => ({ value: s.cr113_jde_co_segmentid, label: s.cr113_co_segment_name })));
       setCompanyTypeOptions((typesRes.data ?? []).map((t: any) => ({ value: t.cr113_jde_typeid, label: t.cr113_co_type_name })));
       setCompanyLedgerOptions((ledgersRes.data ?? []).map((l: any) => ({ value: l.cr113_jde_ledger_typeid, label: l.cr113_co_ledger_type_name })));
+      setAssignmentCompanyOptions(
+        (companiesRes.data ?? [])
+          .map((c: any) => ({
+            value: c.cr113_jde_companyid,
+            label: `${c.cr113_co_id ?? ''} - ${c.cr113_co_desc ?? ''}`.trim(),
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true, sensitivity: 'base' }))
+      );
+      setAssignmentRoleOptions((rolesRes.data ?? []).map((r: any) => ({ value: r.cr113_jde_rolesid, label: r.cr113_role_name ?? '' })));
+      setAssignmentManagerOptions(
+        (managersRes.data ?? []).map((m: any) => ({
+          value: m.cr113_jde_managerid,
+          label: (m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`).trim(),
+        }))
+      );
     };
 
     void loadCompanyLookupOptions();
@@ -351,6 +458,9 @@ export function DataTablesPage() {
     companySegmentOptions,
     companyTypeOptions,
     companyLedgerOptions,
+    assignmentCompanyOptions,
+    assignmentRoleOptions,
+    assignmentManagerOptions,
   );
   const loading = loadingTabs[active.id];
 
@@ -404,6 +514,46 @@ export function DataTablesPage() {
         };
       }
 
+      if (active.id === 'jde_co_assignments') {
+        const [assignmentsRes, companiesRes, rolesRes, managersRes] = await Promise.all([
+          Cr113_jde_co_assignmentsService.getAll(),
+          Cr113_jde_companiesService.getAll({ select: ['cr113_jde_companyid', 'cr113_co_id', 'cr113_co_desc'] }),
+          Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'] }),
+          Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_chat'] }),
+        ]);
+        if (!assignmentsRes.success) return assignmentsRes;
+        const companyById = new Map(
+          (companiesRes.data ?? []).map(c => [
+            c.cr113_jde_companyid,
+            `${c.cr113_co_id ?? ''} - ${c.cr113_co_desc ?? ''}`.trim()
+          ])
+        );
+        const companyCodeById = new Map(
+          (companiesRes.data ?? []).map(c => [
+            c.cr113_jde_companyid,
+            String(c.cr113_co_id ?? '').trim(),
+          ])
+        );
+        const roleById = new Map(
+          (rolesRes.data ?? []).map(r => [r.cr113_jde_rolesid, r.cr113_role_name ?? ''])
+        );
+        const chatByManagerId = new Map(
+          (managersRes.data ?? []).map(m => [m.cr113_jde_managerid, m.cr113_chat ?? ''])
+        );
+        const data = (assignmentsRes.data ?? []).map(row => ({
+          cr113_jde_co_assignmentid: row.cr113_jde_co_assignmentid,
+          cr113_CompanyCode: companyById.get(String(row._cr113_companycode_value)) ?? '',
+          cr113_CompanyCodeSort: companyCodeById.get(String(row._cr113_companycode_value)) ?? '',
+          cr113_rolename: row.cr113_rolename ?? (row._cr113_rolename_value ? roleById.get(String(row._cr113_rolename_value)) : ''),
+          cr113_manager: row.cr113_manager ?? '',
+          cr113_chat: row._cr113_managername_value ? chatByManagerId.get(String(row._cr113_managername_value)) ?? '' : '',
+          cr113_companycode: row._cr113_companycode_value ?? '',
+          cr113_roleid: row._cr113_rolename_value ?? '',
+          cr113_managerid: row._cr113_managername_value ?? '',
+        }));
+        return { ...assignmentsRes, data };
+      }
+
       const result = active.id === 'jde_loc_assignments'
         ? await getAllPages(active.service)
         : await active.service.getAll();
@@ -419,9 +569,13 @@ export function DataTablesPage() {
     },
     create: (record) => active.id === 'jde_companies'
       ? active.service.create(buildCompaniesPayload(record as Record<string, unknown>))
+      : active.id === 'jde_co_assignments'
+        ? active.service.create(buildCompanyAssignmentsPayload(record as Record<string, unknown>))
       : active.service.create(record),
     update: (id, changes) => active.id === 'jde_companies'
       ? active.service.update(id, buildCompaniesPayload(changes as Record<string, unknown>))
+      : active.id === 'jde_co_assignments'
+        ? active.service.update(id, buildCompanyAssignmentsPayload(changes as Record<string, unknown>))
       : active.service.update(id, changes),
     delete: (id) => active.service.delete(id),
   };
@@ -437,12 +591,19 @@ export function DataTablesPage() {
     hideRowDeleteAction: false,
     enableRowDoubleClickEdit: true,
     rowDeleteIconOnly: true,
-    ...(active.id === 'jde_companies'
-      ? {
-          defaultSortKey: 'cr113_co_id' as const,
-          defaultSortDir: 'asc' as const,
-        }
-      : {}),
+    ...(
+      active.id === 'jde_companies'
+        ? {
+            defaultSortKey: 'cr113_co_id' as const,
+            defaultSortDir: 'asc' as const,
+          }
+        : active.id === 'jde_co_assignments'
+          ? {
+              defaultSortKey: 'cr113_CompanyCodeSort' as const,
+              defaultSortDir: 'asc' as const,
+            }
+          : {}
+    ),
     onRowsLoaded: (rows) => {
       setFieldsByTab(prev => {
         const existing = prev[active.id] ?? [];

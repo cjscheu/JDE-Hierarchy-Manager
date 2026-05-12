@@ -84,6 +84,9 @@ export function CompanyAssignmentsPage() {
       config={{
           title: 'Company Assignments',
         description: 'Manage manager and role assignments at the company level.',
+        hideRowEditAction: true,
+        hideRowDeleteAction: true,
+        enableRowDoubleClickEdit: true,
         idField: 'cr113_jde_co_assignmentid',
         defaultSortKey: 'cr113_companycodename',
         defaultSortDir: 'asc',

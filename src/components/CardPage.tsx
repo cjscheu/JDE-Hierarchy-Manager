@@ -284,8 +284,10 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
   const showHeaderCopy = !hideHeaderCopy
   const showHeaderActions = !hideHeaderActions
   const showHeader = showHeaderCopy || showHeaderActions
-  const showRowEditAction = !(hideRowEditAction || pageMode === 'references')
-  const showRowDeleteAction = !(hideRowDeleteAction || pageMode === 'references')
+  const dataPageMode = pageMode === 'data'
+  const enableDoubleClickEdit = enableRowDoubleClickEdit || dataPageMode
+  const showRowEditAction = !(hideRowEditAction || pageMode === 'references' || dataPageMode)
+  const showRowDeleteAction = !(hideRowDeleteAction || pageMode === 'references' || dataPageMode)
   const showRowActionsColumn = (showRowEditAction || showRowDeleteAction) && !actionsInHeader
   const [selectedActionRowId, setSelectedActionRowId] = useState<string | null>(null)
 
@@ -392,11 +394,11 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
                     if (actionsInHeader) setSelectedActionRowId(rowId)
                     onRowSelect?.(row)
                   }}
-                  onDoubleClick={enableRowDoubleClickEdit || onRowDoubleClick ? () => {
-                    if (enableRowDoubleClickEdit) openEdit(row)
+                  onDoubleClick={enableDoubleClickEdit || onRowDoubleClick ? () => {
+                    if (enableDoubleClickEdit) openEdit(row)
                     onRowDoubleClick?.(row)
                   } : undefined}
-                  title={enableRowDoubleClickEdit ? 'Double-click to edit' : onRowDoubleClick ? 'Double-click to view related assignments' : undefined}
+                  title={enableDoubleClickEdit ? 'Double-click to edit' : onRowDoubleClick ? 'Double-click to view related assignments' : undefined}
                   aria-selected={isSelected}
                 >
                   {tableFields.map(f => (

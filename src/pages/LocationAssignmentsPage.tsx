@@ -103,6 +103,9 @@ export function LocationAssignmentsPage() {
       config={{
         title: 'Location Assignments',
         description: 'Manage manager and role assignments at the location level.',
+        hideRowEditAction: true,
+        hideRowDeleteAction: true,
+        enableRowDoubleClickEdit: true,
         idField: 'cr113_jde_loc_assignmentid',
         defaultSortKey: 'cr113_locationcodename',
         defaultSortDir: 'asc',

@@ -150,3 +150,15 @@
 -on the add Location Assigment pop up page, the location code is not being submitted into the table.  The location does not need to be selected by the user becuase the page is opened by double clicking the valid location row on the location page.  When a user add a location assignment, the location, the role and the manager all need to be loaded into the location assignment table.  Right now, the only columns being loaded are Role and Manager
 -I just noticed there are a high number of rows missing in the location assignment pages..for instance,  Location 178-01 has three records in the cr113_jde_loc_assignments table, however, no rows show up the location assignment page on the app.  Location 178-01 is one example, there are many other location codes missing from the page
 -Records are still missing from the Location Assignment cards on the Assignments page, the data page and the data tables pages
+
+5/12/2026
+-on the Company Assignment card tab on the Data Tables page, include only these columns: cr113_CompanyCode, cr113_rolename, cr113_manager, and cr113_email.  Force the cr113_CompanyCode column to be a combination of cr113_CompanyCode space dash space cr113_CompanyName.  The table should be sorted by Company Code ascending order numeric
+-the Company Assignment table still contains two columns for Assign ID and Assignment ID, those need to be removed.  the cr113_CompanyCode column that is a combination of cr113_CompanyCode space dash space cr113_CompanyName is still missing
+-change company code column to Company.  Also the role column is returning no values
+-change the email column to pull in cr113_chat instead
+-sort the Company Assignment card table by Company ascending order numeric
+-Looks good.  Now when I double click the row record to edit, no fields show up on the edit company assignment pop up.  The fields should include Company, Role, Manager, Chat.  the same issue is happening with the Add company assignment pop up
+-on the Add company assignment pop up, the chat field should be a dropdown, not a text field.  
+-actually remove the chat field from the Add company assignment pop up.  This should be auto populate the table when adding a new record
+-on the Assignments page, remove the edit and delete buttons and column; when a user double clicks, the edit form should open.  This applies to both tab cards: Company Assignments and Location Assignments
+-on the Data page, remove the edit and delete buttons and column; when a user double clicks, the edit form should open.  This applies to all tab cards on the page

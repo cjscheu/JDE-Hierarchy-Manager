@@ -252,7 +252,9 @@ function App() {
         <main className="app-content" key={activePage}>
           <PageModeProvider mode="default">
             {active.id === 'data-management' ? (
-              <DataManagementPage accessRole={accessRole} />
+              <PageModeProvider mode="data">
+                <DataManagementPage accessRole={accessRole} />
+              </PageModeProvider>
             ) : active.id === 'app-review' ? (
               <PageModeProvider mode="app-review">
                 <AppReviewPage />
