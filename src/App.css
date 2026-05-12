@@ -941,7 +941,8 @@ body::before {
 }
 
 .cp-table-footer {
-  height: 8px;
+  min-height: 34px;
+  padding: 8px 16px;
   border-top: 1px solid var(--border);
   background: color-mix(in oklab, var(--bg-surface-2) 65%, transparent);
 }

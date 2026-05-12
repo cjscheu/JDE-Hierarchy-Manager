@@ -447,7 +447,9 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
           </tbody>
         </table>
       </div>
-      <div className="cp-table-footer" aria-hidden="true" />
+      <div className="cp-table-footer" aria-hidden="false" style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'right' }}>
+        {sortedFiltered.length} Record{sortedFiltered.length === 1 ? '' : 's'}
+      </div>
     </div>
   )
 

@@ -198,5 +198,8 @@
 -Move Ledger Type Tabs on the Data Tables Page, in between OTC Types and Company Segments
 -on the User Securities card tab on the Data Tables page, only include these columns: User Name, Email, Application, Role Type, and Modified Date. The table should be sorted by User Name ascending order. The Add User Securities pop up page should include these text fields: User Name, Email and Application, and these dropdown fields: Role Type; the Edit User Securities pop up page should include these text fields: User Name, Email and Application, and these dropdown fields: Role Type;
 -Rename the User Securities tab on the Data Tables page to User Security
+
 -on the User Security tab on the Data Tables page, the Role Type column in returning the value, not the alias.  Please correct.  Also, on the add and edit User Security pop ups, the Role Type dropdown should include Super User
 
+-on all cards in the app that contain table records, add to the bottom of the card (inside card bottom padding), X number of Records.
+-widen the bottom padding on all cards containing table records so that the X number of Records string is visible 
