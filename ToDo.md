@@ -175,3 +175,7 @@
 -on the Location Assignment card tab on the Data Tables page,  cr113_locationcode and modified date are not on the card. Please add them.  Please remove cr113_email_contact, cr113_Assign_ID, cr113_JDE_Loc_ASSIGNMENTID; column order should be Location Code, Location Name, Role, Manager, Chat, Modified Date
 -on the Location Assignment card tab on the Data Tables page, combine cr113_LocationCode space dash space cr113_locationname and call it Location.  The table should be sorted by Location ascending order by numeric
 -on the Location Assignment card tab on the Data Tables page, the Location field should be populated on the edit location assignment pop up
+
+-on the Location card tab on the Data Tables page, move tab between Company Assignment and Location Assignments tabs;  only include these columns: Location Code, Location Name, City, State, Division, Group, Location Segment, OTC and Modified Date. Combine Location Code space dash space Location Name as Location and then remove the separate columns for Location Code and Location Name. The table should be sorted by Location ascending order by numeric
+-on the Location card tab on the Data Tables page, the table should be sorted by Location column ascending order by numeric
+

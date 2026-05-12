@@ -43,16 +43,16 @@ const DATA_TABLES: DataTableDef[] = [
     idField: 'cr113_jde_co_assignmentid',
   },
   {
-    id: 'jde_loc_assignments',
-    label: 'Location Assignments',
-    service: Cr113_jde_loc_assignmentsService,
-    idField: 'cr113_jde_loc_assignmentid',
-  },
-  {
     id: 'jde_locations',
     label: 'Locations',
     service: Cr113_jde_locationsService,
     idField: 'cr113_jde_locationid',
+  },
+  {
+    id: 'jde_loc_assignments',
+    label: 'Location Assignments',
+    service: Cr113_jde_loc_assignmentsService,
+    idField: 'cr113_jde_loc_assignmentid',
   },
   {
     id: 'jde_managers',
@@ -183,6 +183,36 @@ function buildLocationAssignmentsPayload(record: Record<string, unknown>) {
   if (locationBind) payload['cr113_LocationCode@odata.bind'] = locationBind;
   if (roleBind) payload['cr113_RoleName@odata.bind'] = roleBind;
   if (managerBind) payload['cr113_Empl_Id@odata.bind'] = managerBind;
+
+  return payload;
+}
+
+function buildLocationsPayload(record: Record<string, unknown>) {
+  const payload: Record<string, unknown> = { ...record };
+
+  const companyBind = toLookupBind('cr113_jde_companies', String(record.cr113_co_id ?? ''));
+  const segmentBind = toLookupBind('cr113_jde_location_segments', String(record.cr113_coloc_segment_name ?? ''));
+  const divBind = toLookupBind('cr113_jde_divs', String(record.cr113_div_name ?? ''));
+  const groupBind = toLookupBind('cr113_jde_groups', String(record.cr113_group_name ?? ''));
+  const otcBind = toLookupBind('cr113_jde_otcs', String(record.cr113_otc_name ?? ''));
+
+  if (record.cr113_co_id !== undefined) delete payload.cr113_co_id;
+  if (record.cr113_coloc_segment_name !== undefined) delete payload.cr113_coloc_segment_name;
+  if (record.cr113_div_name !== undefined) delete payload.cr113_div_name;
+  if (record.cr113_group_name !== undefined) delete payload.cr113_group_name;
+  if (record.cr113_otc_name !== undefined) delete payload.cr113_otc_name;
+
+  delete payload.cr113_co_idname;
+  delete payload.cr113_coloc_segment_namename;
+  delete payload.cr113_div_namename;
+  delete payload.cr113_group_namename;
+  delete payload.cr113_otc_namename;
+
+  if (companyBind) payload['cr113_CO_ID@odata.bind'] = companyBind;
+  if (segmentBind) payload['cr113_COLOC_SEGMENT_NAME@odata.bind'] = segmentBind;
+  if (divBind) payload['cr113_DIV_NAME@odata.bind'] = divBind;
+  if (groupBind) payload['cr113_GROUP_NAME@odata.bind'] = groupBind;
+  if (otcBind) payload['cr113_OTC_NAME@odata.bind'] = otcBind;
 
   return payload;
 }
@@ -477,6 +507,129 @@ function getLocationAssignmentsTabFields(
   ];
 }
 
+function getLocationsTabFields(
+  companyOptions: LookupOption[],
+  locationSegmentOptions: LookupOption[],
+  divisionOptions: LookupOption[],
+  groupOptions: LookupOption[],
+  otcOptions: LookupOption[],
+): FieldDef[] {
+  return [
+    {
+      key: 'LocationCombined',
+      label: 'Location',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_coloc_city',
+      label: 'City',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_coloc_state',
+      label: 'State',
+      showOnCard: true,
+      editable: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_div_namename',
+      label: 'Division',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_group_namename',
+      label: 'Group',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_coloc_segment_namename',
+      label: 'Location Segment',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_otc_namename',
+      label: 'OTC',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'modifiedon',
+      label: 'Modified Date',
+      showOnCard: true,
+      editable: false,
+    },
+    {
+      key: 'cr113_coloc_id',
+      label: 'Location Code',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_coloc_name',
+      label: 'Location Name',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'text',
+    },
+    {
+      key: 'cr113_co_id',
+      label: 'Company',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      inputType: 'select',
+      options: companyOptions,
+      placeholder: 'Select company',
+    },
+    {
+      key: 'cr113_coloc_segment_name',
+      label: 'Location Segment',
+      showOnCard: false,
+      editable: true,
+      inputType: 'select',
+      options: locationSegmentOptions,
+      placeholder: 'Select location segment',
+    },
+    {
+      key: 'cr113_div_name',
+      label: 'Division',
+      showOnCard: false,
+      editable: true,
+      inputType: 'select',
+      options: divisionOptions,
+      placeholder: 'Select division',
+    },
+    {
+      key: 'cr113_group_name',
+      label: 'Group',
+      showOnCard: false,
+      editable: true,
+      inputType: 'select',
+      options: groupOptions,
+      placeholder: 'Select group',
+    },
+    {
+      key: 'cr113_otc_name',
+      label: 'OTC',
+      showOnCard: false,
+      editable: true,
+      inputType: 'select',
+      options: otcOptions,
+      placeholder: 'Select OTC',
+    },
+  ];
+}
+
 function getConfiguredFields(
   tabId: string,
   fields: FieldDef[],
@@ -487,9 +640,22 @@ function getConfiguredFields(
   assignmentRoleOptions: LookupOption[],
   assignmentManagerOptions: LookupOption[],
   assignmentLocationOptions: LookupOption[],
+  locationSegmentOptions: LookupOption[],
+  divisionOptions: LookupOption[],
+  groupOptions: LookupOption[],
+  otcOptions: LookupOption[],
 ): FieldDef[] {
   if (tabId === 'jde_companies') {
     return getCompaniesTabFields(segmentOptions, typeOptions, ledgerOptions);
+  }
+  if (tabId === 'jde_locations') {
+    return getLocationsTabFields(
+      assignmentCompanyOptions,
+      locationSegmentOptions,
+      divisionOptions,
+      groupOptions,
+      otcOptions,
+    );
   }
   if (tabId === 'jde_co_assignments') {
     return getCompanyAssignmentsTabFields(
@@ -519,10 +685,14 @@ export function DataTablesPage() {
   const [assignmentLocationOptions, setAssignmentLocationOptions] = useState<LookupOption[]>([]);
   const [assignmentRoleOptions, setAssignmentRoleOptions] = useState<LookupOption[]>([]);
   const [assignmentManagerOptions, setAssignmentManagerOptions] = useState<LookupOption[]>([]);
+  const [locationSegmentOptions, setLocationSegmentOptions] = useState<LookupOption[]>([]);
+  const [divisionOptions, setDivisionOptions] = useState<LookupOption[]>([]);
+  const [groupOptions, setGroupOptions] = useState<LookupOption[]>([]);
+  const [otcOptions, setOtcOptions] = useState<LookupOption[]>([]);
 
   useEffect(() => {
     const loadCompanyLookupOptions = async () => {
-      const [segmentsRes, typesRes, ledgersRes, companiesRes, locationsRes, rolesRes, managersRes] = await Promise.all([
+      const [segmentsRes, typesRes, ledgersRes, companiesRes, locationsRes, rolesRes, managersRes, locationSegmentsRes, divisionsRes, groupsRes, otcsRes] = await Promise.all([
         Cr113_jde_co_segmentsService.getAll({ select: ['cr113_jde_co_segmentid', 'cr113_co_segment_name'], orderBy: ['cr113_co_segment_name asc'] }),
         Cr113_jde_typesService.getAll({ select: ['cr113_jde_typeid', 'cr113_co_type_name'], orderBy: ['cr113_co_type_name asc'] }),
         Cr113_jde_ledger_typesService.getAll({ select: ['cr113_jde_ledger_typeid', 'cr113_co_ledger_type_name'], orderBy: ['cr113_co_ledger_type_name asc'] }),
@@ -530,6 +700,10 @@ export function DataTablesPage() {
         Cr113_jde_locationsService.getAll({ select: ['cr113_jde_locationid', 'cr113_coloc_id', 'cr113_coloc_name'] }),
         Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'], orderBy: ['cr113_role_name asc'] }),
         Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name', 'cr113_chat'], orderBy: ['cr113_manager_name asc'] }),
+        Cr113_jde_location_segmentsService.getAll({ select: ['cr113_jde_location_segmentid', 'cr113_coloc_segment_name'], orderBy: ['cr113_coloc_segment_name asc'] }),
+        Cr113_jde_divsService.getAll({ select: ['cr113_jde_divid', 'cr113_div_name'], orderBy: ['cr113_div_name asc'] }),
+        Cr113_jde_groupsService.getAll({ select: ['cr113_jde_groupid', 'cr113_group_name'], orderBy: ['cr113_group_name asc'] }),
+        Cr113_jde_otcsService.getAll({ select: ['cr113_jde_otcid', 'cr113_otc_name'], orderBy: ['cr113_otc_name asc'] }),
       ]);
 
       setCompanySegmentOptions((segmentsRes.data ?? []).map((s: any) => ({ value: s.cr113_jde_co_segmentid, label: s.cr113_co_segment_name })));
@@ -558,6 +732,10 @@ export function DataTablesPage() {
           label: (m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`).trim(),
         }))
       );
+      setLocationSegmentOptions((locationSegmentsRes.data ?? []).map((s: any) => ({ value: s.cr113_jde_location_segmentid, label: s.cr113_coloc_segment_name ?? '' })));
+      setDivisionOptions((divisionsRes.data ?? []).map((d: any) => ({ value: d.cr113_jde_divid, label: d.cr113_div_name ?? '' })));
+      setGroupOptions((groupsRes.data ?? []).map((g: any) => ({ value: g.cr113_jde_groupid, label: g.cr113_group_name ?? '' })));
+      setOtcOptions((otcsRes.data ?? []).map((o: any) => ({ value: o.cr113_jde_otcid, label: o.cr113_otc_name ?? '' })));
     };
 
     void loadCompanyLookupOptions();
@@ -591,6 +769,10 @@ export function DataTablesPage() {
     assignmentRoleOptions,
     assignmentManagerOptions,
     assignmentLocationOptions,
+    locationSegmentOptions,
+    divisionOptions,
+    groupOptions,
+    otcOptions,
   );
   const loading = loadingTabs[active.id];
 
@@ -684,6 +866,62 @@ export function DataTablesPage() {
         return { ...assignmentsRes, data };
       }
 
+      if (active.id === 'jde_locations') {
+        const [locationsResult, locationSegmentsRes, divisionsRes, groupsRes, otcsRes] = await Promise.all([
+          Cr113_jde_locationsService.getAll(),
+          Cr113_jde_location_segmentsService.getAll({ select: ['cr113_jde_location_segmentid', 'cr113_coloc_segment_name'] }),
+          Cr113_jde_divsService.getAll({ select: ['cr113_jde_divid', 'cr113_div_name'] }),
+          Cr113_jde_groupsService.getAll({ select: ['cr113_jde_groupid', 'cr113_group_name'] }),
+          Cr113_jde_otcsService.getAll({ select: ['cr113_jde_otcid', 'cr113_otc_name'] }),
+        ]);
+
+        const locationSegmentById = new Map((locationSegmentsRes.data ?? []).map((s: any) => [s.cr113_jde_location_segmentid, s.cr113_coloc_segment_name]));
+        const divisionById = new Map((divisionsRes.data ?? []).map((d: any) => [d.cr113_jde_divid, d.cr113_div_name]));
+        const groupById = new Map((groupsRes.data ?? []).map((g: any) => [g.cr113_jde_groupid, g.cr113_group_name]));
+        const otcById = new Map((otcsRes.data ?? []).map((o: any) => [o.cr113_jde_otcid, o.cr113_otc_name]));
+
+        const data = (locationsResult.data ?? []).map((row: any) => {
+          const code = String(row.cr113_coloc_id ?? '');
+          const name = String(row.cr113_coloc_name ?? '');
+          return {
+            ...row,
+            LocationCombined: code && name ? `${code} - ${name}` : (code || name),
+            LocationSort: code,
+            cr113_coloc_segment_namename:
+              row.cr113_coloc_segment_namename ??
+              (row._cr113_coloc_segment_name_value
+                ? locationSegmentById.get(String(row._cr113_coloc_segment_name_value)) ?? ''
+                : ''),
+            cr113_div_namename:
+              row.cr113_div_namename ??
+              (row._cr113_div_name_value
+                ? divisionById.get(String(row._cr113_div_name_value)) ?? ''
+                : ''),
+            cr113_group_namename:
+              row.cr113_group_namename ??
+              (row._cr113_group_name_value
+                ? groupById.get(String(row._cr113_group_name_value)) ?? ''
+                : ''),
+            cr113_otc_namename:
+              row.cr113_otc_namename ??
+              (row._cr113_otc_name_value
+                ? otcById.get(String(row._cr113_otc_name_value)) ?? ''
+                : ''),
+            cr113_co_id: row._cr113_co_id_value ?? row.cr113_co_id ?? '',
+            cr113_coloc_segment_name: row._cr113_coloc_segment_name_value ?? row.cr113_coloc_segment_name ?? '',
+            cr113_div_name: row._cr113_div_name_value ?? row.cr113_div_name ?? '',
+            cr113_group_name: row._cr113_group_name_value ?? row.cr113_group_name ?? '',
+            cr113_otc_name: row._cr113_otc_name_value ?? row.cr113_otc_name ?? '',
+            modifiedon: toUserTime(row.modifiedon),
+          };
+        });
+
+        return {
+          ...locationsResult,
+          data,
+        };
+      }
+
       if (active.id === 'jde_loc_assignments') {
         const [assignmentsRes, locationsRes, rolesRes, managersRes] = await Promise.all([
           getAllPages(Cr113_jde_loc_assignmentsService),
@@ -741,6 +979,8 @@ export function DataTablesPage() {
     },
     create: (record) => active.id === 'jde_companies'
       ? active.service.create(buildCompaniesPayload(record as Record<string, unknown>))
+      : active.id === 'jde_locations'
+        ? active.service.create(buildLocationsPayload(record as Record<string, unknown>))
       : active.id === 'jde_co_assignments'
         ? active.service.create(buildCompanyAssignmentsPayload(record as Record<string, unknown>))
       : active.id === 'jde_loc_assignments'
@@ -748,6 +988,8 @@ export function DataTablesPage() {
       : active.service.create(record),
     update: (id, changes) => active.id === 'jde_companies'
       ? active.service.update(id, buildCompaniesPayload(changes as Record<string, unknown>))
+      : active.id === 'jde_locations'
+        ? active.service.update(id, buildLocationsPayload(changes as Record<string, unknown>))
       : active.id === 'jde_co_assignments'
         ? active.service.update(id, buildCompanyAssignmentsPayload(changes as Record<string, unknown>))
       : active.id === 'jde_loc_assignments'
@@ -773,6 +1015,11 @@ export function DataTablesPage() {
             defaultSortKey: 'cr113_co_id' as const,
             defaultSortDir: 'asc' as const,
           }
+        : active.id === 'jde_locations'
+          ? {
+              defaultSortKey: 'LocationSort' as const,
+              defaultSortDir: 'asc' as const,
+            }
         : active.id === 'jde_co_assignments'
           ? {
               defaultSortKey: 'cr113_CompanyCodeSort' as const,
