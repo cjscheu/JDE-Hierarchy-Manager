@@ -1404,7 +1404,7 @@ export function DataTablesPage() {
         ))}
       </div>
       <div className="refs-tab-panel" role="tabpanel">
-        {loading ? <div>Loading table schema…</div> : <CardPage key={active.id} config={config} />}
+        {loading ? <div>Loading table schema…</div> : <CardPage key={active.id} config={config} showExportExcelButton={true} />}
       </div>
     </section>
   );

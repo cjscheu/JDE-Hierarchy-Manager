@@ -81,6 +81,7 @@ export function CompanyAssignmentsPage() {
 
   return (
     <CardPage
+      showExportExcelButton={true}
       config={{
           title: 'Company Assignments',
         description: 'Manage manager and role assignments at the company level.',
@@ -115,22 +116,6 @@ export function CompanyAssignmentsPage() {
             placeholder: 'Select company',
           },
           {
-            key: 'cr113_managernamename',
-            label: 'Manager',
-            showOnCard: true,
-            editable: false,
-          },
-          {
-            key: 'cr113_managername',
-            label: 'Manager',
-            inputType: 'select',
-            options: managerOptions,
-            showOnCard: false,
-            editable: true,
-            required: true,
-            placeholder: 'Select manager',
-          },
-          {
             key: 'cr113_rolenamename',
             label: 'Role',
             showOnCard: true,
@@ -159,6 +144,28 @@ export function CompanyAssignmentsPage() {
             editable: true,
             required: true,
             placeholder: 'Select role',
+          },
+          {
+            key: 'cr113_managernamename',
+            label: 'Manager',
+            showOnCard: true,
+            editable: false,
+          },
+          {
+            key: 'cr113_managername',
+            label: 'Manager',
+            inputType: 'select',
+            options: managerOptions,
+            showOnCard: false,
+            editable: true,
+            required: true,
+            placeholder: 'Select manager',
+          },
+          {
+            key: 'cr113_chat',
+            label: 'Contact',
+            showOnCard: true,
+            editable: false,
           },
         ],
       }}

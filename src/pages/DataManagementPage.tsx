@@ -7,23 +7,18 @@ import { GroupsPage } from './GroupsPage'
 import { LedgerTypesPage } from './LedgerTypesPage'
 import { TypesPage } from './TypesPage'
 import { OtcsPage } from './OtcsPage'
-import { ManagersPage } from './ManagersPage'
-import { CompanyAssignmentsPage } from './CompanyAssignmentsPage'
-import { LocationAssignmentsPage } from './LocationAssignmentsPage'
 import type { AccessRole } from '../security/access'
 
 const DATA_MANAGEMENT_TABS = [
   { id: 'divisions', label: 'Divisions', component: <DivsPage /> },
   { id: 'groups', label: 'Groups', component: <GroupsPage /> },
   { id: 'roles', label: 'Roles', component: <RolesPage /> },
-  { id: 'jde-managers', label: 'Managers', component: <ManagersPage /> },
+  // Removed Managers, Company Assignments, Location Assignments tabs
   { id: 'co-segments', label: 'Company Segments', component: <CoSegmentsPage /> },
   { id: 'loc-segments', label: 'Location Segments', component: <LocationSegmentsPage /> },
   { id: 'ledger-types', label: 'Ledger Types', component: <LedgerTypesPage /> },
   { id: 'company-types', label: 'Company Types', component: <TypesPage /> },
   { id: 'otcs', label: 'OTC Types', component: <OtcsPage /> },
-  { id: 'jde-co-assignments', label: 'Company Assignments', component: <CompanyAssignmentsPage /> },
-  { id: 'jde-loc-assignments', label: 'Location Assignments', component: <LocationAssignmentsPage /> },
 ] as const
 
 type DataManagementTabId = typeof DATA_MANAGEMENT_TABS[number]['id']

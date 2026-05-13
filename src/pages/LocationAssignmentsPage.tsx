@@ -100,6 +100,7 @@ export function LocationAssignmentsPage() {
 
   return (
     <CardPage
+      showExportExcelButton={true}
       config={{
         title: 'Location Assignments',
         description: 'Manage manager and role assignments at the location level.',
@@ -134,22 +135,6 @@ export function LocationAssignmentsPage() {
             placeholder: 'Select location',
           },
           {
-            key: 'cr113_empl_name',
-            label: 'Manager',
-            showOnCard: true,
-            editable: false,
-          },
-          {
-            key: 'cr113_empl_id',
-            label: 'Manager',
-            inputType: 'select',
-            options: managerOptions,
-            showOnCard: false,
-            editable: true,
-            required: true,
-            placeholder: 'Select manager',
-          },
-          {
             key: 'cr113_rolenamename',
             label: 'Role',
             showOnCard: true,
@@ -178,6 +163,28 @@ export function LocationAssignmentsPage() {
             editable: true,
             required: true,
             placeholder: 'Select role',
+          },
+          {
+            key: 'cr113_empl_name',
+            label: 'Manager',
+            showOnCard: true,
+            editable: false,
+          },
+          {
+            key: 'cr113_empl_id',
+            label: 'Manager',
+            inputType: 'select',
+            options: managerOptions,
+            showOnCard: false,
+            editable: true,
+            required: true,
+            placeholder: 'Select manager',
+          },
+          {
+            key: 'cr113_empl_chat',
+            label: 'Contact',
+            showOnCard: true,
+            editable: false,
           },
         ],
       }}

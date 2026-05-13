@@ -203,3 +203,12 @@
 
 -on all cards in the app that contain table records, add to the bottom of the card (inside card bottom padding), X number of Records.
 -widen the bottom padding on all cards containing table records so that the X number of Records string is visible 
+
+-on the Data page, remove the following tabs: Managers, Company Assignments and Location Assignments
+-Change the Data Page navigation name to Reference Data
+-Change the Users page navigation name to User Security
+-on the Assignments page, add a columns for the field Chat and call it Contact.  Please add this to both tab cards: Company Assignments and Location Assignments
+-on the Assignments page on the Company Assignments tab, move the Role column in between Company and Manager
+-on the Assignments page on the Location Assignments tab, move the Role column in between Location and Manager
+-on the Assignments page, add an Export to Excel button on the left side of the bottom padding of the card.  Add this button on both card tabs for Company Assignments and Location Assignments.  The exported file should contain only the columns on each card tab
+

@@ -1,4 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, useEffect, useRef } from 'react'
+import * as XLSX from 'xlsx'
 import { usePageMode } from './page-mode'
 
 // ── Field descriptor ──────────────────────────────────────────────────────────
@@ -79,7 +80,7 @@ export interface CardPageHandle {
 type Row = Record<string, any>
 
 // ── Main component ────────────────────────────────────────────────────────────
-export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(function CardPage({ config }, ref) {
+export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; showExportExcelButton?: boolean }>(function CardPage({ config, showExportExcelButton = false }, ref) {
   const {
     title,
     description,
@@ -339,6 +340,20 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
     </div>
   );
 
+  const handleExportExcel = () => {
+    // Only export visible columns
+    const exportFields = tableFields;
+    const exportData = sortedFiltered.map(row => {
+      const obj: Record<string, any> = {};
+      exportFields.forEach(f => { obj[f.label] = row[f.key]; });
+      return obj;
+    });
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, title);
+    XLSX.writeFile(wb, `${title.replace(/\s+/g, '_')}.xlsx`);
+  };
+
   const tableSection = (
     <div className={`cp-table-wrap${showHeader ? '' : ' cp-table-wrap-standalone'}`}>
       {actionsInHeader && rows.length > 0 && (
@@ -447,8 +462,13 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig }>(f
           </tbody>
         </table>
       </div>
-      <div className="cp-table-footer" aria-hidden="false" style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'right' }}>
-        {sortedFiltered.length} Record{sortedFiltered.length === 1 ? '' : 's'}
+      <div className="cp-table-footer" aria-hidden="false" style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {showExportExcelButton && (
+          <button className="cp-btn cp-btn-secondary" style={{ marginRight: 8 }} onClick={handleExportExcel}>
+            Export to Excel
+          </button>
+        )}
+        <span style={{ flex: 1, textAlign: 'right' }}>{sortedFiltered.length} Record{sortedFiltered.length === 1 ? '' : 's'}</span>
       </div>
     </div>
   )

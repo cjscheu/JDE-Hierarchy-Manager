@@ -27,8 +27,8 @@ const PRIMARY_NAV = [
 
 
 const ADMIN_NAV = [
-  { id: 'data-management', label: 'Data', icon: '🗄️', component: <DataManagementPage /> },
-  { id: 'user-management', label: 'Users', icon: '👤', component: <UserManagementPage /> },
+  { id: 'data-management', label: 'Reference Data', icon: '🗄️', component: <DataManagementPage /> },
+  { id: 'user-management', label: 'User Security', icon: '👤', component: <UserManagementPage /> },
 ] as const
 
 const SUPER_NAV = [

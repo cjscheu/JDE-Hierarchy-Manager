@@ -107,7 +107,7 @@ export function UserManagementPage({ accessRole = 'basic' }: { accessRole?: Acce
   return (
     <section className="refs-page user-management-page">
 {/*       <div className="refs-header">
-        <h2 className="refs-title">User Management</h2>
+        <h2 className="refs-title">User Security</h2>
         <p className="refs-description">Manage admin and power users.</p>
       </div> */}
 
