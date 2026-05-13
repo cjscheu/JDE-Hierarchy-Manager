@@ -218,3 +218,8 @@
 -the division listing card does not extend the width the of the page.  it only extends the same width as the title card.  The title card width should stay the same, the division listing card needs to be extended to the width of the page
 -extend the home page title card to the width of the page as well.  Keep the title and title description text centered as is
  
+5/13/2026
+-the table cr113_jde_location has a new column called cr113_locationtype.  Add the new column to the app schemas and datasources
+-on the companies page and on the related records cards +add location pop up page, add cr113_locationtype as a dropdown option below the OTC field
+-on the data tables page and on the location tab card and +add and edit location pop up page, add cr113_locationtype as a dropdown option below the OTC field
+-on the add and edit location pop up page cards, put Division and Group side by side.  These pop up pages are too tall for the browser

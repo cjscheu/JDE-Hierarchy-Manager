@@ -1123,8 +1123,13 @@ body::before {
 }
 .cp-modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-.cp-modal-body { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
-.cp-modal-body p { margin: 0; font-size: 14px; color: var(--text-secondary); }
+.cp-modal-body {
+  padding: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 14px;
+}
+.cp-modal-body p { margin: 0; font-size: 14px; color: var(--text-secondary); grid-column: 1 / -1; }
 
 .cp-modal-footer {
   display: flex; justify-content: flex-end; gap: 10px;
@@ -1132,7 +1137,8 @@ body::before {
 }
 
 /* form fields */
-.cp-field { display: flex; flex-direction: column; gap: 6px; }
+.cp-field { display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1; min-width: 0; }
+.cp-field-half { grid-column: span 1; }
 .cp-field-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
 .cp-required { color: var(--danger); margin-left: 2px; }
 
@@ -1145,6 +1151,17 @@ body::before {
 .cp-form-error {
   font-size: 13px; color: var(--danger); background: var(--danger-soft);
   border: 1px solid var(--danger-border); padding: 8px 12px; border-radius: 6px;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  .cp-modal-body {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-field-half {
+    grid-column: 1 / -1;
+  }
 }
 
 /* ─── Companies master/details layout ──────────────────────────────────────── */

@@ -24,6 +24,7 @@ export interface Cr113_jde_locationsBase {
   "cr113_DIV_NAME@odata.bind"?: string;
   "cr113_GROUP_NAME@odata.bind"?: string;
   cr113_jde_locationid: string;
+  "cr113_LOCATIONTYPE@odata.bind"?: string;
   "cr113_OTC_NAME@odata.bind"?: string;
   importsequencenumber?: string;
   overriddencreatedon?: string;
@@ -41,6 +42,7 @@ export interface Cr113_jde_locations extends Cr113_jde_locationsBase {
   cr113_coloc_segment_namename?: string;
   cr113_div_namename?: string;
   cr113_group_namename?: string;
+  cr113_locationtypename?: string;
   cr113_otc_namename?: string;
   createdbyname?: string;
   createdbyyominame: string;
@@ -66,6 +68,8 @@ export interface Cr113_jde_locations extends Cr113_jde_locationsBase {
   _cr113_div_name_value?: string;
   cr113_group_name?: object;
   _cr113_group_name_value?: string;
+  cr113_locationtype?: object;
+  _cr113_locationtype_value?: string;
   cr113_otc_name?: object;
   _cr113_otc_name_value?: string;
   createdby?: object;

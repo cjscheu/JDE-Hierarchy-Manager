@@ -136,6 +136,22 @@
           "required": true,
           "x-ms-keyType": "primary"
         },
+        "cr113_locationtype": {
+          "type": "string",
+          "title": "Location Type",
+          "x-ms-dataverse-attribute": "cr113_locationtype",
+          "x-ms-dataverse-type": "LookupType",
+          "x-ms-schema-name": "cr113_LOCATIONTYPE"
+        },
+        "cr113_locationtypename": {
+          "type": "string",
+          "title": "cr113_locationtypename",
+          "x-ms-dataverse-attribute": "cr113_locationtypename",
+          "x-ms-dataverse-type": "StringType",
+          "x-ms-schema-name": "cr113_LOCATIONTYPEName",
+          "x-ms-read-only": true,
+          "maxLength": 850
+        },
         "cr113_otc_name": {
           "type": "string",
           "title": "OTC",

@@ -15,6 +15,7 @@ import { Cr113_jde_managersService } from '../generated/services/Cr113_jde_manag
 import { Cr113_jde_rolesesService } from '../generated/services/Cr113_jde_rolesesService'
 
 type LookupOption = { label: string; value: string }
+const locationTypeNames = new Set(['Managed', 'Not Managed'])
 
 const toLookupBind = (entitySet: string, id?: string) => (id ? `/${entitySet}(${id})` : undefined)
 
@@ -44,6 +45,7 @@ const buildLocationPayload = (record: Record<string, string>, companyId: string)
     cr113_coloc_segment_name,
     cr113_div_name,
     cr113_group_name,
+    cr113_locationtype,
     cr113_otc_name,
     ...rest
   } = record
@@ -54,11 +56,13 @@ const buildLocationPayload = (record: Record<string, string>, companyId: string)
   const segmentBind = toLookupBind('cr113_jde_location_segments', cr113_coloc_segment_name)
   const divBind = toLookupBind('cr113_jde_divs', cr113_div_name)
   const groupBind = toLookupBind('cr113_jde_groups', cr113_group_name)
+  const locationTypeBind = toLookupBind('cr113_jde_types', cr113_locationtype)
   const otcBind = toLookupBind('cr113_jde_otcs', cr113_otc_name)
 
   if (segmentBind) payload['cr113_COLOC_SEGMENT_NAME@odata.bind'] = segmentBind
   if (divBind) payload['cr113_DIV_NAME@odata.bind'] = divBind
   if (groupBind) payload['cr113_GROUP_NAME@odata.bind'] = groupBind
+  if (locationTypeBind) payload['cr113_LOCATIONTYPE@odata.bind'] = locationTypeBind
   if (otcBind) payload['cr113_OTC_NAME@odata.bind'] = otcBind
 
   return payload
@@ -167,6 +171,7 @@ export function CompaniesPage() {
   const [segmentOptions, setSegmentOptions] = useState<LookupOption[]>([])
   const [typeOptions, setTypeOptions] = useState<LookupOption[]>([])
   const [ledgerOptions, setLedgerOptions] = useState<LookupOption[]>([])
+  const [locationTypeOptions, setLocationTypeOptions] = useState<LookupOption[]>([])
   const [locationSegmentOptions, setLocationSegmentOptions] = useState<LookupOption[]>([])
   const [divOptions, setDivOptions] = useState<LookupOption[]>([])
   const [groupOptions, setGroupOptions] = useState<LookupOption[]>([])
@@ -215,6 +220,14 @@ export function CompaniesPage() {
           value: item.cr113_jde_typeid,
           label: item.cr113_co_type_name,
         }))
+      )
+      setLocationTypeOptions(
+        (typesRes.data ?? [])
+          .filter(item => locationTypeNames.has(item.cr113_co_type_name))
+          .map(item => ({
+            value: item.cr113_jde_typeid,
+            label: item.cr113_co_type_name,
+          }))
       )
       setLedgerOptions(
         (ledgersRes.data ?? []).map(item => ({
@@ -297,8 +310,11 @@ export function CompaniesPage() {
         return { success: true, data: [] }
       }
 
-      const [locationsRes, locationSegmentsRes, divsRes, groupsRes, otcsRes] = await Promise.all([
+      const [locationsRes, typesRes, locationSegmentsRes, divsRes, groupsRes, otcsRes] = await Promise.all([
         Cr113_jde_locationsService.getAll(),
+        Cr113_jde_typesService.getAll({
+          select: ['cr113_jde_typeid', 'cr113_co_type_name'],
+        }),
         Cr113_jde_location_segmentsService.getAll({
           select: ['cr113_jde_location_segmentid', 'cr113_coloc_segment_name'],
         }),
@@ -317,6 +333,9 @@ export function CompaniesPage() {
         return locationsRes
       }
 
+      const locationTypeById = new Map<string, string>(
+        (typesRes.data ?? []).map(item => [item.cr113_jde_typeid, item.cr113_co_type_name])
+      )
       const locationSegmentById = new Map<string, string>(
         (locationSegmentsRes.data ?? []).map(item => [item.cr113_jde_location_segmentid, item.cr113_coloc_segment_name])
       )
@@ -337,7 +356,12 @@ export function CompaniesPage() {
           cr113_coloc_segment_name: row._cr113_coloc_segment_name_value ?? '',
           cr113_div_name: row._cr113_div_name_value ?? '',
           cr113_group_name: row._cr113_group_name_value ?? '',
+          cr113_locationtype: row._cr113_locationtype_value ?? '',
           cr113_otc_name: row._cr113_otc_name_value ?? '',
+          cr113_locationtypename:
+            row.cr113_locationtypename ??
+            (row._cr113_locationtype_value ? locationTypeById.get(row._cr113_locationtype_value) : undefined) ??
+            '',
           cr113_coloc_segment_namename:
             row.cr113_coloc_segment_namename ??
             (row._cr113_coloc_segment_name_value
@@ -793,6 +817,7 @@ export function CompaniesPage() {
                     key: 'cr113_div_name',
                     label: 'Division',
                     inputType: 'select',
+                    layout: 'half',
                     editable: true,
                     options: divOptions,
                     showOnCard: false,
@@ -808,6 +833,7 @@ export function CompaniesPage() {
                     key: 'cr113_group_name',
                     label: 'Group',
                     inputType: 'select',
+                    layout: 'half',
                     editable: true,
                     options: groupOptions,
                     showOnCard: false,
@@ -827,6 +853,16 @@ export function CompaniesPage() {
                     options: otcOptions,
                     showOnCard: false,
                     placeholder: 'Select OTC',
+                  },
+                  {
+                    key: 'cr113_locationtype',
+                    label: 'Location Type',
+                    inputType: 'select',
+                    showOnCard: false,
+                    editable: true,
+                    required: false,
+                    options: locationTypeOptions,
+                    placeholder: 'Select location type',
                   },
                 ],
               }}

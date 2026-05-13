@@ -27,6 +27,7 @@ type DataTableDef = {
 };
 
 type LookupOption = { label: string; value: string };
+const locationTypeNames = new Set(['Managed', 'Not Managed']);
 
 // List of all Dataverse tables/services to show as tabs
 const DATA_TABLES: DataTableDef[] = [
@@ -251,24 +252,28 @@ function buildLocationsPayload(record: Record<string, unknown>) {
   const segmentBind = toLookupBind('cr113_jde_location_segments', String(record.cr113_coloc_segment_name ?? ''));
   const divBind = toLookupBind('cr113_jde_divs', String(record.cr113_div_name ?? ''));
   const groupBind = toLookupBind('cr113_jde_groups', String(record.cr113_group_name ?? ''));
+  const locationTypeBind = toLookupBind('cr113_jde_types', String(record.cr113_locationtype ?? ''));
   const otcBind = toLookupBind('cr113_jde_otcs', String(record.cr113_otc_name ?? ''));
 
   if (record.cr113_co_id !== undefined) delete payload.cr113_co_id;
   if (record.cr113_coloc_segment_name !== undefined) delete payload.cr113_coloc_segment_name;
   if (record.cr113_div_name !== undefined) delete payload.cr113_div_name;
   if (record.cr113_group_name !== undefined) delete payload.cr113_group_name;
+  if (record.cr113_locationtype !== undefined) delete payload.cr113_locationtype;
   if (record.cr113_otc_name !== undefined) delete payload.cr113_otc_name;
 
   delete payload.cr113_co_idname;
   delete payload.cr113_coloc_segment_namename;
   delete payload.cr113_div_namename;
   delete payload.cr113_group_namename;
+  delete payload.cr113_locationtypename;
   delete payload.cr113_otc_namename;
 
   if (companyBind) payload['cr113_CO_ID@odata.bind'] = companyBind;
   if (segmentBind) payload['cr113_COLOC_SEGMENT_NAME@odata.bind'] = segmentBind;
   if (divBind) payload['cr113_DIV_NAME@odata.bind'] = divBind;
   if (groupBind) payload['cr113_GROUP_NAME@odata.bind'] = groupBind;
+  if (locationTypeBind) payload['cr113_LOCATIONTYPE@odata.bind'] = locationTypeBind;
   if (otcBind) payload['cr113_OTC_NAME@odata.bind'] = otcBind;
 
   return payload;
@@ -577,6 +582,7 @@ function getLocationAssignmentsTabFields(
 }
 
 function getLocationsTabFields(
+  locationTypeOptions: LookupOption[],
   locationSegmentOptions: LookupOption[],
   divisionOptions: LookupOption[],
   groupOptions: LookupOption[],
@@ -637,6 +643,12 @@ function getLocationsTabFields(
       editable: false,
     },
     {
+      key: 'cr113_locationtypename',
+      label: 'Location Type',
+      showOnCard: true,
+      editable: false,
+    },
+    {
       key: 'modifiedon',
       label: 'Modified Date',
       showOnCard: true,
@@ -677,6 +689,7 @@ function getLocationsTabFields(
       key: 'cr113_div_name',
       label: 'Division',
       showOnCard: false,
+      layout: 'half',
       editable: true,
       inputType: 'select',
       options: divisionOptions,
@@ -686,6 +699,7 @@ function getLocationsTabFields(
       key: 'cr113_group_name',
       label: 'Group',
       showOnCard: false,
+      layout: 'half',
       editable: true,
       inputType: 'select',
       options: groupOptions,
@@ -708,6 +722,15 @@ function getLocationsTabFields(
       inputType: 'select',
       options: otcOptions,
       placeholder: 'Select OTC',
+    },
+    {
+      key: 'cr113_locationtype',
+      label: 'Location Type',
+      showOnCard: false,
+      editable: true,
+      inputType: 'select',
+      options: locationTypeOptions,
+      placeholder: 'Select location type',
     },
   ];
 }
@@ -922,6 +945,7 @@ function getConfiguredFields(
   assignmentRoleOptions: LookupOption[],
   assignmentManagerOptions: LookupOption[],
   assignmentLocationOptions: LookupOption[],
+  locationTypeOptions: LookupOption[],
   locationSegmentOptions: LookupOption[],
   divisionOptions: LookupOption[],
   groupOptions: LookupOption[],
@@ -932,6 +956,7 @@ function getConfiguredFields(
   }
   if (tabId === 'jde_locations') {
     return getLocationsTabFields(
+      locationTypeOptions,
       locationSegmentOptions,
       divisionOptions,
       groupOptions,
@@ -996,6 +1021,7 @@ export function DataTablesPage() {
   const [assignmentLocationOptions, setAssignmentLocationOptions] = useState<LookupOption[]>([]);
   const [assignmentRoleOptions, setAssignmentRoleOptions] = useState<LookupOption[]>([]);
   const [assignmentManagerOptions, setAssignmentManagerOptions] = useState<LookupOption[]>([]);
+  const [locationTypeOptions, setLocationTypeOptions] = useState<LookupOption[]>([]);
   const [locationSegmentOptions, setLocationSegmentOptions] = useState<LookupOption[]>([]);
   const [divisionOptions, setDivisionOptions] = useState<LookupOption[]>([]);
   const [groupOptions, setGroupOptions] = useState<LookupOption[]>([]);
@@ -1043,6 +1069,11 @@ export function DataTablesPage() {
           label: (m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`).trim(),
         }))
       );
+      setLocationTypeOptions(
+        (typesRes.data ?? [])
+          .filter((t: any) => locationTypeNames.has(String(t.cr113_co_type_name ?? '')))
+          .map((t: any) => ({ value: t.cr113_jde_typeid, label: t.cr113_co_type_name ?? '' }))
+      );
       setLocationSegmentOptions((locationSegmentsRes.data ?? []).map((s: any) => ({ value: s.cr113_jde_location_segmentid, label: s.cr113_coloc_segment_name ?? '' })));
       setDivisionOptions((divisionsRes.data ?? []).map((d: any) => ({ value: d.cr113_jde_divid, label: d.cr113_div_name ?? '' })));
       setGroupOptions((groupsRes.data ?? []).map((g: any) => ({ value: g.cr113_jde_groupid, label: g.cr113_group_name ?? '' })));
@@ -1080,6 +1111,7 @@ export function DataTablesPage() {
     assignmentRoleOptions,
     assignmentManagerOptions,
     assignmentLocationOptions,
+    locationTypeOptions,
     locationSegmentOptions,
     divisionOptions,
     groupOptions,
@@ -1188,14 +1220,16 @@ export function DataTablesPage() {
       }
 
       if (active.id === 'jde_locations') {
-        const [locationsResult, locationSegmentsRes, divisionsRes, groupsRes, otcsRes] = await Promise.all([
+        const [locationsResult, typesRes, locationSegmentsRes, divisionsRes, groupsRes, otcsRes] = await Promise.all([
           Cr113_jde_locationsService.getAll(),
+          Cr113_jde_typesService.getAll({ select: ['cr113_jde_typeid', 'cr113_co_type_name'] }),
           Cr113_jde_location_segmentsService.getAll({ select: ['cr113_jde_location_segmentid', 'cr113_coloc_segment_name'] }),
           Cr113_jde_divsService.getAll({ select: ['cr113_jde_divid', 'cr113_div_name'] }),
           Cr113_jde_groupsService.getAll({ select: ['cr113_jde_groupid', 'cr113_group_name'] }),
           Cr113_jde_otcsService.getAll({ select: ['cr113_jde_otcid', 'cr113_otc_name'] }),
         ]);
 
+        const locationTypeById = new Map((typesRes.data ?? []).map((t: any) => [t.cr113_jde_typeid, t.cr113_co_type_name]));
         const locationSegmentById = new Map((locationSegmentsRes.data ?? []).map((s: any) => [s.cr113_jde_location_segmentid, s.cr113_coloc_segment_name]));
         const divisionById = new Map((divisionsRes.data ?? []).map((d: any) => [d.cr113_jde_divid, d.cr113_div_name]));
         const groupById = new Map((groupsRes.data ?? []).map((g: any) => [g.cr113_jde_groupid, g.cr113_group_name]));
@@ -1223,6 +1257,11 @@ export function DataTablesPage() {
               (row._cr113_group_name_value
                 ? groupById.get(String(row._cr113_group_name_value)) ?? ''
                 : ''),
+            cr113_locationtypename:
+              row.cr113_locationtypename ??
+              (row._cr113_locationtype_value
+                ? locationTypeById.get(String(row._cr113_locationtype_value)) ?? ''
+                : ''),
             cr113_otc_namename:
               row.cr113_otc_namename ??
               (row._cr113_otc_name_value
@@ -1232,6 +1271,7 @@ export function DataTablesPage() {
             cr113_coloc_segment_name: row._cr113_coloc_segment_name_value ?? row.cr113_coloc_segment_name ?? '',
             cr113_div_name: row._cr113_div_name_value ?? row.cr113_div_name ?? '',
             cr113_group_name: row._cr113_group_name_value ?? row.cr113_group_name ?? '',
+            cr113_locationtype: row._cr113_locationtype_value ?? row.cr113_locationtype ?? '',
             cr113_otc_name: row._cr113_otc_name_value ?? row.cr113_otc_name ?? '',
             modifiedon: toUserTime(row.modifiedon),
           };

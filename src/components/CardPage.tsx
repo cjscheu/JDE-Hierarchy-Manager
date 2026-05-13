@@ -8,6 +8,8 @@ export interface FieldDef {
   key: string
   /** human-readable label */
   label: string
+  /** optional layout width in add/edit modal */
+  layout?: 'full' | 'half'
   /** input control type in add/edit form */
   inputType?: 'text' | 'select'
   /** options for select inputs */
@@ -517,7 +519,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
             </div>
             <div className="cp-modal-body">
               {editableFields.map((f, i) => (
-                <label className="cp-field" key={f.key}>
+                <label className={f.layout === 'half' ? 'cp-field cp-field-half' : 'cp-field'} key={f.key}>
                   <span className="cp-field-label">
                     {f.label}{f.required && <span className="cp-required">*</span>}
                   </span>
