@@ -6,6 +6,10 @@ export function HomePage() {
         <p className="home-descriptor">A Power App code app powered by Copilot Studio. Manage company and location data<br />and manager assignments — all from one interface.</p>
       </div>
 
+      <div className="home-report-card" role="region" aria-label="Division Listing placeholder">
+        <p className="home-report-note">Division Listing report coming soon...</p>
+      </div>
+
 {/*       <div className="home-cards">
         <div className="home-info-card">
           <div className="home-info-icon" aria-hidden="true">01</div>

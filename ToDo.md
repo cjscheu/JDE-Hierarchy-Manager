@@ -1,5 +1,6 @@
 # To Do
-
+-the vertical size of the page cards differs depending on the size of the computer screen.  How do we resolve this so that any user with varying screen sizes can view it the same way proportionally? 
+-Add division listing view on the home page with the custom report view for excel
 ## In Progress
 
 ## Backlog
@@ -212,3 +213,8 @@
 -on the Assignments page on the Location Assignments tab, move the Role column in between Location and Manager
 -on the Assignments page, add an Export to Excel button on the left side of the bottom padding of the card.  Add this button on both card tabs for Company Assignments and Location Assignments.  The exported file should contain only the columns on each card tab
 
+-fix the horizontal divider lines on the navigation pane and page container. see pasted image (boxed in red is the issue)
+-add a blank card on the home page beneath the title card.  Put a note in the new card area stating "Division Listing report coming soon..."  The card needs to fit the width of the page and the vertical length of the card should not extend below the build version container on the navigation pane
+-the division listing card does not extend the width the of the page.  it only extends the same width as the title card.  The title card width should stay the same, the division listing card needs to be extended to the width of the page
+-extend the home page title card to the width of the page as well.  Keep the title and title description text centered as is
+ 
