@@ -19,7 +19,7 @@ import { ManagerAssignmentsPage } from './pages/ManagerAssignmentsPage'
 const PRIMARY_NAV = [
   { id: 'home', label: 'Home', icon: '🏠', component: <HomePage />, hidden: false },
   { id: 'companies', label: 'Companies', icon: '🏢', component: <CompaniesPage />, hidden: false },
-  { id: 'locations', label: 'JDE Locations', icon: '📍', component: <LocationsPage />, hidden: true },
+  { id: 'locations', label: 'JDE Locations', icon: '📍', component: <LocationsPage />, hidden: false },
   { id: 'managers', label: 'Managers', icon: '🧑‍💼', component: <ManagersHubPage />, hidden: false },
   { id: 'manager-assignments', label: 'Assignments', icon: '📋', component: <ManagerAssignmentsPage />, hidden: false },
 ] as const

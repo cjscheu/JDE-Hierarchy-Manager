@@ -223,3 +223,5 @@
 -on the companies page and on the related records cards +add location pop up page, add cr113_locationtype as a dropdown option below the OTC field
 -on the data tables page and on the location tab card and +add and edit location pop up page, add cr113_locationtype as a dropdown option below the OTC field
 -on the add and edit location pop up page cards, put Division and Group side by side.  These pop up pages are too tall for the browser
+
+-unhide the Location Page
