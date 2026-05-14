@@ -1,5 +1,5 @@
 export const BUILD_META = {
-  version: "1.0.0",
-  build: 404,
-  builtAt: "2026-05-14T21:52:51.246Z",
+  version: "1.1.0",
+  build: 1,
+  builtAt: "2026-05-14T22:05:16.795Z",
 } as const;

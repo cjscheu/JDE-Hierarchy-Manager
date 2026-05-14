@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const appVersion = process.env.APP_VERSION || "1.0.0";
+const appVersion = process.env.APP_VERSION || "1.1.0";
 const targetPath = path.resolve("src", "build-meta.ts");
 
 let currentBuild = 0;
