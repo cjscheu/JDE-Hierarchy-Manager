@@ -42,6 +42,7 @@ const buildCompanyPayload = (record: Record<string, string>) => {
 
 const buildLocationPayload = (record: Record<string, string>, companyId: string) => {
   const {
+    cr113_co_id,
     cr113_coloc_segment_name,
     cr113_div_name,
     cr113_group_name,
@@ -49,6 +50,7 @@ const buildLocationPayload = (record: Record<string, string>, companyId: string)
     cr113_otc_name,
     ...rest
   } = record
+  void cr113_co_id // company is bound via companyId parameter
 
   const payload: Record<string, string> = { ...rest }
   payload['cr113_CO_ID@odata.bind'] = `/${'cr113_jde_companies'}(${companyId})`
@@ -168,6 +170,7 @@ export function CompaniesPage() {
   const companiesCardRef = useRef<CardPageHandle | null>(null)
   const locationsCardRef = useRef<CardPageHandle | null>(null)
   const assignmentsCardRef = useRef<CardPageHandle | null>(null)
+  const [companyOptions, setCompanyOptions] = useState<LookupOption[]>([])
   const [segmentOptions, setSegmentOptions] = useState<LookupOption[]>([])
   const [typeOptions, setTypeOptions] = useState<LookupOption[]>([])
   const [ledgerOptions, setLedgerOptions] = useState<LookupOption[]>([])
@@ -194,7 +197,10 @@ export function CompaniesPage() {
 
   useEffect(() => {
     const loadOptions = async () => {
-      const [segmentsRes, typesRes, ledgersRes] = await Promise.all([
+      const [companiesRes, segmentsRes, typesRes, ledgersRes] = await Promise.all([
+        Cr113_jde_companiesService.getAll({
+          select: ['cr113_jde_companyid', 'cr113_co_id', 'cr113_co_desc'],
+        }),
         Cr113_jde_co_segmentsService.getAll({
           select: ['cr113_jde_co_segmentid', 'cr113_co_segment_name'],
           orderBy: ['cr113_co_segment_name asc'],
@@ -209,6 +215,14 @@ export function CompaniesPage() {
         }),
       ])
 
+      setCompanyOptions(
+        (companiesRes.data ?? [])
+          .map(item => ({
+            value: item.cr113_jde_companyid,
+            label: `${item.cr113_co_id ?? ''} - ${item.cr113_co_desc ?? ''}`.trim(),
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true, sensitivity: 'base' }))
+      )
       setSegmentOptions(
         (segmentsRes.data ?? []).map(item => ({
           value: item.cr113_jde_co_segmentid,
@@ -353,6 +367,7 @@ export function CompaniesPage() {
         .filter(row => row._cr113_co_id_value === selectedCompanyId)
         .map(row => ({
           ...row,
+          cr113_co_id: row._cr113_co_id_value ?? '',
           cr113_coloc_segment_name: row._cr113_coloc_segment_name_value ?? '',
           cr113_div_name: row._cr113_div_name_value ?? '',
           cr113_group_name: row._cr113_group_name_value ?? '',
@@ -761,7 +776,29 @@ export function CompaniesPage() {
                 service: locationsService,
                 defaultSortKey: 'cr113_coloc_id',
                 defaultSortDir: 'asc',
+                rowActions: [
+                  {
+                    label: 'Assignments',
+                    onClick: (row) => {
+                      setDrilldownLocationId(String(row.cr113_jde_locationid))
+                      setDrilldownLocationName(String(row.cr113_coloc_name ?? row.cr113_coloc_id ?? ''))
+                      setDrilldownAssignmentsSearch('')
+                      setDrilldownOpen(true)
+                    },
+                  },
+                ],
                 fields: [
+                  {
+                    key: 'cr113_co_id',
+                    label: 'Company Code',
+                    inputType: 'select',
+                    editable: true,
+                    readOnlyAlways: true,
+                    defaultValue: selectedCompanyId ?? '',
+                    showOnCard: false,
+                    placeholder: 'Select company',
+                    options: companyOptions,
+                  },
                   {
                     key: 'cr113_coloc_id',
                     label: 'Location Code',

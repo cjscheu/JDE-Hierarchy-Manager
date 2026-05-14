@@ -582,6 +582,7 @@ function getLocationAssignmentsTabFields(
 }
 
 function getLocationsTabFields(
+  companyOptions: LookupOption[],
   locationTypeOptions: LookupOption[],
   locationSegmentOptions: LookupOption[],
   divisionOptions: LookupOption[],
@@ -656,11 +657,23 @@ function getLocationsTabFields(
     },
     // Add popup fields (no editOnly)
     {
+      key: 'cr113_co_id',
+      label: 'Company Code',
+      showOnCard: false,
+      editable: true,
+      required: true,
+      readOnlyOnEdit: true,
+      inputType: 'select',
+      options: companyOptions,
+      placeholder: 'Select company',
+    },
+    {
       key: 'cr113_coloc_id',
       label: 'Location Code',
       showOnCard: false,
       editable: true,
       required: true,
+      layout: 'half',
       inputType: 'text',
     },
     {
@@ -669,6 +682,7 @@ function getLocationsTabFields(
       showOnCard: false,
       editable: true,
       required: true,
+      layout: 'half',
       inputType: 'text',
     },
     {
@@ -956,6 +970,7 @@ function getConfiguredFields(
   }
   if (tabId === 'jde_locations') {
     return getLocationsTabFields(
+      assignmentCompanyOptions,
       locationTypeOptions,
       locationSegmentOptions,
       divisionOptions,

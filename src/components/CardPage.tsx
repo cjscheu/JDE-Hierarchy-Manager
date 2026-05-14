@@ -24,6 +24,12 @@ export interface FieldDef {
   editable?: boolean
   /** included only when editing an existing record */
   editOnly?: boolean
+  /** shown in edit form but disabled (read-only) */
+  readOnlyOnEdit?: boolean
+  /** always disabled in the form (add and edit) */
+  readOnlyAlways?: boolean
+  /** default value pre-populated when the add form is opened */
+  defaultValue?: string
   /** required in the form */
   required?: boolean
   /** placeholder text */
@@ -71,6 +77,9 @@ export interface CardPageConfig {
   onRowDoubleClick?: (row: any) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onRowsLoaded?: (rows: any[]) => void
+  /** custom link-style actions rendered in the Actions column of each row */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rowActions?: Array<{ label: string; onClick: (row: any) => void }>
 }
 
 export interface CardPageHandle {
@@ -102,6 +111,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
     selectedRowId,
     onRowDoubleClick,
     onRowsLoaded,
+    rowActions,
   } = config
   const pageMode = usePageMode()
   const singularTitle = title.endsWith('ies')
@@ -212,7 +222,11 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
   // ── open add modal ──
   const openAdd = () => {
     setEditTarget(null)
-    setFormValues({})
+    const defaults: Record<string, string> = {}
+    getEditableFields(false).forEach(f => {
+      if (f.defaultValue !== undefined) defaults[f.key] = f.defaultValue
+    })
+    setFormValues(defaults)
     setFormError(null)
     setModalOpen(true)
     setTimeout(() => {
@@ -300,7 +314,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
   const enableDoubleClickEdit = enableRowDoubleClickEdit || dataPageMode
   const showRowEditAction = !(hideRowEditAction || pageMode === 'references' || dataPageMode)
   const showRowDeleteAction = !(hideRowDeleteAction || pageMode === 'references' || dataPageMode)
-  const showRowActionsColumn = (showRowEditAction || showRowDeleteAction) && !actionsInHeader
+  const showRowActionsColumn = (showRowEditAction || showRowDeleteAction || (rowActions && rowActions.length > 0)) && !actionsInHeader
   const [selectedActionRowId, setSelectedActionRowId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -461,6 +475,18 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
                           {rowDeleteIconOnly ? '🗑' : '🗑 Delete'}
                         </button>
                       )}
+                      {rowActions?.map((action, ai) => (
+                        <button
+                          key={ai}
+                          className="cp-btn cp-btn-row-link"
+                          onClick={e => {
+                            e.stopPropagation()
+                            action.onClick(row)
+                          }}
+                        >
+                          {action.label}
+                        </button>
+                      ))}
                     </td>
                   )}
                 </tr>
@@ -538,6 +564,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
                       ref={i === 0 ? firstSelectRef : undefined}
                       className="cp-input"
                       value={formValues[f.key] ?? ''}
+                      disabled={f.readOnlyAlways || !!(editTarget && f.readOnlyOnEdit)}
                       onChange={e => setFormValues(v => ({ ...v, [f.key]: e.target.value }))}
                       onKeyDown={e => { if (e.key === 'Enter') void handleSave() }}
                     >

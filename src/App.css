@@ -957,6 +957,9 @@ body::before {
 .cp-btn-danger-ghost { background: transparent; color: var(--danger); border-color: transparent; padding: 6px 10px; font-size: 13px; }
 .cp-btn-danger-ghost:hover:not(:disabled) { background: var(--danger-soft); }
 
+.cp-btn-row-link { background: none; border: none; padding: 2px 6px; color: #3b9eff; cursor: pointer; font-size: inherit; font-family: inherit; text-decoration: none; }
+.cp-btn-row-link:hover { color: #1d7fdd; text-decoration: underline; }
+
 .cp-btn-icon-only {
   min-width: 2rem;
   justify-content: center;
@@ -1053,7 +1056,8 @@ body::before {
 .cp-row-selected { background: var(--accent-soft); }
 .cp-row-selected:hover { background: var(--accent-soft); }
 
-.cp-col-actions { text-align: right; width: 160px; white-space: nowrap; }
+.cp-col-actions { width: 160px; white-space: nowrap; }
+.cp-table .cp-col-actions { text-align: center; }
 .cp-col-actions-icononly {
   width: 44px;
   min-width: 44px;

@@ -412,6 +412,7 @@ export function LocationsPage() {
                     label: 'Company Code',
                     inputType: 'select',
                     editable: true,
+                    readOnlyOnEdit: true,
                     showOnCard: false,
                     placeholder: 'Select company',
                     options: companyOptions,

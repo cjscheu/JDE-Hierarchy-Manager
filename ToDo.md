@@ -235,3 +235,10 @@
 -on the Managers page, the bottom of the right side card should never extend below the bottom of the left side card, apply this logic to the Companies, and Locations pages
 -let the container card on the right side shrink and grow with the card inside.  logic applied in line above still applies
 -on the data tables page, the card should never go lower than the bottom build version container on the navigation screen.  vertical scroll bar on the card table is expected.
+
+5/14/2026
+-on the Location page, when the left card row is double clicked, and the edit location page pops up, the company code dropdown field should not be editable
+-on the Companies page right hand side card, when the row is double clicked, and the Add location page pops up, add the the company code dropdown field above Location Code and Location Name
+-on the Data Tables page Location Tab, and on the Add location pop up page, add the the company code dropdown field above Location Code and Location Name which should be side by side
+-on the Data Tables page Location Tab, when the row is double clicked, and the Edit location page pops up, add the the company code dropdown field as non-editable above Location Code and Location Name which should be side by side
+-on the Companies page right hand side card, Add an Action column to the right of Location Name;  There should be text called Assignments in light blue; when you user clicks Assignments, a pop up page with open with all of the location assignments for that location.  The pop up page should be the same card used on the Location Page right side card
