@@ -273,7 +273,7 @@ function buildLocationsPayload(record: Record<string, unknown>) {
   if (segmentBind) payload['cr113_COLOC_SEGMENT_NAME@odata.bind'] = segmentBind;
   if (divBind) payload['cr113_DIV_NAME@odata.bind'] = divBind;
   if (groupBind) payload['cr113_GROUP_NAME@odata.bind'] = groupBind;
-  if (locationTypeBind) payload['cr113_LOCATIONTYPE@odata.bind'] = locationTypeBind;
+  if (locationTypeBind) payload['cr113_LocationType@odata.bind'] = locationTypeBind;
   if (otcBind) payload['cr113_OTC_NAME@odata.bind'] = otcBind;
 
   return payload;

@@ -547,8 +547,10 @@ body::before {
 .app-content {
   flex: 1;
   padding: 28px 32px 34px;
-  overflow-y: auto;
-  height: 100%;
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .home-page {
@@ -558,7 +560,9 @@ body::before {
   width: 100%;
   max-width: 100%;
   margin: 0;
-  min-height: calc(100vh - 4rem - 28px - 34px);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .home-hero {
@@ -733,6 +737,15 @@ body::before {
   gap: 13px;
 }
 
+.data-management-page,
+.user-management-page,
+.manager-assignments-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .data-management-page:not(.data-tables-page),
 .user-management-page,
 .manager-assignments-page {
@@ -789,7 +802,7 @@ body::before {
 }
 
 .data-tables-page .cp-table-scroll {
-  max-height: calc(44px * 16);
+  max-height: calc(100vh - 4rem - 220px);
 }
 
 .user-management-page .refs-tabs {
@@ -830,6 +843,10 @@ body::before {
 
 .refs-tab-panel {
   min-width: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── CardPage ──────────────────────────────────────────────────────────────── */
@@ -887,6 +904,10 @@ body::before {
   background: var(--bg-surface);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .cp-header-actions-only {
@@ -962,7 +983,8 @@ body::before {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
 }
 
 .cp-table-wrap-standalone {
@@ -974,6 +996,8 @@ body::before {
 .cp-table-scroll {
   overflow-x: auto;
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
   max-height: calc(44px * 11);
 }
 
@@ -1171,6 +1195,8 @@ body::before {
   gap: 18px;
   width: min(100%, 1680px);
   margin: 0 auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .companies-page-title-card {
@@ -1203,6 +1229,8 @@ body::before {
   align-items: flex-start;
   width: 100%;
   gap: 18px;
+  flex: 1;
+  min-height: 0;
 }
 
 .companies-main,
@@ -1211,11 +1239,16 @@ body::before {
   max-width: 760px;
   min-width: 0;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .companies-main .cp-page,
 .companies-details .cp-page {
   gap: 14px;
+  flex: 1;
+  min-height: 0;
 }
 
 .companies-main .cp-page > :not(.cp-overlay),
@@ -1224,14 +1257,36 @@ body::before {
   margin-inline: 0;
 }
 
-.companies-main .cp-table-scroll,
+.companies-main .cp-table-scroll {
+  max-height: calc(100vh - 4rem - 220px + 3vh);
+}
+
 .companies-details .cp-table-scroll {
-  max-height: calc(44px * 15);
+  max-height: calc(100vh - 4rem - 220px);
 }
 
 .managers-page .companies-main .cp-table-scroll,
 .managers-page .companies-details .cp-table-scroll {
-  max-height: calc(44px * 15);
+  max-height: calc(100vh - 4rem - 220px);
+}
+
+/* Make the managers left card fill its column height (same logic as companies-main-shell) */
+.managers-page .companies-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.managers-page .companies-main .cp-page {
+  flex: 1;
+  min-height: 0;
+}
+
+.managers-page .companies-main .cp-card-shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 .managers-details-tools-row {
@@ -1244,7 +1299,18 @@ body::before {
   margin-top: 2px;
 }
 
-.companies-main-shell,
+.companies-main-shell {
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
 .companies-details-shell {
   border: 1px solid var(--border);
   border-radius: 0.9rem;
@@ -1254,6 +1320,7 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-sizing: border-box;
 }
 
 .companies-main-topbar {

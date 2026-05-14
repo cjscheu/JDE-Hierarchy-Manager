@@ -225,3 +225,13 @@
 -on the add and edit location pop up page cards, put Division and Group side by side.  These pop up pages are too tall for the browser
 
 -unhide the Location Page
+
+-remove Locations Page title card
+-on the Location page main card, remove the Company column and remove Actions column and the edit button.  Rows should be editable by double clicking
+-on the Location page details card, remove Actions column and the edit button.  Rows should be editable by double clicking
+-when adding a new location, the record is created but the Company Code lookup column is blank.   A Company Code dropdown on the pop up page should be added, top row; the location code field should be on the second row side by side to the left of the location Name field
+-on the Add and Edit Location pop up page process on the Companies page,  update those processes the same as the line above
+-on the Location page details card, remove Actions column with the edit button.  Rows should be editable by double clicking
+-on the Managers page, the bottom of the right side card should never extend below the bottom of the left side card, apply this logic to the Companies, and Locations pages
+-let the container card on the right side shrink and grow with the card inside.  logic applied in line above still applies
+-on the data tables page, the card should never go lower than the bottom build version container on the navigation screen.  vertical scroll bar on the card table is expected.

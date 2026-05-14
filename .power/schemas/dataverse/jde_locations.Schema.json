@@ -141,14 +141,14 @@
           "title": "Location Type",
           "x-ms-dataverse-attribute": "cr113_locationtype",
           "x-ms-dataverse-type": "LookupType",
-          "x-ms-schema-name": "cr113_LOCATIONTYPE"
+          "x-ms-schema-name": "cr113_LocationType"
         },
         "cr113_locationtypename": {
           "type": "string",
           "title": "cr113_locationtypename",
           "x-ms-dataverse-attribute": "cr113_locationtypename",
           "x-ms-dataverse-type": "StringType",
-          "x-ms-schema-name": "cr113_LOCATIONTYPEName",
+          "x-ms-schema-name": "cr113_LocationTypeName",
           "x-ms-read-only": true,
           "maxLength": 850
         },

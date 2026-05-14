@@ -169,9 +169,7 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
     setLoading(true)
     setError(null)
     try {
-      console.log('CardPage: calling service.getAll')
       const res = await service.getAll()
-      console.log('CardPage: service.getAll result', res)
       const nextRows = res?.data ?? []
       setRows(nextRows)
       onRowsLoaded?.(nextRows)
@@ -266,10 +264,17 @@ export const CardPage = forwardRef<CardPageHandle, { config: CardPageConfig; sho
       activeEditableFields.forEach(f => {
         if (formValues[f.key] !== undefined) payload[f.key] = formValues[f.key]
       })
+      let result: { success?: boolean; error?: unknown }
       if (editTarget) {
-        await service.update(String(editTarget[idField]), payload)
+        result = await service.update(String(editTarget[idField]), payload)
       } else {
-        await service.create(payload)
+        result = await service.create(payload)
+      }
+      if (result?.success === false) {
+        const errMsg = result.error
+          ? (typeof result.error === 'string' ? result.error : JSON.stringify(result.error))
+          : 'An error occurred while saving. Please try again.'
+        throw new Error(errMsg)
       }
       closeModal()
       await load()

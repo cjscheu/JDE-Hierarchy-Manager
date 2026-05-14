@@ -27,6 +27,7 @@ const buildLocationPayload = (record: Record<string, string>) => {
     ...rest
   } = record
 
+  // rest already contains cr113_coloc_id, cr113_coloc_name, cr113_coloc_city, cr113_coloc_state
   const payload: Record<string, string> = { ...rest }
 
   const companyBind = toLookupBind('cr113_jde_companies', cr113_co_id)
@@ -40,7 +41,7 @@ const buildLocationPayload = (record: Record<string, string>) => {
   if (segmentBind) payload['cr113_COLOC_SEGMENT_NAME@odata.bind'] = segmentBind
   if (divBind) payload['cr113_DIV_NAME@odata.bind'] = divBind
   if (groupBind) payload['cr113_GROUP_NAME@odata.bind'] = groupBind
-  if (locationTypeBind) payload['cr113_LOCATIONTYPE@odata.bind'] = locationTypeBind
+  if (locationTypeBind) payload['cr113_LocationType@odata.bind'] = locationTypeBind
   if (otcBind) payload['cr113_OTC_NAME@odata.bind'] = otcBind
 
   return payload
@@ -90,7 +91,6 @@ export function LocationsPage() {
       const [companiesRes, typesRes, segmentsRes, divsRes, groupsRes, otcsRes, managersRes, rolesRes] = await Promise.all([
         Cr113_jde_companiesService.getAll({
           select: ['cr113_jde_companyid', 'cr113_co_id', 'cr113_co_desc'],
-          orderBy: ['cr113_co_id asc'],
         }),
         Cr113_jde_typesService.getAll({
           select: ['cr113_jde_typeid', 'cr113_co_type_name'],
@@ -123,10 +123,12 @@ export function LocationsPage() {
       ])
 
       setCompanyOptions(
-        (companiesRes.data ?? []).map(item => ({
-          value: item.cr113_jde_companyid,
-          label: item.cr113_co_desc ?? item.cr113_co_id,
-        }))
+        (companiesRes.data ?? [])
+          .map(item => ({
+            value: item.cr113_jde_companyid,
+            label: `${item.cr113_co_id ?? ''} - ${item.cr113_co_desc ?? ''}`.trim(),
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true, sensitivity: 'base' }))
       )
       setLocationTypeOptions(
         (typesRes.data ?? [])
@@ -161,13 +163,13 @@ export function LocationsPage() {
         }))
       )
       setManagerOptions(
-        (managersRes.data ?? []).map(item => ({
+        (managersRes.data ?? []).map((item: any) => ({
           value: item.cr113_jde_managerid,
           label: item.cr113_manager_name ?? item.cr113_empl_id,
         }))
       )
       setRoleOptions(
-        (rolesRes.data ?? []).map(item => ({
+        (rolesRes.data ?? []).map((item: any) => ({
           value: item.cr113_jde_rolesid,
           label: item.cr113_role_name,
         }))
@@ -179,11 +181,8 @@ export function LocationsPage() {
 
   const locationsService = {
     getAll: async () => {
-      const [locationsRes, companiesRes, typesRes, segmentsRes, divsRes, groupsRes, otcsRes] = await Promise.all([
+      const [locationsRes, typesRes, segmentsRes, divsRes, groupsRes, otcsRes] = await Promise.all([
         Cr113_jde_locationsService.getAll(),
-        Cr113_jde_companiesService.getAll({
-          select: ['cr113_jde_companyid', 'cr113_co_desc', 'cr113_co_id'],
-        }),
         Cr113_jde_typesService.getAll({
           select: ['cr113_jde_typeid', 'cr113_co_type_name'],
         }),
@@ -205,9 +204,6 @@ export function LocationsPage() {
         return locationsRes
       }
 
-      const companyById = new Map<string, string>(
-        (companiesRes.data ?? []).map(item => [item.cr113_jde_companyid, item.cr113_co_desc ?? item.cr113_co_id])
-      )
       const locationTypeById = new Map<string, string>(
         (typesRes.data ?? []).map(item => [item.cr113_jde_typeid, item.cr113_co_type_name])
       )
@@ -232,10 +228,7 @@ export function LocationsPage() {
         cr113_group_name: row._cr113_group_name_value ?? '',
         cr113_locationtype: row._cr113_locationtype_value ?? '',
         cr113_otc_name: row._cr113_otc_name_value ?? '',
-        cr113_co_idname:
-          row.cr113_co_idname ??
-          (row._cr113_co_id_value ? companyById.get(row._cr113_co_id_value) : undefined) ??
-          '',
+        cr113_co_idname: row.cr113_co_idname ?? '',
         cr113_locationtypename:
           row.cr113_locationtypename ??
           (row._cr113_locationtype_value ? locationTypeById.get(row._cr113_locationtype_value) : undefined) ??
@@ -298,14 +291,14 @@ export function LocationsPage() {
       }
 
       const managerById = new Map<string, string>(
-        (managersRes.data ?? []).map(item => [item.cr113_jde_managerid, item.cr113_manager_name ?? item.cr113_empl_id])
+        (managersRes.data ?? []).map((item: any) => [item.cr113_jde_managerid, item.cr113_manager_name ?? item.cr113_empl_id])
       )
       const roleById = new Map<string, string>(
-        (rolesRes.data ?? []).map(item => [item.cr113_jde_rolesid, item.cr113_role_name])
+        (rolesRes.data ?? []).map((item: any) => [item.cr113_jde_rolesid, item.cr113_role_name])
       )
 
       const data = (assignmentsRes.data ?? [])
-        .map(row => ({
+        .map((row: any) => ({
           ...row,
           cr113_empl_id: row._cr113_empl_id_value ?? '',
           cr113_rolename: row._cr113_rolename_value ?? '',
@@ -348,10 +341,10 @@ export function LocationsPage() {
 
   return (
     <div className="companies-page">
-      <section className="companies-page-title-card">
+{/*       <section className="companies-page-title-card">
         <h2 className="companies-page-title">JDE Locations</h2>
         <p className="companies-page-subtitle">Manage JDE locations and location assignment records.</p>
-      </section>
+      </section> */}
 
       <div className="companies-layout">
         <section className="companies-main">
@@ -373,7 +366,7 @@ export function LocationsPage() {
                   className="cp-btn cp-btn-primary"
                   onClick={() => locationsCardRef.current?.openAddForm()}
                 >
-                  + Add JDE Location
+                  + Add Location
                 </button>
               </div>
             </div>
@@ -381,11 +374,13 @@ export function LocationsPage() {
             <CardPage
               ref={locationsCardRef}
               config={{
-                title: 'JDE Locations',
+                title: 'Locations',
                 description: 'Manage JDE location records. Select a row to load related assignment details.',
                 hideHeaderCopy: true,
                 hideHeaderActions: true,
+                hideRowEditAction: true,
                 hideRowDeleteAction: true,
+                enableRowDoubleClickEdit: true,
                 idField: 'cr113_jde_locationid',
                 service: locationsService,
                 defaultSortKey: 'cr113_coloc_id',
@@ -413,11 +408,21 @@ export function LocationsPage() {
                 },
                 fields: [
                   {
+                    key: 'cr113_co_id',
+                    label: 'Company Code',
+                    inputType: 'select',
+                    editable: true,
+                    showOnCard: false,
+                    placeholder: 'Select company',
+                    options: companyOptions,
+                  },
+                  {
                     key: 'cr113_coloc_id',
                     label: 'Location Code',
                     showOnCard: true,
                     editable: true,
                     required: true,
+                    layout: 'half',
                     placeholder: 'e.g. 1001',
                   },
                   {
@@ -426,6 +431,7 @@ export function LocationsPage() {
                     showOnCard: true,
                     editable: true,
                     required: true,
+                    layout: 'half',
                     placeholder: 'e.g. Dallas HQ',
                   },
                   {
@@ -435,20 +441,9 @@ export function LocationsPage() {
                     editable: false,
                   },
                   {
-                    key: 'cr113_co_idname',
-                    label: 'Company',
-                    showOnCard: true,
-                    editable: false,
-                  },
-                  {
-                    key: 'cr113_co_id',
-                    label: 'Company',
-                    inputType: 'select',
-                    editable: true,
-                    required: true,
-                    options: companyOptions,
-                    showOnCard: false,
-                    placeholder: 'Select company',
+                    key: 'actions',
+                    label: 'Actions',
+                    showOnCard: false, // Hide the Actions column
                   },
                   {
                     key: 'cr113_coloc_city',
@@ -570,7 +565,7 @@ export function LocationsPage() {
                     className="cp-btn cp-btn-primary"
                     onClick={() => assignmentsCardRef.current?.openAddForm()}
                   >
-                    + Add Location Assignment
+                    + Add Assignment
                   </button>
                 </div>
               </div>
@@ -589,7 +584,9 @@ export function LocationsPage() {
                   description: 'Create, edit, and delete assignments related to the selected location.',
                   hideHeaderCopy: true,
                   hideHeaderActions: true,
+                  hideRowEditAction: true,
                   hideRowDeleteAction: true,
+                  enableRowDoubleClickEdit: true,
                   idField: 'cr113_jde_loc_assignmentid',
                   service: locationAssignmentsService,
                   defaultSortKey: 'cr113_rolenamename',

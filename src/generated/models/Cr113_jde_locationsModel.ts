@@ -24,7 +24,7 @@ export interface Cr113_jde_locationsBase {
   "cr113_DIV_NAME@odata.bind"?: string;
   "cr113_GROUP_NAME@odata.bind"?: string;
   cr113_jde_locationid: string;
-  "cr113_LOCATIONTYPE@odata.bind"?: string;
+  "cr113_LocationType@odata.bind"?: string;
   "cr113_OTC_NAME@odata.bind"?: string;
   importsequencenumber?: string;
   overriddencreatedon?: string;
