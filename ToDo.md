@@ -248,3 +248,5 @@
 -on the locations page, when adding assignments, the manager dropdown needs to be sorted alpha A to Z by Last Name.  Kenneth Orf is the first manager in the list.  This is similar to the most recent change on the Companies page
 -on the Assignments page, when adding assignments, the manager dropdown needs to be sorted alpha A to Z by Last Name.  Kenneth Orf is the first manager in the list.  This is similar to the most recent change on the Companies and Locations pages
 -on the Data Tabls page, on the Company Assignment and Location Assignment tabs, when adding assignments, the manager dropdown needs to be sorted alpha A to Z by Last Name.  Kenneth Orf is the first manager in the list.  This is similar to the most recent change on the Companies, Locations and Assignment pages
+
+-update the app so that dark mode is a few shades lighter
