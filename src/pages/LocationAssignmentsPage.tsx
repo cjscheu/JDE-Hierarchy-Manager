@@ -50,7 +50,14 @@ export function LocationAssignmentsPage() {
       })
       rawLocations.sort((a, b) => { const an = parseFloat(a.label), bn = parseFloat(b.label); return isFinite(an) && isFinite(bn) ? an - bn : a.label.localeCompare(b.label) })
       setLocationOptions(rawLocations)
-      setManagerOptions((managersRes.data ?? []).map(m => ({ value: m.cr113_jde_managerid, label: m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`.trim() })).sort((a, b) => a.label.localeCompare(b.label)))
+      setManagerOptions(
+        [...(managersRes.data ?? [])]
+          .sort((a, b) =>
+            (a.cr113_last_name ?? '').localeCompare(b.cr113_last_name ?? '') ||
+            (a.cr113_first_name ?? '').localeCompare(b.cr113_first_name ?? '')
+          )
+          .map(m => ({ value: m.cr113_jde_managerid, label: m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`.trim() }))
+      )
       setRoleOptions((rolesRes.data ?? []).map(r => ({ value: r.cr113_jde_rolesid, label: r.cr113_role_name })))
     }
     void load()

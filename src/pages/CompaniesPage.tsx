@@ -268,8 +268,8 @@ export function CompaniesPage() {
           orderBy: ['cr113_otc_name asc'],
         }),
         Cr113_jde_managersService.getAll({
-          select: ['cr113_jde_managerid', 'cr113_manager_name'],
-          orderBy: ['cr113_manager_name asc'],
+          select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name'],
+          orderBy: ['cr113_last_name asc', 'cr113_first_name asc'],
         }),
         Cr113_jde_rolesesService.getAll({
           select: ['cr113_jde_rolesid', 'cr113_role_name'],
@@ -302,10 +302,15 @@ export function CompaniesPage() {
         }))
       )
       setManagerOptions(
-        (managersRes.data ?? []).map(item => ({
-          value: item.cr113_jde_managerid,
-          label: item.cr113_manager_name ?? item.cr113_empl_id,
-        }))
+        [...(managersRes.data ?? [])]
+          .sort((a, b) =>
+            (a.cr113_last_name ?? '').localeCompare(b.cr113_last_name ?? '') ||
+            (a.cr113_first_name ?? '').localeCompare(b.cr113_first_name ?? '')
+          )
+          .map(item => ({
+            value: item.cr113_jde_managerid,
+            label: item.cr113_manager_name ?? `${item.cr113_first_name ?? ''} ${item.cr113_last_name ?? ''}`.trim(),
+          }))
       )
       setRoleOptions(
         (rolesRes.data ?? []).map(item => ({

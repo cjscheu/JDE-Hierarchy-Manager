@@ -242,3 +242,9 @@
 -on the Data Tables page Location Tab, and on the Add location pop up page, add the the company code dropdown field above Location Code and Location Name which should be side by side
 -on the Data Tables page Location Tab, when the row is double clicked, and the Edit location page pops up, add the the company code dropdown field as non-editable above Location Code and Location Name which should be side by side
 -on the Companies page right hand side card, Add an Action column to the right of Location Name;  There should be text called Assignments in light blue; when you user clicks Assignments, a pop up page with open with all of the location assignments for that location.  The pop up page should be the same card used on the Location Page right side card
+
+5/15/2026
+-on the companies page, when adding assignments, the manager dropdown needs to be sorted alpha A to Z by Last Name.  Kenneth Orf is the first manager in the list.
+-on the locations page, when adding assignments, the manager dropdown needs to be sorted alpha A to Z by Last Name.  Kenneth Orf is the first manager in the list.  This is similar to the most recent change on the Companies page
+-on the Assignments page, when adding assignments, the manager dropdown needs to be sorted alpha A to Z by Last Name.  Kenneth Orf is the first manager in the list.  This is similar to the most recent change on the Companies and Locations pages
+-on the Data Tabls page, on the Company Assignment and Location Assignment tabs, when adding assignments, the manager dropdown needs to be sorted alpha A to Z by Last Name.  Kenneth Orf is the first manager in the list.  This is similar to the most recent change on the Companies, Locations and Assignment pages

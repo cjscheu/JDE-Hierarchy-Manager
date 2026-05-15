@@ -1051,7 +1051,7 @@ export function DataTablesPage() {
         Cr113_jde_companiesService.getAll({ select: ['cr113_jde_companyid', 'cr113_co_id', 'cr113_co_desc'] }),
         Cr113_jde_locationsService.getAll({ select: ['cr113_jde_locationid', 'cr113_coloc_id', 'cr113_coloc_name'] }),
         Cr113_jde_rolesesService.getAll({ select: ['cr113_jde_rolesid', 'cr113_role_name'], orderBy: ['cr113_role_name asc'] }),
-        Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name', 'cr113_chat'], orderBy: ['cr113_manager_name asc'] }),
+        Cr113_jde_managersService.getAll({ select: ['cr113_jde_managerid', 'cr113_manager_name', 'cr113_first_name', 'cr113_last_name', 'cr113_chat'], orderBy: ['cr113_last_name asc', 'cr113_first_name asc'] }),
         Cr113_jde_location_segmentsService.getAll({ select: ['cr113_jde_location_segmentid', 'cr113_coloc_segment_name'], orderBy: ['cr113_coloc_segment_name asc'] }),
         Cr113_jde_divsService.getAll({ select: ['cr113_jde_divid', 'cr113_div_name'], orderBy: ['cr113_div_name asc'] }),
         Cr113_jde_groupsService.getAll({ select: ['cr113_jde_groupid', 'cr113_group_name'], orderBy: ['cr113_group_name asc'] }),
@@ -1079,10 +1079,15 @@ export function DataTablesPage() {
       );
       setAssignmentRoleOptions((rolesRes.data ?? []).map((r: any) => ({ value: r.cr113_jde_rolesid, label: r.cr113_role_name ?? '' })));
       setAssignmentManagerOptions(
-        (managersRes.data ?? []).map((m: any) => ({
-          value: m.cr113_jde_managerid,
-          label: (m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`).trim(),
-        }))
+        [...(managersRes.data ?? [])]
+          .sort((a: any, b: any) =>
+            (a.cr113_last_name ?? '').localeCompare(b.cr113_last_name ?? '') ||
+            (a.cr113_first_name ?? '').localeCompare(b.cr113_first_name ?? '')
+          )
+          .map((m: any) => ({
+            value: m.cr113_jde_managerid,
+            label: (m.cr113_manager_name ?? `${m.cr113_first_name ?? ''} ${m.cr113_last_name ?? ''}`).trim(),
+          }))
       );
       setLocationTypeOptions(
         (typesRes.data ?? [])
